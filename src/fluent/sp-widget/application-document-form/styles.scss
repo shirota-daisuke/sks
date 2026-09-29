@@ -1,0 +1,247 @@
+/**
+ * 添付書類の提出（ITCOM-03）
+ * 左に書類種別ごとの提出状況、右に充足状況とファイルの条件。
+ * 色は Service Portal テーマの SCSS 変数のみを使用する（他ウィジェットと同じ方針）。
+ */
+.sks-doc {
+    padding: 24px 0;
+
+    .sks-doc-card .panel-body,
+    .sks-doc-side .panel-body {
+        padding: 24px;
+    }
+
+    .sks-doc-side {
+        margin-bottom: 16px;
+    }
+
+    .sks-doc-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    // --- ステップ表示（対象経費の入力と同じ見え方にそろえる）-------------
+    .sks-doc-steps {
+        display: flex;
+        margin: 0 0 20px;
+        padding: 0;
+        list-style: none;
+        border: 1px solid $panel-default-border;
+        border-radius: $border-radius-base;
+        background: #fff;
+        overflow: hidden;
+
+        li {
+            flex: 1;
+            padding: 10px 8px;
+            border-left: 1px solid $table-border-color;
+            text-align: center;
+            font-size: $font-size-small;
+            color: $text-muted;
+
+            &:first-child {
+                border-left: 0;
+            }
+
+            a {
+                color: inherit;
+            }
+        }
+
+        li.is-done {
+            color: $brand-success;
+        }
+
+        li.is-active {
+            background: lighten($brand-primary, 45%);
+            color: $brand-primary;
+            font-weight: bold;
+        }
+
+        .sks-step-no {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+            border-radius: 50%;
+            background: $text-muted;
+            color: #fff;
+            line-height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        li.is-done .sks-step-no {
+            background: $brand-success;
+        }
+
+        li.is-active .sks-step-no {
+            background: $brand-primary;
+        }
+    }
+
+    .sks-doc-meta {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid $panel-default-border;
+        font-size: $font-size-small;
+
+        dt {
+            width: 110px;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-left: 126px;
+        }
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    /**
+     * ファイル入力は行のボタンから click() して使うため画面には出さない。
+     * display:none にすると一部のブラウザで click() が効かないため、
+     * 画面外へ逃がして隠す。
+     */
+    .sks-doc-file {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        border: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+
+    // --- 提出状況の一覧 -------------------------------------------------
+    .sks-doc-table {
+        margin-bottom: 24px;
+
+        th {
+            background: $table-bg-accent;
+            font-size: $font-size-small;
+            white-space: nowrap;
+        }
+
+        td {
+            vertical-align: top;
+            font-size: $font-size-small;
+        }
+
+        .sks-col-file {
+            width: 45%;
+        }
+
+        .sks-col-action {
+            width: 150px;
+            white-space: nowrap;
+        }
+
+        // 未提出の必須書類は行で分かるようにする
+        .sks-row-missing > td {
+            background: lighten($brand-warning, 38%);
+        }
+
+        .sks-empty {
+            padding: 20px 8px;
+            text-align: center;
+        }
+
+        .sks-doc-required,
+        .sks-doc-optional {
+            margin-left: 6px;
+            font-weight: normal;
+        }
+
+        .sks-doc-size,
+        .sks-doc-date {
+            margin-left: 6px;
+            color: $text-muted;
+            font-size: 11px;
+        }
+
+        .sks-remove {
+            color: $brand-danger;
+        }
+    }
+
+    .sks-doc-nav {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid $panel-default-border;
+
+        .btn {
+            margin-right: 8px;
+        }
+    }
+
+    .sks-doc-note {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    // --- 右側のパネル ---------------------------------------------------
+    .sks-doc-count {
+        margin-bottom: 16px;
+        font-size: $font-size-base;
+        color: $text-color;
+
+        strong {
+            font-size: $font-size-h4;
+        }
+    }
+
+    .sks-doc-complete,
+    .sks-doc-missing {
+        margin-bottom: 12px;
+        font-size: $font-size-small;
+    }
+
+    .sks-doc-missing-list {
+        margin: 8px 0 0;
+        padding-left: 20px;
+    }
+
+    .sks-doc-spec {
+        margin-bottom: 0;
+
+        dt {
+            font-size: $font-size-small;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-bottom: 12px;
+            font-size: $font-size-small;
+            color: $text-color;
+        }
+    }
+
+    .sks-doc-help {
+        margin-top: 12px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+    }
+
+    // --- 提出できない場合のメッセージ -----------------------------------
+    .sks-doc-message {
+        padding: 24px 0;
+
+        .sks-doc-title {
+            margin-top: 16px;
+        }
+
+        .btn {
+            margin-top: 12px;
+        }
+    }
+}

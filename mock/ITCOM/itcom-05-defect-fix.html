@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-05 申請の不備修正（事業者側）
+  ============================================================================
+  位置づけ   ITCOM 主担当（申請機能）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-05 は仮番号。
+
+  想定する処理  申請の不備対応（事業者側の再入力）
+                不備確認依頼 defect_request → 不備修正中 defect_fixing
+                → 不備修正回答あり defect_answered
+
+  ■ ユーザ登録の不備対応（処理No.7）とは別物
+  ユーザ登録の不備対応は実装済み（src/fluent/sp-page/defect-fix/）。
+  本画面は「申請」の不備対応であり、対象・遷移するステータスが異なる。
+    ユーザ登録: T02 u_registration_status（defect_request／defect_fixing）
+    申請      : T03 u_application_status（defect_request／defect_fixing／defect_answered）
+
+  ■ 現状の欠落
+  SC-07 申請状況一覧に「不備を修正する」ボタンがあるが、遷移先URL
+  （application_form_url）が未設定のためボタンが表示されない。
+  本画面がその遷移先に相当する。
+  また ACL は acl_request_write_applicant が「自社かつ input のみ」に限定しているため、
+  defect_fixing での更新を許可する条件の追加が必要。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・不備の指摘単位（申請全体への自由記述か、項目単位の指摘か）
+    ・修正できる範囲（本モックは指摘された項目のみ編集可としている）
+    ・回答期限と期限超過時の扱い
+    ・指摘と回答の履歴を複数往復分保持するか（保持するなら履歴テーブルが必要）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-05 申請の不備修正（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      これは<b>申請</b>の不備修正で、実装済みの<b>ユーザ登録</b>の不備修正
+      （<code>src/fluent/sp-page/defect-fix/</code>）とは別物です。
+      SC-07 の「不備を修正する」ボタンの遷移先に相当しますが、URL 未設定のため現状ボタンが出ません。
+      ACL <code>acl_request_write_applicant</code> が「自社かつ input のみ」に限定しているため、
+      <code>defect_fixing</code> を許可する条件追加が必要です。
+    </p>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">申請 APP-2026-00123 の不備修正</h3>
+      </div>
+      <div class="panel-body">
+
+        <p class="sks-status-chip" style="margin-bottom:20px;">
+          <span class="label label-danger">要対応：不備修正中</span>
+          <span class="text-muted" style="margin-left:12px; font-size:12px;">
+            回答期限：2026/10/08（あと14日）
+          </span>
+        </p>
+
+        <!-- 事務局からの指摘。改行を保持して表示する -->
+        <div class="alert alert-warning">
+          <h4 style="margin-top:0; font-size:14px;">事務局からの確認事項</h4>
+          <p style="white-space:pre-wrap; margin-bottom:8px;">対象経費のうち「自動仕分け装置 1台」について、提出いただいた見積書の金額（3,800,000円）と申請金額（4,000,000円）が一致しておりません。いずれかをご確認のうえ修正をお願いします。
+
+また、専門家経費の日数が見積書の記載（10日）と申請（12日）で相違しています。</p>
+          <p class="text-muted" style="margin:0; font-size:12px;">
+            指摘日時：2026/09/22 10:15／担当：事務局 花子
+          </p>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+
+            <!-- 指摘された項目のみ編集可。それ以外は参照表示にする -->
+            <h4 class="sks-form-section">修正対象の項目</h4>
+            <p class="sks-form-section-note">
+              事務局が指摘した項目のみ編集できます。その他の項目を変更する必要がある場合は、
+              事務局へお問い合わせください。
+            </p>
+
+            <table class="table sks-expense-table">
+              <thead>
+                <tr>
+                  <th>経費区分</th>
+                  <th>内容</th>
+                  <th class="sks-col-days">日数</th>
+                  <th class="sks-col-amount">金額（円）</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="text-muted">クラウドサービス利用費</td>
+                  <td class="text-muted">受発注管理SaaS 年間利用料</td>
+                  <td class="text-muted">—</td>
+                  <td class="sks-amount text-muted">3,600,000</td>
+                </tr>
+                <tr>
+                  <td>設備費</td>
+                  <td>自動仕分け装置 1台</td>
+                  <td><input type="text" class="form-control" disabled /></td>
+                  <td><input type="text" class="form-control" value="3800000" /></td>
+                </tr>
+                <tr>
+                  <td>専門家経費</td>
+                  <td>業務設計コンサルティング</td>
+                  <td><input type="text" class="form-control" value="10" /></td>
+                  <td><input type="text" class="form-control" value="500000" /></td>
+                </tr>
+                <tr class="sks-expense-total">
+                  <td colspan="3">対象経費合計</td>
+                  <td class="sks-amount">7,900,000</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4 class="sks-form-section" style="margin-top:24px;">添付書類の差し替え</h4>
+            <table class="table sks-attachment-list">
+              <thead>
+                <tr>
+                  <th>提出書類</th>
+                  <th class="sks-col-file">ファイル</th>
+                  <th class="sks-col-state">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>見積書（対象経費の根拠）</td>
+                  <td>
+                    <span class="sks-file-name">見積書_3社分.pdf</span>
+                    <span class="sks-file-meta">2.4 MB／2026/09/20 11:10 アップロード</span>
+                  </td>
+                  <td><button type="button" class="btn btn-link" style="padding-left:0;">差し替え</button></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4 class="sks-form-section" style="margin-top:24px;">事務局への回答</h4>
+            <div class="form-group">
+              <label for="reply">修正内容の説明 <span class="text-danger">*</span></label>
+              <textarea id="reply" class="form-control" rows="5">見積書の金額に合わせて設備費を3,800,000円へ修正しました。専門家経費の日数も見積書どおり10日へ修正し、金額を500,000円としています。</textarea>
+              <span class="help-block">どの指摘にどう対応したかをご記入ください（2000文字以内）。</span>
+            </div>
+
+            <div class="sks-form-actions">
+              <button type="button" class="btn btn-default">一時保存</button>
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-primary">修正内容を提出する</button>
+              </span>
+            </div>
+
+          </div>
+
+          <div class="col-md-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">補助金額（修正後の試算）</h3>
+              </div>
+              <div class="panel-body">
+                <dl class="sks-amount-summary">
+                  <dt>対象経費合計</dt>
+                  <dd>7,900,000円 <span class="text-muted" style="font-size:11px;">（修正前 8,200,000円）</span></dd>
+                  <dt>補助率</dt>
+                  <dd>1/2</dd>
+                  <dt>補助上限額</dt>
+                  <dd>20,000,000円</dd>
+                  <dt class="sks-total">補助金額</dt>
+                  <dd class="sks-total">3,950,000円</dd>
+                </dl>
+              </div>
+            </div>
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">これまでの経過</h3>
+              </div>
+              <div class="panel-body">
+                <ul class="sks-timeline">
+                  <li>
+                    <span class="sks-tl-when">2026/08/01 09:40</span>
+                    <span class="sks-tl-what">申請を提出</span>
+                  </li>
+                  <li>
+                    <span class="sks-tl-when">2026/08/05 13:20</span>
+                    <span class="sks-tl-what">一次審査開始</span>
+                  </li>
+                  <li class="is-current">
+                    <span class="sks-tl-when">2026/09/22 10:15</span>
+                    <span class="sks-tl-what">不備確認依頼</span>
+                    <span class="sks-tl-who">事務局 花子</span>
+                  </li>
+                </ul>
+                <p class="text-muted" style="margin:8px 0 0; font-size:11px;">
+                  処理履歴を保持するテーブルは未定義です（監査ログ／sys_audit からの再構成が必要）。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：修正内容の提出でステータスを <code>defect_answered</code>（不備修正回答あり）へ遷移させ、
+      事務局の「再審査中」へ引き継ぐ想定です。提出のたびに補助上限額・補助率を再判定しないと、
+      対象経費が変わったのに金額が古いままになります。
+    </p>
+
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,576 @@
+/* ==========================================================================
+   ITCOM 担当範囲（申請機能・審査プロセス）画面モック 追加スタイル
+   ==========================================================================
+   Bootstrap 3 相当の基礎スタイルは ../assets/sks-mock.css を先に読み込むこと。
+   本ファイルは、既存モックに存在しないコンポーネントのみを定義する。
+
+   ・申請入力のステップインジケータ
+   ・対象経費明細の入力テーブル
+   ・添付書類の一覧
+   ・事務局ワークスペース風のシェル（左ナビ＋コンテンツ）
+   ・審査パネル・判定フォーム・処理履歴のタイムライン
+
+   実装は存在しないため、class 名は本モックの提案であり実装との一致を保証しない。
+   ========================================================================== */
+
+/* --- 事業者ポータル：申請入力ウィザード -------------------------------- */
+
+.sks-apply-steps {
+    display: flex;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.sks-apply-steps li {
+    flex: 1;
+    padding: 12px 8px;
+    border-left: 1px solid #eee;
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+}
+
+.sks-apply-steps li:first-child {
+    border-left: 0;
+}
+
+.sks-apply-steps li .sks-step-no {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #fff;
+    line-height: 22px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.sks-apply-steps li.is-done {
+    color: #5cb85c;
+}
+
+.sks-apply-steps li.is-done .sks-step-no {
+    background: #5cb85c;
+}
+
+.sks-apply-steps li.is-active {
+    color: #337ab7;
+    font-weight: bold;
+    background: #f5faff;
+}
+
+.sks-apply-steps li.is-active .sks-step-no {
+    background: #337ab7;
+}
+
+/* セクション見出し（申請入力の項目グループ） */
+.sks-form-section {
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+.sks-form-section-note {
+    margin: 0 0 16px;
+    font-size: 12px;
+    color: #777;
+}
+
+/* 画面下部の操作ボタン列 */
+.sks-form-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+.sks-form-actions .btn {
+    margin-right: 8px;
+}
+
+.sks-form-actions .sks-actions-right {
+    float: right;
+}
+
+.sks-form-actions .sks-actions-right .btn {
+    margin-right: 0;
+    margin-left: 8px;
+}
+
+.sks-form-actions:after {
+    display: block;
+    clear: both;
+    content: '';
+}
+
+/* --- 対象経費明細（処理No.18）------------------------------------------ */
+
+.sks-expense-table {
+    margin-bottom: 0;
+}
+
+.sks-expense-table th {
+    background: #f5f5f5;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.sks-expense-table td {
+    vertical-align: top;
+}
+
+.sks-expense-table .form-control {
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+
+.sks-expense-table .sks-col-category {
+    width: 210px;
+}
+
+.sks-expense-table .sks-col-amount {
+    width: 140px;
+}
+
+.sks-expense-table .sks-col-days {
+    width: 90px;
+}
+
+.sks-expense-table .sks-col-remove {
+    width: 60px;
+    text-align: center;
+}
+
+.sks-expense-table td.sks-amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sks-expense-total {
+    background: #fafafa;
+    font-weight: bold;
+}
+
+.sks-expense-total td {
+    border-top: 2px solid #ddd;
+}
+
+/* 日額上限の警告（専門家経費） */
+.sks-cap-warning {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #a94442;
+}
+
+/* --- 添付書類 ---------------------------------------------------------- */
+
+.sks-attachment-list {
+    margin-bottom: 0;
+}
+
+.sks-attachment-list th {
+    background: #f5f5f5;
+    font-size: 12px;
+}
+
+.sks-attachment-list .sks-col-required {
+    width: 70px;
+    text-align: center;
+}
+
+.sks-attachment-list .sks-col-file {
+    width: 46%;
+}
+
+.sks-attachment-list .sks-col-state {
+    width: 110px;
+}
+
+.sks-attachment-list .sks-file-name {
+    font-size: 13px;
+}
+
+.sks-attachment-list .sks-file-meta {
+    display: block;
+    color: #999;
+    font-size: 11px;
+}
+
+.sks-dropzone {
+    margin: 16px 0 0;
+    padding: 24px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    background: #fafafa;
+}
+
+/* --- 申請内容の確認 ---------------------------------------------------- */
+
+.sks-confirm-block {
+    margin-bottom: 24px;
+}
+
+.sks-confirm-block .sks-confirm-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.sks-confirm-block .sks-confirm-head h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.sks-confirm-list {
+    margin-bottom: 0;
+}
+
+.sks-confirm-list dt {
+    float: left;
+    clear: left;
+    width: 160px;
+    padding: 5px 0;
+    color: #777;
+    font-weight: normal;
+    font-size: 13px;
+}
+
+.sks-confirm-list dd {
+    margin-left: 176px;
+    padding: 5px 0;
+    font-size: 13px;
+}
+
+.sks-confirm-list:after {
+    display: block;
+    clear: both;
+    content: '';
+}
+
+/* 補助金額の内訳（右カラム） */
+.sks-amount-summary dt {
+    color: #777;
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.sks-amount-summary dd {
+    margin: 0 0 12px;
+    font-size: 14px;
+}
+
+.sks-amount-summary .sks-total {
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+}
+
+.sks-amount-summary dd.sks-total {
+    margin-bottom: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* --- 事務局ワークスペース風シェル -------------------------------------- */
+
+.mock-ws-header {
+    background: #1f2b3d;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.mock-ws-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mock-ws-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.mock-ws-user {
+    font-size: 12px;
+    color: #c5cede;
+}
+
+.mock-ws-body {
+    display: flex;
+    align-items: stretch;
+    min-height: 620px;
+    background: #f0f2f5;
+}
+
+.mock-ws-nav {
+    flex: 0 0 216px;
+    padding: 16px 0;
+    border-right: 1px solid #dde1e7;
+    background: #fff;
+}
+
+.mock-ws-nav .mock-ws-nav-group {
+    margin: 0 0 6px;
+    padding: 6px 16px;
+    color: #8a93a0;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.mock-ws-nav ul {
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+}
+
+.mock-ws-nav li a {
+    display: block;
+    padding: 7px 16px 7px 24px;
+    color: #333;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.mock-ws-nav li a:hover {
+    background: #f5f7fa;
+}
+
+.mock-ws-nav li.is-active a {
+    border-left: 3px solid #337ab7;
+    padding-left: 21px;
+    background: #eef5fc;
+    color: #1a5a92;
+    font-weight: bold;
+}
+
+.mock-ws-nav li .mock-ws-count {
+    float: right;
+    padding: 0 6px;
+    border-radius: 9px;
+    background: #d9534f;
+    color: #fff;
+    font-size: 11px;
+    line-height: 18px;
+}
+
+.mock-ws-content {
+    flex: 1 1 auto;
+    padding: 20px 24px 40px;
+    min-width: 0;
+}
+
+.mock-ws-content h1 {
+    margin: 0 0 4px;
+    font-size: 19px;
+}
+
+.mock-ws-content .mock-ws-sub {
+    margin: 0 0 18px;
+    color: #777;
+    font-size: 12px;
+}
+
+/* ワークスペースのレコードフォーム上のボタン列 */
+.mock-ws-actions {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border: 1px solid #dde1e7;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.mock-ws-actions .btn {
+    margin-right: 8px;
+}
+
+/* --- 審査パネル -------------------------------------------------------- */
+
+.sks-review-table th {
+    background: #f5f5f5;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.sks-review-table td {
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.sks-review-table .sks-col-number {
+    width: 140px;
+}
+
+.sks-review-table .sks-col-amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sks-review-table .sks-overdue {
+    color: #a94442;
+    font-weight: bold;
+}
+
+/* 審査の判定入力 */
+.sks-judge-form .radio label {
+    font-size: 13px;
+}
+
+.sks-judge-form .sks-judge-hint {
+    margin: 2px 0 10px 20px;
+    color: #777;
+    font-size: 12px;
+}
+
+/* チェックリスト（審査項目） */
+.sks-checklist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sks-checklist li {
+    padding: 8px 0;
+    border-top: 1px solid #eee;
+    font-size: 13px;
+}
+
+.sks-checklist li:first-child {
+    border-top: 0;
+}
+
+.sks-checklist .sks-check-label {
+    display: inline-block;
+    min-width: 260px;
+}
+
+.sks-checklist .sks-check-auto {
+    margin-left: 8px;
+    color: #999;
+    font-size: 11px;
+}
+
+/* --- 処理履歴のタイムライン -------------------------------------------- */
+
+.sks-timeline {
+    margin: 0;
+    padding: 0 0 0 18px;
+    list-style: none;
+    border-left: 2px solid #e5e5e5;
+}
+
+.sks-timeline li {
+    position: relative;
+    padding: 0 0 16px 14px;
+}
+
+.sks-timeline li:before {
+    position: absolute;
+    top: 3px;
+    left: -24px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #bbb;
+    content: '';
+}
+
+.sks-timeline li.is-current:before {
+    background: #337ab7;
+}
+
+.sks-timeline .sks-tl-when {
+    display: block;
+    color: #999;
+    font-size: 11px;
+}
+
+.sks-timeline .sks-tl-what {
+    font-size: 13px;
+}
+
+.sks-timeline .sks-tl-who {
+    color: #777;
+    font-size: 12px;
+}
+
+/* --- 外部信用調査 ------------------------------------------------------ */
+
+.sks-credit-flow {
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    border: 1px solid #dde1e7;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 13px;
+}
+
+.sks-credit-flow .sks-flow-step {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 3px;
+    background: #f0f2f5;
+    color: #777;
+    font-size: 12px;
+}
+
+.sks-credit-flow .sks-flow-step.is-current {
+    background: #337ab7;
+    color: #fff;
+    font-weight: bold;
+}
+
+.sks-credit-flow .sks-flow-step.is-done {
+    background: #dff0d8;
+    color: #3c763d;
+}
+
+.sks-credit-flow .sks-flow-arrow {
+    margin: 0 4px;
+    color: #ccc;
+}
+
+/* --- モック注記 -------------------------------------------------------- */
+
+.mock-proposal {
+    margin: 0 0 20px;
+    padding: 10px 14px;
+    border: 1px solid #f0c36d;
+    border-left-width: 4px;
+    border-radius: 3px;
+    background: #fcf8e3;
+    color: #8a6d3b;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.mock-proposal b {
+    color: #7a5b28;
+}
+
+.mock-proposal code {
+    padding: 1px 4px;
+    background: #fff;
+    border: 1px solid #e8dcc0;
+    border-radius: 3px;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 11px;
+    color: #a33;
+}

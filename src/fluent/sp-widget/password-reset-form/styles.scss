@@ -1,0 +1,41 @@
+/**
+ * SC-04 パスワードリセット画面
+ * STEP1／STEP2 を1カード内に区切り線で分けて配置する。
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-reset {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+
+    .sks-reset-card {
+        width: 100%;
+        max-width: 460px;
+
+        .panel-body {
+            padding: 28px;
+        }
+    }
+
+    .sks-step-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: $font-size-h4;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-step-divider {
+        margin: 28px 0;
+        border-top: 1px solid $panel-default-border;
+    }
+
+    .sks-target-account {
+        margin-bottom: 16px;
+        font-size: $font-size-small;
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+}

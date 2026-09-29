@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-08 信用調査：要否判定・外部調査・結果取込（事務局）
+  ============================================================================
+  位置づけ   ITCOM 主担当（審査プロセス）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-08 は仮番号。
+             T03 の申請ステータスに対応する6つの段階を1画面で扱う構成としている。
+
+  対応する申請ステータス（T03 u_application_status）
+    credit_judging   信用調査要否判定中
+    credit_exempt    信用調査免除
+    ext_preparing    外部調査準備中
+    ext_reviewing    外部信用調査中
+    result_waiting   調査結果取込待ち
+    result_checking  信用調査結果確認中
+
+  ■ 現状の欠落
+  ・上記6ステータスへ遷移させる処理が存在しない。
+  ・信用調査の依頼内容・調査結果を保持する列／テーブルが無い。
+    T03 にあるのは申請ステータスのみで、調査機関・依頼日・結果・判定を持てない。
+  ・外部機関との連携方式が未定義（IF 番号の割当も無い）。
+  ・外部審査員には ServiceNow のロール・アカウントを付与しない方針（A17）のため、
+    外部機関が直接システムへ入力する経路は取れない。
+    ファイル授受またはメールでの往復を前提とした設計が必要。
+
+  実装方式の想定
+    ステータス遷移は UI Action。調査依頼・結果は T03 の子テーブル
+    （例 x_dent2_dentsusoke_credit）に持たせる。1申請に複数回の調査がありうるため
+    1対多を前提とする。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・信用調査の要否判定基準（本モックは補助金額と前年度採択の有無を仮置き）
+    ・免除条件
+    ・調査機関・依頼様式・結果の受領形式
+    ・調査費用の負担と記録の要否
+    ・結果が「否」の場合の扱い（即不採択か、事務局判断か）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-08 信用調査：要否判定・外部調査（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-ws-header">
+  <div class="container">
+    <span class="mock-ws-title">SKS 事務局ワークスペース</span>
+    <span class="mock-ws-user">事務局 花子（x_dent2_dentsusoke.staff）</span>
+  </div>
+</header>
+
+<div class="mock-ws-body">
+
+  <nav class="mock-ws-nav">
+    <div class="mock-ws-nav-group">申請審査（提案）</div>
+    <ul>
+      <li><a href="itcom-06-review-list.html">一次審査：要対応 <span class="mock-ws-count">7</span></a></li>
+      <li class="is-active"><a href="#">信用調査：要対応 <span class="mock-ws-count">3</span></a></li>
+      <li><a href="itcom-09-award-decision.html">採択判定：要対応</a></li>
+      <li><a href="#">申請（すべて）</a></li>
+    </ul>
+    <div class="mock-ws-nav-group">ユーザ管理</div>
+    <ul>
+      <li><a href="#">登録審査：要対応 <span class="mock-ws-count">4</span></a></li>
+    </ul>
+  </nav>
+
+  <div class="mock-ws-content">
+
+    <h1>APP-2026-00126 — 信用調査</h1>
+    <p class="mock-ws-sub">
+      株式会社ミライ工業 ｜ 一次審査完了 2026/09/12 ｜ <span class="label label-warning">外部信用調査中</span>
+    </p>
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      T03 の信用調査系6ステータスへ<b>遷移させる処理が存在せず</b>、
+      調査の依頼内容・結果を保持する列／テーブルもありません。
+      外部機関との連携方式は未定義（IF 番号の割当も無し）で、
+      <b>外部審査員にはロール・アカウントを付与しない方針（A17）</b>のため、
+      外部機関が直接システムへ入力する経路は取れません。ファイル授受またはメール往復が前提になります。
+    </p>
+
+    <!-- 段階の可視化。T03 のステータス値に対応 -->
+    <div class="sks-credit-flow">
+      <span class="sks-flow-step is-done">要否判定</span>
+      <span class="sks-flow-arrow">→</span>
+      <span class="sks-flow-step is-done">調査準備</span>
+      <span class="sks-flow-arrow">→</span>
+      <span class="sks-flow-step is-current">外部調査中</span>
+      <span class="sks-flow-arrow">→</span>
+      <span class="sks-flow-step">結果取込待ち</span>
+      <span class="sks-flow-arrow">→</span>
+      <span class="sks-flow-step">結果確認</span>
+      <span style="float:right; color:#777; font-size:12px; padding-top:4px;">
+        免除の場合はこの流れをスキップし「信用調査免除」へ
+      </span>
+    </div>
+
+    <div class="mock-ws-actions">
+      <button type="button" class="btn btn-primary">調査結果を取り込む</button>
+      <button type="button" class="btn btn-default">調査を督促する</button>
+      <button type="button" class="btn btn-default">調査を取り消す</button>
+    </div>
+
+    <div class="row">
+      <div class="col-md-7">
+
+        <!-- ① 要否判定 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">① 信用調査の要否判定</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="sks-checklist">
+              <li>
+                <span class="sks-check-label">補助金額</span>
+                9,000,000円
+                <span class="sks-check-auto">基準額（仮：5,000,000円）以上 → 調査対象</span>
+              </li>
+              <li>
+                <span class="sks-check-label">前年度採択実績</span>
+                なし
+                <span class="sks-check-auto">実績ありの場合は免除とする案（未確定）</span>
+              </li>
+              <li>
+                <span class="sks-check-label">従業員数区分</span>
+                21～50人
+              </li>
+            </ul>
+
+            <div class="sks-judge-form" style="margin-top:16px;">
+              <div class="radio">
+                <label><input type="radio" name="need" checked /> 信用調査を実施する</label>
+              </div>
+              <p class="sks-judge-hint">外部調査準備中（ext_preparing）へ遷移します。</p>
+              <div class="radio">
+                <label><input type="radio" name="need" /> 信用調査を免除する</label>
+              </div>
+              <p class="sks-judge-hint">信用調査免除（credit_exempt）へ遷移し、採択判定へ進みます。</p>
+            </div>
+
+            <p class="text-muted" style="margin:12px 0 0; font-size:12px;">
+              判定基準（金額のしきい値・免除条件）は未確定です。本モックの値は仮置きです。
+            </p>
+          </div>
+        </div>
+
+        <!-- ② 調査依頼 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">② 外部機関への調査依頼</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-confirm-list">
+              <dt>調査機関</dt>
+              <dd>（未確定）</dd>
+              <dt>依頼日</dt>
+              <dd>2026/09/13</dd>
+              <dt>依頼方法</dt>
+              <dd>依頼書ファイルの授受（A17 によりシステムへの直接入力は不可）</dd>
+              <dt>依頼書</dt>
+              <dd><a href="#">信用調査依頼書_APP-2026-00126.pdf</a></dd>
+              <dt>回答予定日</dt>
+              <dd>2026/09/30</dd>
+            </dl>
+
+            <div class="alert alert-warning" style="margin-top:16px; margin-bottom:0;">
+              回答予定日まで <b>6日</b>。督促の運用（タイミング・手段）が未確定です。
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ 結果取込 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">③ 調査結果の取込</h3>
+          </div>
+          <div class="panel-body">
+            <p class="sks-form-section-note">
+              外部機関から受領した結果を事務局が登録します。受領形式が未確定のため、
+              本モックはファイル添付＋判定の手入力としています。
+            </p>
+
+            <div class="form-group">
+              <label for="credit-file">調査結果ファイル</label>
+              <div class="sks-dropzone" style="margin-top:4px;">
+                ここにファイルをドラッグ＆ドロップ、またはクリックして選択
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="credit-result">調査結果</label>
+              <select id="credit-result" class="form-control" style="max-width:280px;">
+                <option>選択してください</option>
+                <option>問題なし</option>
+                <option>条件付き（要確認事項あり）</option>
+                <option>問題あり</option>
+              </select>
+              <span class="help-block">結果の区分は未確定です。</span>
+            </div>
+
+            <div class="form-group">
+              <label for="credit-note">事務局メモ</label>
+              <textarea id="credit-note" class="form-control" rows="4"></textarea>
+              <span class="help-block">
+                調査結果に含まれる情報は機微情報です。記録範囲と保存期間の方針が必要です。
+              </span>
+            </div>
+
+            <div class="sks-form-actions">
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-primary">結果を登録して結果確認へ進む</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-5">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請の概要</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-confirm-list">
+              <dt>申請番号</dt>
+              <dd>APP-2026-00126</dd>
+              <dt>事業者</dt>
+              <dd>株式会社ミライ工業</dd>
+              <dt>法人番号</dt>
+              <dd>4567890123456</dd>
+              <dt>対象経費合計</dt>
+              <dd>18,000,000円</dd>
+              <dt>補助金額</dt>
+              <dd>9,000,000円</dd>
+              <dt>一次審査完了</dt>
+              <dd>2026/09/12（事務局 太郎）</dd>
+            </dl>
+            <p><a href="itcom-07-review-detail.html">一次審査の内容を見る</a></p>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">処理履歴</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="sks-timeline">
+              <li>
+                <span class="sks-tl-when">2026/08/12 11:02</span>
+                <span class="sks-tl-what">申請を提出</span>
+              </li>
+              <li>
+                <span class="sks-tl-when">2026/09/05 09:30</span>
+                <span class="sks-tl-what">不備確認依頼 → 修正回答あり</span>
+                <span class="sks-tl-who">事務局 太郎</span>
+              </li>
+              <li>
+                <span class="sks-tl-when">2026/09/12 16:45</span>
+                <span class="sks-tl-what">一次審査完了</span>
+                <span class="sks-tl-who">事務局 太郎</span>
+              </li>
+              <li>
+                <span class="sks-tl-when">2026/09/13 10:00</span>
+                <span class="sks-tl-what">信用調査 実施と判定・依頼</span>
+                <span class="sks-tl-who">事務局 花子</span>
+              </li>
+              <li class="is-current">
+                <span class="sks-tl-when">—</span>
+                <span class="sks-tl-what">外部信用調査中（回答待ち）</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">前年度採択の照合</h3>
+          </div>
+          <div class="panel-body">
+            <p class="text-muted" style="font-size:12px; line-height:1.9; margin:0;">
+              前年度採択の有無は本システム内の
+              <code>u_prior_year_awarded_flag</code> のみで判定しています。
+              Salesforce 横断照合（IF-02）は未実装のため、他システムに実績があっても検出できません。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：1申請に複数回の調査がありうるため、調査の依頼・結果は
+      T03 の子テーブル（1対多）で持つ構成を推奨します。T03 に列を足す方式だと
+      再調査の履歴が残りません。
+    </p>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 ⑦事業者に紐づかないユーザ（案内のみ）
+  ============================================================================
+  実装         src/fluent/sp-widget/inquiry-form/server_script.js
+                 PortalContextUtil.getMyEntityId() が空 → data.message を設定して return
+              src/fluent/sp-widget/inquiry-form/template.html
+                 ng-if="!c.data.isApplicant" の警告ブロック
+  表示条件     data.isApplicant === false
+              （事業者ユーザ拡張テーブルに行がない、または u_business_entity が未設定のユーザ）
+              例：事務局ユーザ・システム管理者、本登録前のユーザ
+  ============================================================================
+  補足（単体テスト No.59 の保留事項）
+    ページ側のロール制御（sp_page.roles = applicant / applicant_admin）により、
+    ロールを持たないユーザは通常 404 ページへ遷移する。
+    ただし admin は hasRole 判定で全ロールを保持するためページが開く場合があり、
+    そのときに表示されるのが本状態。ウィジェット単体でも安全側に倒す実装としている。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 ⑦事業者ユーザ以外</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">System Administrator 様</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li class="is-active"><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>⑦事業者ユーザ以外</b>：<code>c.data.isApplicant === false</code>。
+      履歴・新規フォームはいずれも描画せず、案内メッセージのみを表示する（データ取得も行わない）。
+    </p>
+
+    <div class="sks-inquiry">
+
+      <!-- ng-if="!c.data.isApplicant" -->
+      <div class="alert alert-warning" role="alert">
+        このページは事業者ユーザ向けです。事業者情報が紐づいたアカウントでログインしてください。
+      </div>
+
+      <!--
+        以降の <div class="row" ng-if="c.data.isApplicant"> は描画されない。
+      -->
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

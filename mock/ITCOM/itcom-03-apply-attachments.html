@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-03 申請入力：添付書類（STEP3）
+  ============================================================================
+  位置づけ   ITCOM 主担当（申請機能）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-03 は仮番号。
+
+  ■ 実装上の前提が欠けている点
+  添付ファイルを扱うコードがアプリ内に1件も存在しない（sys_attachment／GlideSysAttachment の
+  参照が grep で0件）。さらに sys_attachment に対する ACL も未定義であり、
+  事業者が自社の申請に紐づく添付のみを扱えるよう制限する仕組みが無い。
+  本画面の実装前に ACL の整備が必要（整備前に実装すると、転送処理・他画面側で
+  スコープ制御をやり直すことになる）。
+
+  また、書類種別を保持する項目が sys_attachment に無いため、
+  「どの提出書類としてアップロードされたか」を区別できない。
+  区別が必要な場合は次のいずれかが必要。
+    ・sys_attachment のメタデータを持つ子テーブルを別に用意する
+    ・書類種別ごとに添付先レコードを分ける
+
+  関連する既存の成果物
+    RPA 連携（rpa/Export-SksAttachments.ps1）が申請審査完了の添付をファイルサーバへ複製するが、
+    添付の実装と review_done への遷移が無いため実運用で動かせない状態。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・提出書類の種類と必須／任意の区分（本モックの5種は仮）
+    ・ファイル形式・サイズの制限（RPA 側は既定 50MB・拡張子許可リストで運用）
+    ・特例措置の根拠書類の要否
+    ・差し替え時に旧ファイルを残すか置き換えるか
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-03 申請入力：添付書類（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      添付ファイルを扱うコードはアプリ内に存在せず、<code>sys_attachment</code> の <b>ACL も未定義</b>です。
+      本画面の実装前に「事業者は自社の申請の添付のみ扱える」ACL の整備が必要です。
+      また書類種別を保持する項目が無いため、どの提出書類かを区別する仕組みの検討が必要です。
+    </p>
+
+    <ul class="sks-apply-steps">
+      <li class="is-done"><span class="sks-step-no">1</span>基本情報</li>
+      <li class="is-done"><span class="sks-step-no">2</span>対象経費</li>
+      <li class="is-active"><span class="sks-step-no">3</span>添付書類</li>
+      <li><span class="sks-step-no">4</span>内容確認・提出</li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">添付書類のアップロード</h3>
+          </div>
+          <div class="panel-body">
+
+            <div class="alert alert-warning">
+              必須書類のうち <b>1件</b> が未提出です。すべて提出しないと申請を提出できません。
+            </div>
+
+            <table class="table sks-attachment-list">
+              <thead>
+                <tr>
+                  <th class="sks-col-required">必須</th>
+                  <th>提出書類</th>
+                  <th class="sks-col-file">ファイル</th>
+                  <th class="sks-col-state">状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="sks-col-required"><span class="text-danger">必須</span></td>
+                  <td>
+                    決算書（直近1期分）
+                    <span class="sks-file-meta">中小企業判定・財務状況の確認に使用</span>
+                  </td>
+                  <td>
+                    <span class="sks-file-name">決算書_2025年度.pdf</span>
+                    <span class="sks-file-meta">1.8 MB／2026/09/20 11:04 アップロード</span>
+                  </td>
+                  <td>
+                    <span class="label label-success">提出済</span><br />
+                    <button type="button" class="btn btn-link" style="padding-left:0;">差し替え</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="sks-col-required"><span class="text-danger">必須</span></td>
+                  <td>
+                    履歴事項全部証明書
+                    <span class="sks-file-meta">法人番号・所在地の突合に使用（法人のみ）</span>
+                  </td>
+                  <td>
+                    <span class="sks-file-name">登記簿_20260901.pdf</span>
+                    <span class="sks-file-meta">0.6 MB／2026/09/20 11:06 アップロード</span>
+                  </td>
+                  <td>
+                    <span class="label label-success">提出済</span><br />
+                    <button type="button" class="btn btn-link" style="padding-left:0;">差し替え</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="sks-col-required"><span class="text-danger">必須</span></td>
+                  <td>
+                    見積書（対象経費の根拠）
+                    <span class="sks-file-meta">対象経費明細の金額と突合</span>
+                  </td>
+                  <td>
+                    <span class="text-muted">未提出</span>
+                  </td>
+                  <td>
+                    <span class="label label-danger">未提出</span><br />
+                    <button type="button" class="btn btn-link" style="padding-left:0;">選択</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="sks-col-required"><span class="text-danger">必須</span></td>
+                  <td>
+                    売上を証する書類
+                    <span class="sks-file-meta">売上増加率の根拠（対象月・前年同月）</span>
+                  </td>
+                  <td>
+                    <span class="sks-file-name">売上推移_2025-2026.xlsx</span>
+                    <span class="sks-file-meta">0.1 MB／2026/09/24 14:20 アップロード</span>
+                  </td>
+                  <td>
+                    <span class="label label-success">提出済</span><br />
+                    <button type="button" class="btn btn-link" style="padding-left:0;">差し替え</button>
+                  </td>
+                </tr>
+                <!-- 特例措置を選択した場合のみ行を表示する想定。要件未確定 -->
+                <tr>
+                  <td class="sks-col-required"><span class="text-muted">任意</span></td>
+                  <td>
+                    特例措置の根拠書類
+                    <span class="sks-file-meta">特例措置を申請する場合。要件が未確定のため任意扱い</span>
+                  </td>
+                  <td>
+                    <span class="text-muted">未提出</span>
+                  </td>
+                  <td>
+                    <span class="label label-default">任意</span><br />
+                    <button type="button" class="btn btn-link" style="padding-left:0;">選択</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="sks-dropzone">
+              ここにファイルをドラッグ＆ドロップ、またはクリックして選択<br />
+              <span style="font-size:11px;">PDF／Excel／Word／画像（JPEG・PNG）／ZIP、1ファイル 50MB まで</span>
+            </div>
+
+            <div class="sks-form-actions">
+              <button type="button" class="btn btn-default">戻る（対象経費）</button>
+              <button type="button" class="btn btn-default">一時保存</button>
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-primary">次へ（内容確認）</button>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">提出状況</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-amount-summary">
+              <dt>必須書類</dt>
+              <dd>3 / 4 件</dd>
+              <dt>任意書類</dt>
+              <dd>0 / 1 件</dd>
+              <dt>合計サイズ</dt>
+              <dd>2.5 MB</dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">書類の取り扱い</h3>
+          </div>
+          <div class="panel-body">
+            <p class="text-muted" style="font-size:12px; line-height:1.9; margin:0;">
+              提出書類は事務局の審査にのみ使用します。<br />
+              審査完了後、事務局の保管手続きのため社内ファイルサーバへ複製されます
+              （RPA 連携。ポータルからの閲覧は継続できます）。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：ファイル形式・サイズの制限は RPA 側の転送ポリシー
+      （<code>rpa/config/export-config.sample.json</code> の <code>allowedExtensions</code>／<code>maxAttachmentBytes</code>）と
+      そろえること。画面で許可した形式が転送側で拒否されると、提出はできたのに保管されない状態になります。
+    </p>
+
+  </div>
+</main>
+
+</body>
+</html>

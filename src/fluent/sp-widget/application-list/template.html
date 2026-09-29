@@ -1,0 +1,122 @@
+<!-- SC-07 申請状況一覧・詳細画面（上段：一覧／下段：詳細パネル） -->
+<div class="sks-app-list">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <div ng-if="c.data.isApplicant">
+
+    <!-- 上段：D1 申請状況一覧 -->
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">申請状況一覧</h3>
+        <span class="sks-count" ng-if="c.data.totalCount">全 {{c.data.totalCount}} 件</span>
+      </div>
+
+      <table class="table table-hover sks-table" ng-if="c.data.applications.length">
+        <thead>
+          <tr>
+            <th>申請ID</th>
+            <th class="sks-col-status">ステータス</th>
+            <th class="sks-col-date">提出日</th>
+            <th class="sks-col-date">最終更新日</th>
+            <th class="sks-col-action">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="app in c.data.applications track by app.sys_id"
+              ng-class="{'sks-row-selected': c.isSelected(app)}">
+            <td>{{app.number}}</td>
+            <td><span class="label" ng-class="app.statusClass" ng-bind="app.statusLabel"></span></td>
+            <td>{{app.submittedOn || '－'}}</td>
+            <td>{{app.updatedOn}}</td>
+            <td>
+              <button type="button" class="btn btn-link sks-detail-link"
+                      ng-disabled="c.loading || c.isSelected(app)"
+                      ng-click="c.showDetail(app)">詳細</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="panel-body text-center text-muted" ng-if="!c.data.applications.length">
+        <i class="fa fa-file-text-o fa-2x" aria-hidden="true"></i>
+        <p>申請はまだ作成されていません。</p>
+      </div>
+
+      <div class="panel-footer sks-truncated" ng-if="c.data.truncated">
+        最新 {{c.data.applications.length}} 件を表示しています（全 {{c.data.totalCount}} 件）。
+      </div>
+    </div>
+
+    <!-- 下段：D2／D3 申請詳細パネル -->
+    <div class="panel panel-default" ng-if="c.data.selected">
+      <div class="panel-heading">
+        <h3 class="panel-title">申請詳細（{{c.data.selected.number}}）</h3>
+      </div>
+      <div class="panel-body">
+
+        <div class="alert alert-danger" ng-if="c.withdrawErrors.length" role="alert">
+          <ul class="list-unstyled sks-error-list">
+            <li ng-repeat="err in c.withdrawErrors track by $index">{{err}}</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-success" ng-if="c.data.withdrawResult.success" role="alert">
+          申請を取下げました。
+        </div>
+
+        <!-- D2 ステータスチップ -->
+        <p class="sks-status-chip">
+          <span class="label" ng-class="c.data.selected.statusClass" ng-bind="c.data.selected.statusLabel"></span>
+          <span class="sks-special" ng-if="c.data.selected.specialMeasure">特例措置対象</span>
+        </p>
+
+        <!-- D3 金額情報 -->
+        <dl class="sks-amount-list">
+          <dt>補助上限額</dt>
+          <dd>{{c.data.selected.subsidyCap || '－'}}</dd>
+          <dt>補助率</dt>
+          <dd>{{c.data.selected.subsidyRate || '－'}}</dd>
+          <dt>対象経費合計</dt>
+          <dd>{{c.data.selected.totalExpense || '－'}}</dd>
+        </dl>
+
+        <dl class="sks-meta-list">
+          <dt>従業員数区分</dt>
+          <dd>{{c.data.selected.employeeCategory || '－'}}</dd>
+          <dt>組織形態</dt>
+          <dd>{{c.data.selected.organizationType || '－'}}</dd>
+          <dt>提出日</dt>
+          <dd>{{c.data.selected.submittedOn || '－'}}</dd>
+          <dt>最終更新日</dt>
+          <dd>{{c.data.selected.updatedOn}}</dd>
+        </dl>
+
+        <!-- ③No.2 不備を修正する -->
+        <div ng-if="c.data.selected.canFixDefect">
+          <button type="button" class="btn btn-primary"
+                  ng-if="c.data.selected.fixUrl"
+                  ng-click="c.fixDefect()">不備を修正する</button>
+          <div class="alert alert-info sks-fix-note" ng-if="!c.data.selected.fixUrl" role="alert">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            不備の修正が必要です。修正画面（申請入力機能）との連携先が未設定のため、事務局からのご案内に従ってお手続きください。
+          </div>
+        </div>
+
+        <!-- ③No.3 取下げる（検討中） -->
+        <button type="button" class="btn btn-default sks-withdraw"
+                ng-if="c.data.selected.canWithdraw"
+                ng-disabled="c.withdrawing"
+                ng-click="c.withdraw()">
+          <span ng-if="c.withdrawing"><i class="fa fa-spinner fa-spin"></i> 処理中…</span>
+          <span ng-if="!c.withdrawing">取下げる</span>
+        </button>
+
+        <p class="sks-note">{{c.data.note}}</p>
+      </div>
+    </div>
+
+  </div>
+</div>

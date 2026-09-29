@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-03 本登録画面 ②入力エラー（パスワード不一致＋サーバー検証エラー）
+  ============================================================================
+  画面設計書  SC-03 ②F2 パスワード（桁数・複雑性は未確定／暫定8文字以上128文字以内）
+                      F3 パスワード確認（不一致チェック）
+                      F4 法人番号（法人＝13桁の数字／個人事業主＝半角英数字13桁以内・暫定 Q01）
+  実装         src/fluent/sp-widget/signup-form/client_script.js   c.passwordMismatch()
+              src/fluent/sp-widget/signup-form/server_script.js    validate()
+  表示条件     ・クライアント：c.passwordMismatch() が真 → .has-error ＋ help-block ＋ 送信不可
+              ・サーバー    ：c.serverErrors.length > 0
+  ============================================================================
+  サーバー側メッセージ一覧（server_script.js validate()）
+    ・事業者名（法人名／屋号）を入力してください。／事業者名は100文字以内で入力してください。
+    ・事業者区分を選択してください。
+    ・法人番号／本人識別情報を入力してください。
+    ・法人番号は13桁の数字で入力してください。            … 事業者区分＝法人
+    ・本人識別情報は半角英数字13桁以内で入力してください。 … 事業者区分＝個人事業主
+    ・パスワードを入力してください。／パスワードは8文字以上128文字以内で入力してください。
+    ・パスワード（確認）が一致していません。
+    ・利用規約に同意してください。
+    ・本登録に失敗しました。時間をおいて再度お試しください。 … insert／update 失敗時
+  ============================================================================
+  補足
+    ・パスワードの桁数不足はクライアント側でチェックしていないため、
+      サーバー検証エラーとして返る（単体テスト No.28 で確認済）。
+    ・エラー時はパスワード欄をクリアせず入力値を保持する（c.data.password のみ破棄）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-03 本登録 ②入力エラー</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">未ログイン（仮登録トークンでアクセス）</span>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②入力エラー</b>：サーバー検証エラーはカード上部に箇条書きで表示し、
+      パスワード不一致は確認欄に <code>.has-error</code> ＋ help-block で表示する（<code>c.canSubmit()</code> が偽になり送信不可）。
+    </p>
+
+    <div class="sks-signup">
+      <div class="panel panel-default sks-signup-card">
+        <div class="panel-body">
+
+          <div>
+            <h2 class="sks-signup-title">本登録</h2>
+
+            <dl class="dl-horizontal sks-signup-account">
+              <dt>ログインID</dt>
+              <dd>taro0001</dd>
+              <dt>メールアドレス</dt>
+              <dd>taro.jigyo@example.co.jp</dd>
+            </dl>
+
+            <!-- ng-if="c.serverErrors.length" -->
+            <div class="alert alert-danger" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li>法人番号は13桁の数字で入力してください。</li>
+                <li>パスワードは8文字以上128文字以内で入力してください。</li>
+              </ul>
+            </div>
+
+            <form name="signupForm" novalidate>
+              <div class="form-group">
+                <label for="sks-business-name">事業者名（法人名／屋号） <span class="text-danger">*</span></label>
+                <input type="text" id="sks-business-name" name="businessName" class="form-control"
+                       placeholder="株式会社サンプル" maxlength="100" required value="株式会社サンプル" />
+              </div>
+
+              <div class="form-group">
+                <label>事業者区分 <span class="text-danger">*</span></label>
+                <div class="radio">
+                  <label for="sks-entity-corporate">
+                    <input type="radio" id="sks-entity-corporate" name="entityType" value="corporate" checked />
+                    法人
+                  </label>
+                </div>
+                <div class="radio">
+                  <label for="sks-entity-sole">
+                    <input type="radio" id="sks-entity-sole" name="entityType" value="sole_proprietor" />
+                    個人事業主
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sks-corporate-number">法人番号／本人識別情報 <span class="text-danger">*</span></label>
+                <input type="text" id="sks-corporate-number" name="corporateNumber" class="form-control"
+                       placeholder="13桁の数字" maxlength="13" required value="123456789012" />
+                <span class="help-block">重複チェックのキーとして使用します（13桁の数字）。</span>
+              </div>
+
+              <div class="form-group">
+                <label for="sks-password">パスワード <span class="text-danger">*</span></label>
+                <input type="password" id="sks-password" name="password" class="form-control" maxlength="128" required value="pass123" />
+                <span class="help-block">8文字以上128文字以内で入力してください。</span>
+              </div>
+
+              <!-- ng-class="{'has-error': c.passwordMismatch()}" -->
+              <div class="form-group has-error">
+                <label for="sks-password-confirm">パスワード（確認） <span class="text-danger">*</span></label>
+                <input type="password" id="sks-password-confirm" name="passwordConfirm" class="form-control" maxlength="128" required value="pass1234" />
+                <!-- ng-if="c.passwordMismatch()" -->
+                <span class="help-block">パスワードが一致していません。</span>
+              </div>
+
+              <div class="checkbox sks-agree">
+                <label for="sks-agreed">
+                  <input type="checkbox" id="sks-agreed" checked />
+                  利用規約に同意する <span class="text-danger">*</span>
+                </label>
+              </div>
+
+              <!-- パスワード不一致のため c.canSubmit() は偽 -->
+              <button type="submit" class="btn btn-primary btn-block" disabled>本登録を完了する</button>
+            </form>
+
+            <p class="sks-signup-note">
+              完了後、前年度登録有無の判定・重複チェックを実施し、事務局承認後に利用開始となります。
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

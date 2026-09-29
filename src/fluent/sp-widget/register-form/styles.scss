@@ -1,0 +1,53 @@
+/**
+ * SC-02 仮登録画面
+ * 中央配置の仮登録カード。色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-register {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+
+    .sks-register-card {
+        width: 100%;
+        max-width: 460px;
+
+        .panel-body {
+            padding: 28px;
+        }
+    }
+
+    .sks-register-title {
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    .sks-register-note {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-register-done {
+        padding: 12px 0;
+
+        .sks-done-lead {
+            margin-top: 16px;
+            font-size: $font-size-large;
+            font-weight: bold;
+            color: $text-color;
+        }
+
+        .sks-done-note {
+            margin-top: 16px;
+            font-size: $font-size-small;
+        }
+    }
+}

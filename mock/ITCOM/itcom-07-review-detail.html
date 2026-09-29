@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-07 一次審査：申請詳細・審査（事務局）／★不備確認依頼の入力を併記
+  ============================================================================
+  位置づけ   ITCOM 主担当（審査プロセス）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-07 は仮番号。
+             ★ 実装では排他となる「審査判定」と「不備確認依頼の入力」を
+                レビュー用に1ファイルへ並べている。
+
+  想定する処理  一次審査（申請内容の確認と判定）
+                判定結果によるステータス遷移
+                  一次審査完了 first_review_done
+                  不備確認依頼 defect_request
+                  不採択       rejected
+
+  ■ 現状の欠落
+  ・審査結果（判定・理由・審査者・審査日時）を保持する列が T03 に無い。
+    SC-11 のユーザ登録審査には u_approved_on／u_approved_by があるが、
+    申請側には相当する列が無く、却下理由の記録項目も無い。
+  ・審査のチェック項目を保持する仕組みが無い（本モックのチェックリストは仮）。
+  ・自動判定できる項目（中小企業判定・補助金額の再計算）はマスタが揃っているため
+    実装可能だが、判定結果を保存する先が無い。
+
+  実装方式の想定
+    事務局ワークスペースのレコードフォーム（T03）＋ UI Action。
+    SC-11 の「承認／却下／不備修正を依頼」と同じ構成
+    （src/fluent/ui-actions/registration-review-actions.now.ts が参考になる）。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・審査の観点・チェック項目（本モックの6項目は仮）
+    ・不採択理由の区分（自由記述か選択式か）
+    ・一次審査完了後に信用調査要否判定へ自動遷移させるか、手動操作か
+    ・合議・二次審査の要否
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-07 一次審査：申請詳細・審査（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-ws-header">
+  <div class="container">
+    <span class="mock-ws-title">SKS 事務局ワークスペース</span>
+    <span class="mock-ws-user">事務局 花子（x_dent2_dentsusoke.staff）</span>
+  </div>
+</header>
+
+<div class="mock-ws-body">
+
+  <nav class="mock-ws-nav">
+    <div class="mock-ws-nav-group">申請審査（提案）</div>
+    <ul>
+      <li class="is-active"><a href="itcom-06-review-list.html">一次審査：要対応 <span class="mock-ws-count">7</span></a></li>
+      <li><a href="itcom-08-credit-check.html">信用調査：要対応</a></li>
+      <li><a href="itcom-09-award-decision.html">採択判定：要対応</a></li>
+      <li><a href="#">申請（すべて）</a></li>
+    </ul>
+    <div class="mock-ws-nav-group">ユーザ管理</div>
+    <ul>
+      <li><a href="#">登録審査：要対応 <span class="mock-ws-count">4</span></a></li>
+    </ul>
+    <div class="mock-ws-nav-group">問合せ管理</div>
+    <ul>
+      <li><a href="#">問合せ（未回答） <span class="mock-ws-count">2</span></a></li>
+    </ul>
+  </nav>
+
+  <div class="mock-ws-content">
+
+    <h1>APP-2026-00123 — 一次審査</h1>
+    <p class="mock-ws-sub">
+      株式会社テスト ｜ 提出 2026/08/01 ｜ <span class="label label-warning">一次審査中</span> ｜ 担当 事務局 花子
+    </p>
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      <b>審査結果を保持する列が T03 にありません</b>（判定・理由・審査者・審査日時）。
+      SC-11 のユーザ登録審査には <code>u_approved_on</code>／<code>u_approved_by</code> がありますが、申請側には相当する列がなく、
+      不採択理由の記録項目もありません。チェック項目を保持する仕組みも未定義です。
+    </p>
+
+    <!-- ワークスペースのレコードフォーム上のボタン列（UI Action 相当） -->
+    <div class="mock-ws-actions">
+      <button type="button" class="btn btn-primary">一次審査を完了する</button>
+      <button type="button" class="btn btn-default">不備修正を依頼する</button>
+      <button type="button" class="btn btn-default">不採択にする</button>
+      <span style="float:right; padding-top:6px;">
+        <button type="button" class="btn btn-link">自分が担当する</button>
+      </span>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+
+        <!-- 申請内容 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請内容</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-confirm-list">
+              <dt>申請番号</dt>
+              <dd>APP-2026-00123</dd>
+              <dt>事業者</dt>
+              <dd>株式会社テスト（法人番号 1234567890123）</dd>
+              <dt>申請者</dt>
+              <dd>事業 太郎（sks.demo）</dd>
+              <dt>組織形態</dt>
+              <dd>法人</dd>
+              <dt>従業員数区分</dt>
+              <dd>6～20人</dd>
+              <dt>売上増加率対象月</dt>
+              <dd>2026年6月</dd>
+              <dt>売上増加率</dt>
+              <dd>15.0%</dd>
+              <dt>特例措置</dt>
+              <dd>対象</dd>
+              <dt>提出日時</dt>
+              <dd>2026/08/01 09:40</dd>
+            </dl>
+          </div>
+        </div>
+
+        <!-- 対象経費 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">対象経費</h3>
+          </div>
+          <table class="table sks-expense-table">
+            <thead>
+              <tr>
+                <th>経費区分</th>
+                <th>内容</th>
+                <th class="sks-col-days">日数</th>
+                <th class="sks-col-amount">金額</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>クラウドサービス利用費</td>
+                <td>受発注管理SaaS 年間利用料</td>
+                <td>—</td>
+                <td class="sks-amount">3,600,000</td>
+              </tr>
+              <tr>
+                <td>設備費</td>
+                <td>自動仕分け装置 1台</td>
+                <td>—</td>
+                <td class="sks-amount">4,000,000</td>
+              </tr>
+              <tr>
+                <td>専門家経費</td>
+                <td>業務設計コンサルティング</td>
+                <td>12</td>
+                <td class="sks-amount">600,000</td>
+              </tr>
+              <tr class="sks-expense-total">
+                <td colspan="3">対象経費合計</td>
+                <td class="sks-amount">8,200,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 審査チェックリスト -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">審査チェック</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="sks-checklist">
+              <li>
+                <label>
+                  <input type="checkbox" checked />
+                  <span class="sks-check-label">事業者情報が提出書類と一致している</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" checked />
+                  <span class="sks-check-label">中小企業に該当する</span>
+                </label>
+                <span class="sks-check-auto">
+                  自動判定：業種別基準マスタ（サービス業：資本金5,000万円以下 または 従業員100人以下）に適合
+                </span>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" checked />
+                  <span class="sks-check-label">売上増加率の根拠書類が整合している</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span class="sks-check-label">対象経費が見積書と一致している</span>
+                </label>
+                <span class="sks-check-auto text-danger">
+                  要確認：設備費 4,000,000円 に対し見積書は 3,800,000円
+                </span>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span class="sks-check-label">専門家経費が日額上限内である</span>
+                </label>
+                <span class="sks-check-auto text-danger">
+                  要確認：600,000円 ÷ 12日 = 50,000円/日（上限 50,000円）／見積書の日数は10日
+                </span>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" checked />
+                  <span class="sks-check-label">特例措置の要件を満たしている</span>
+                </label>
+                <span class="sks-check-auto">要件が未確定のため手動確認</span>
+              </li>
+            </ul>
+            <p class="text-muted" style="margin:12px 0 0; font-size:12px;">
+              チェック項目とその保存先は未定義です。項目が確定したら専用テーブルまたは T03 への列追加が必要です。
+            </p>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- ★ 不備確認依頼の入力（排他表示） -->
+        <p class="mock-note">
+          <b>★「不備修正を依頼する」を押した場合の入力</b>（実装では上記と排他。
+          SC-11 の「登録不備内容」と同じ構成）
+        </p>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">不備修正の依頼</h3>
+          </div>
+          <div class="panel-body">
+            <div class="alert alert-info">
+              入力した内容は申請者へのメールにそのまま記載され、修正画面（ITCOM-05）へのリンクが送られます。
+              申請者が修正画面を開くとステータスが「不備修正中」に、再提出すると「不備修正回答あり」になります。
+            </div>
+
+            <div class="form-group">
+              <label for="defect-note">不備内容 <span class="text-danger">*</span></label>
+              <textarea id="defect-note" class="form-control" rows="6">対象経費のうち「自動仕分け装置 1台」について、提出いただいた見積書の金額（3,800,000円）と申請金額（4,000,000円）が一致しておりません。いずれかをご確認のうえ修正をお願いします。
+
+また、専門家経費の日数が見積書の記載（10日）と申請（12日）で相違しています。</textarea>
+              <span class="help-block">修正が必要な項目と理由を記入してください（2000文字以内）。</span>
+            </div>
+
+            <div class="form-group">
+              <label for="defect-due">回答期限</label>
+              <input type="date" id="defect-due" class="form-control" value="2026-10-08" style="max-width:220px;" />
+              <span class="help-block">回答期限の運用（期限超過時の扱い）が未確定です。</span>
+            </div>
+
+            <div class="sks-form-actions">
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-default">キャンセル</button>
+                <button type="button" class="btn btn-primary">不備修正を依頼する</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 右カラム -->
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">補助金額の判定</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-amount-summary">
+              <dt>対象経費合計</dt>
+              <dd>8,200,000円</dd>
+              <dt>補助率（補助率マスタ）</dt>
+              <dd>1/2</dd>
+              <dt>補助上限額（補助上限額マスタ）</dt>
+              <dd>20,000,000円 <span class="text-muted" style="font-size:11px;">（特例措置適用）</span></dd>
+              <dt class="sks-total">補助金額</dt>
+              <dd class="sks-total">4,100,000円</dd>
+            </dl>
+            <p class="text-muted" style="margin-top:12px; font-size:12px;">
+              マスタの分子・分母で算出しています。保存列が無いため、この値は画面表示のみです。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">添付書類</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="list-unstyled" style="margin:0; font-size:13px; line-height:2;">
+              <li><a href="#">決算書_2025年度.pdf</a> <span class="text-muted" style="font-size:11px;">1.8 MB</span></li>
+              <li><a href="#">登記簿_20260901.pdf</a> <span class="text-muted" style="font-size:11px;">0.6 MB</span></li>
+              <li><a href="#">見積書_3社分.pdf</a> <span class="text-muted" style="font-size:11px;">2.4 MB</span></li>
+              <li><a href="#">売上推移_2025-2026.xlsx</a> <span class="text-muted" style="font-size:11px;">0.1 MB</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">処理履歴</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="sks-timeline">
+              <li>
+                <span class="sks-tl-when">2026/08/01 09:40</span>
+                <span class="sks-tl-what">申請を提出</span>
+                <span class="sks-tl-who">事業 太郎</span>
+              </li>
+              <li class="is-current">
+                <span class="sks-tl-when">2026/08/05 13:20</span>
+                <span class="sks-tl-what">一次審査開始・担当割当</span>
+                <span class="sks-tl-who">事務局 花子</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：判定結果の記録先として T03 へ少なくとも
+      「審査結果」「審査理由」「審査者」「審査日時」「審査担当者」の列追加が必要です。
+      SC-11 の <code>reject()</code> には「却下理由を記録する項目がテーブル定義書に定義されていない」という
+      同じ問題が既に TODO として残っており、申請側でも同じ判断が必要になります。
+    </p>
+
+  </div>
+</div>
+
+</body>
+</html>

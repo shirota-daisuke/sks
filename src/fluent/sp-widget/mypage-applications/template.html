@@ -1,0 +1,36 @@
+<!-- SC-05 マイページ「申請状況」（D5：申請ID／現在のステータス／最終更新日） -->
+<div class="panel panel-default sks-applications">
+  <div class="panel-heading">
+    <h3 class="panel-title">申請状況</h3>
+    <a class="sks-more" href="{{c.data.listUrl}}">申請状況一覧へ</a>
+  </div>
+
+  <div class="panel-body" ng-if="!c.data.isApplicant">
+    <p class="text-muted">事業者ユーザでログインすると申請状況が表示されます。</p>
+  </div>
+
+  <table class="table sks-table" ng-if="c.data.isApplicant && c.hasApplications()">
+    <thead>
+      <tr>
+        <th>申請ID</th>
+        <th class="sks-col-status">現在のステータス</th>
+        <th class="sks-col-date">最終更新日</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="app in c.data.applications track by app.sys_id">
+        <td><a href="{{app.url}}">{{app.number}}</a></td>
+        <td>
+          <span class="label" ng-class="app.statusClass" ng-bind="app.statusLabel"></span>
+        </td>
+        <td>{{app.updatedOn}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="panel-body text-center text-muted"
+       ng-if="c.data.isApplicant && !c.hasApplications()">
+    <i class="fa fa-file-text-o fa-2x"></i>
+    <p>申請はまだ作成されていません。</p>
+  </div>
+</div>

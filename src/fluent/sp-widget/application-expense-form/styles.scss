@@ -1,0 +1,288 @@
+/**
+ * 対象経費の入力（ITCOM-02）
+ * 左に明細一覧＋入力フォーム、右に補助金額の試算。
+ * 色は Service Portal テーマの SCSS 変数のみを使用する（他ウィジェットと同じ方針）。
+ */
+.sks-expense {
+    padding: 24px 0;
+
+    .sks-expense-card .panel-body,
+    .sks-estimate-card .panel-body {
+        padding: 24px;
+    }
+
+    .sks-estimate-card {
+        margin-bottom: 16px;
+    }
+
+    .sks-expense-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    // --- ステップ表示 ---------------------------------------------------
+    .sks-expense-steps {
+        display: flex;
+        margin: 0 0 20px;
+        padding: 0;
+        list-style: none;
+        border: 1px solid $panel-default-border;
+        border-radius: $border-radius-base;
+        background: #fff;
+        overflow: hidden;
+
+        li {
+            flex: 1;
+            padding: 10px 8px;
+            border-left: 1px solid $table-border-color;
+            text-align: center;
+            font-size: $font-size-small;
+            color: $text-muted;
+
+            &:first-child {
+                border-left: 0;
+            }
+
+            a {
+                color: inherit;
+            }
+        }
+
+        li.is-done {
+            color: $brand-success;
+        }
+
+        li.is-active {
+            background: lighten($brand-primary, 45%);
+            color: $brand-primary;
+            font-weight: bold;
+        }
+
+        .sks-step-no {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+            border-radius: 50%;
+            background: $text-muted;
+            color: #fff;
+            line-height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        li.is-done .sks-step-no {
+            background: $brand-success;
+        }
+
+        li.is-active .sks-step-no {
+            background: $brand-primary;
+        }
+    }
+
+    .sks-expense-meta {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid $panel-default-border;
+        font-size: $font-size-small;
+
+        dt {
+            width: 110px;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-left: 126px;
+        }
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    // --- 明細一覧 -------------------------------------------------------
+    .sks-expense-table {
+        margin-bottom: 24px;
+
+        th {
+            background: $table-bg-accent;
+            font-size: $font-size-small;
+            white-space: nowrap;
+        }
+
+        td {
+            vertical-align: top;
+            font-size: $font-size-small;
+        }
+
+        .sks-col-days {
+            width: 70px;
+            text-align: right;
+        }
+
+        .sks-col-amount {
+            width: 120px;
+            text-align: right;
+        }
+
+        .sks-col-action {
+            width: 110px;
+            white-space: nowrap;
+        }
+
+        // 編集中の行と上限違反の行を見分けられるようにする
+        .sks-row-editing > td {
+            background: lighten($brand-primary, 46%);
+        }
+
+        .sks-row-error > td {
+            background: lighten($brand-danger, 42%);
+        }
+
+        .sks-expense-total {
+            font-weight: bold;
+
+            td {
+                border-top: 2px solid $panel-default-border;
+            }
+        }
+
+        .sks-empty {
+            padding: 20px 8px;
+            text-align: center;
+        }
+
+        .sks-expert {
+            color: $text-muted;
+            font-size: 11px;
+        }
+
+        .sks-cap-error {
+            margin: 4px 0 0;
+            color: $brand-danger;
+            font-size: 11px;
+        }
+
+        .sks-remove {
+            color: $brand-danger;
+        }
+    }
+
+    // --- 明細の入力フォーム ---------------------------------------------
+    .sks-item-form {
+        padding: 20px;
+        border: 1px solid $panel-default-border;
+        border-radius: $border-radius-base;
+        background: $table-bg-accent;
+
+        .sks-item-form-title {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: $font-size-base;
+            font-weight: bold;
+            color: $text-color;
+        }
+
+        .sks-item-form-actions {
+            margin-top: 8px;
+
+            .btn {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    .sks-expense-nav {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid $panel-default-border;
+
+        .btn {
+            margin-right: 8px;
+        }
+    }
+
+    .sks-expense-note {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    // --- 試算パネル -----------------------------------------------------
+    .sks-estimate-list {
+        margin-bottom: 0;
+
+        dt {
+            font-size: $font-size-small;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-bottom: 12px;
+            font-size: $font-size-base;
+            color: $text-color;
+        }
+
+        .sks-estimate-total {
+            padding-top: 12px;
+            border-top: 1px solid $panel-default-border;
+        }
+
+        dd.sks-estimate-total {
+            margin-bottom: 0;
+            font-size: $font-size-h4;
+            font-weight: bold;
+        }
+    }
+
+    .sks-estimate-capped,
+    .sks-estimate-disclaimer,
+    .sks-cap-help {
+        margin-top: 12px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+    }
+
+    .sks-cap-help {
+        margin-top: 0;
+        margin-bottom: 12px;
+    }
+
+    .sks-cap-list {
+        margin: 0;
+        font-size: $font-size-small;
+
+        li {
+            padding: 5px 0;
+            border-top: 1px solid $table-border-color;
+
+            &:first-child {
+                border-top: 0;
+            }
+        }
+
+        .sks-cap-amount {
+            float: right;
+            color: $text-muted;
+        }
+    }
+
+    // --- 編集できない場合のメッセージ -----------------------------------
+    .sks-expense-message {
+        padding: 24px 0;
+
+        .sks-expense-title {
+            margin-top: 16px;
+        }
+
+        .btn {
+            margin-top: 12px;
+        }
+    }
+}

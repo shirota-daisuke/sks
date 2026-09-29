@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-07 申請状況一覧・詳細画面 ③申請0件
+  ============================================================================
+  実装         src/fluent/sp-widget/application-list/template.html
+              ng-if="!c.data.applications.length" の空状態ブロック
+  表示条件     data.applications.length === 0
+              → 一覧テーブル・件数（全 n 件）は非表示、空状態メッセージのみを表示
+              → data.selected が null のため下段の詳細パネルも描画されない
+  ============================================================================
+  想定ケース
+    事務局の承認直後で申請をまだ作成していない状態。
+    申請の作成・入力は申請入力機能（ITCOM主担当）側で行うため、本画面には作成ボタンを置かない。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-07 申請状況一覧・詳細 ③申請0件</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-02-no-data.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-02-empty.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-06-empty.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③申請0件</b>：<code>data.applications.length === 0</code>。
+      空状態メッセージのみを表示し、下段の詳細パネルは描画しない。
+    </p>
+
+    <div class="sks-app-list">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">申請状況一覧</h3>
+          <!-- 0件のため <span class="sks-count"> は非表示 -->
+        </div>
+
+        <!-- ng-if="!c.data.applications.length" -->
+        <div class="panel-body text-center text-muted">
+          <!-- 実装：<i class="fa fa-file-text-o fa-2x" aria-hidden="true"></i> -->
+          <svg class="mock-icon mock-icon-2x" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <p>申請はまだ作成されていません。</p>
+        </div>
+      </div>
+
+      <!-- data.selected が null のため詳細パネル（ng-if="c.data.selected"）は描画されない -->
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

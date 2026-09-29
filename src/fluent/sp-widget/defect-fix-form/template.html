@@ -1,0 +1,121 @@
+<!-- 登録不備修正画面（中央配置のカード。不備内容の提示＋修正フォーム） -->
+<div class="sks-defect">
+  <div class="panel panel-default sks-defect-card">
+    <div class="panel-body">
+
+      <!-- トークン不正 -->
+      <div ng-if="c.data.state === 'invalid'" class="text-center sks-defect-message">
+        <i class="fa fa-exclamation-triangle fa-3x text-danger" aria-hidden="true"></i>
+        <h2 class="sks-defect-title">修正用のリンクが無効です</h2>
+        <p class="text-muted">
+          リンクが正しくないか、既に手続きが完了しています。<br />
+          お心当たりがない場合は、お手数ですが事務局へお問い合わせください。
+        </p>
+        <a class="btn btn-default" ng-href="{{c.data.topUrl}}">トップへ戻る</a>
+      </div>
+
+      <!-- トークン期限切れ -->
+      <div ng-if="c.data.state === 'expired'" class="text-center sks-defect-message">
+        <i class="fa fa-clock-o fa-3x text-warning" aria-hidden="true"></i>
+        <h2 class="sks-defect-title">リンクの有効期限が切れています</h2>
+        <p class="text-muted">
+          お手数ですが、事務局へご連絡のうえ修正用リンクの再発行をご依頼ください。
+        </p>
+        <a class="btn btn-default" ng-href="{{c.data.topUrl}}">トップへ戻る</a>
+      </div>
+
+      <!-- 既に再提出済み -->
+      <div ng-if="c.data.state === 'resubmitted'" class="text-center sks-defect-message">
+        <i class="fa fa-info-circle fa-3x text-info" aria-hidden="true"></i>
+        <h2 class="sks-defect-title">既に再提出済みです</h2>
+        <p class="text-muted">
+          修正内容は事務局へ提出されています。審査結果はご登録のメールアドレスへご連絡します。
+        </p>
+        <a class="btn btn-default" ng-href="{{c.data.topUrl}}">トップへ戻る</a>
+      </div>
+
+      <!-- 修正フォーム -->
+      <div ng-if="c.data.state === 'form'">
+        <h2 class="sks-defect-title">ご登録内容の修正</h2>
+
+        <dl class="dl-horizontal sks-defect-account">
+          <dt>ログインID</dt>
+          <dd>{{c.data.context.loginId}}</dd>
+          <dt>メールアドレス</dt>
+          <dd>{{c.data.context.email}}</dd>
+          <dt ng-if="c.data.context.requestedOn">登録申請日時</dt>
+          <dd ng-if="c.data.context.requestedOn">{{c.data.context.requestedOn}}</dd>
+        </dl>
+
+        <!-- 事務局が記載した不備内容。改行を保持して表示する -->
+        <div class="alert alert-warning sks-defect-note" role="alert">
+          <h3 class="sks-defect-note-title">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+            事務局からの確認事項
+          </h3>
+          <p class="sks-defect-note-body">{{c.data.context.issueNote}}</p>
+        </div>
+
+        <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+          <ul class="list-unstyled sks-error-list">
+            <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+          </ul>
+        </div>
+
+        <form name="defectForm" ng-submit="c.submit()" novalidate>
+          <div class="form-group">
+            <label for="sks-defect-business-name">事業者名（法人名／屋号） <span class="text-danger">*</span></label>
+            <input type="text" id="sks-defect-business-name" name="businessName" class="form-control"
+                   ng-model="c.form.business_name" maxlength="100" required />
+          </div>
+
+          <div class="form-group">
+            <label>事業者区分 <span class="text-danger">*</span></label>
+            <div class="radio">
+              <label for="sks-defect-entity-corporate">
+                <input type="radio" id="sks-defect-entity-corporate" name="entityType"
+                       ng-model="c.form.entity_type" value="corporate" />
+                法人
+              </label>
+            </div>
+            <div class="radio">
+              <label for="sks-defect-entity-sole">
+                <input type="radio" id="sks-defect-entity-sole" name="entityType"
+                       ng-model="c.form.entity_type" value="sole_proprietor" />
+                個人事業主
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sks-defect-corporate-number">法人番号／本人識別情報 <span class="text-danger">*</span></label>
+            <input type="text" id="sks-defect-corporate-number" name="corporateNumber" class="form-control"
+                   placeholder="{{c.identifierHint()}}"
+                   ng-model="c.form.corporate_number" maxlength="13" required />
+            <span class="help-block">重複チェックのキーとして使用します（{{c.identifierHint()}}）。</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" ng-disabled="!c.canSubmit()">
+            <span ng-if="c.submitting"><i class="fa fa-spinner fa-spin"></i> 送信中…</span>
+            <span ng-if="!c.submitting">修正内容を提出する</span>
+          </button>
+        </form>
+
+        <p class="sks-defect-footer">{{c.data.inquiryNote}}</p>
+      </div>
+
+      <!-- 再提出完了（登録申請審査中） -->
+      <div ng-if="c.data.state === 'done'" class="text-center sks-defect-message">
+        <i class="fa fa-check-circle fa-3x text-success" aria-hidden="true"></i>
+        <h2 class="sks-defect-title">登録申請審査中</h2>
+        <p class="sks-done-lead">修正内容を受け付けました。</p>
+        <p class="text-muted">
+          <strong>{{c.data.result.businessName}}</strong> の登録申請を事務局が改めて審査します。<br />
+          審査が完了すると、ご登録のメールアドレスへ結果をご連絡します。
+        </p>
+        <a class="btn btn-default" ng-href="{{c.data.topUrl}}">トップへ戻る</a>
+      </div>
+
+    </div>
+  </div>
+</div>

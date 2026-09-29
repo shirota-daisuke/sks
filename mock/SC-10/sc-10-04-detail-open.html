@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 ④問合せ詳細（未回答＝回答待ち）
+  ============================================================================
+  画面設計書  SC-10 ③アクション定義 No.2「問合せ履歴 行クリック」
+              → 処理なし（詳細情報の取得・表示）→ 問合せ詳細・返信内容を表示
+  実装         src/fluent/sp-widget/inquiry-form/client_script.js  c.showDetail()
+              src/fluent/sp-widget/inquiry-form/server_script.js   loadDetail()
+  表示条件     c.panel === 'detail' かつ c.data.selected != null
+              かつ c.data.selected.replyBody が空（＝状態は未回答）
+  参照範囲     loadDetail() は applyScope() で
+              u_business_entity＝自社 ＋（scope='self' のとき）u_created_by_applicant＝自身
+              に限定するため、他ユーザ・他事業者の sys_id を指定しても取得されない（null）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 ④問合せ詳細（未回答）</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li class="is-active"><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>④問合せ詳細（未回答）</b>：履歴の件名クリックで <code>c.panel = 'detail'</code>。
+      回答本文（<code>u_reply_body</code>）が未登録のため、回答欄の代わりに回答待ちの案内を表示する。
+    </p>
+
+    <div class="sks-inquiry">
+      <div class="row">
+
+        <!-- 左：問合せ履歴（クリックした行が選択状態） -->
+        <div class="col-md-7 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ履歴</h3>
+              <span class="sks-count">全 2 件</span>
+            </div>
+
+            <table class="table table-hover sks-table">
+              <thead>
+                <tr>
+                  <th>件名</th>
+                  <th class="sks-col-state">状態</th>
+                  <th class="sks-col-date">更新日</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sks-row-selected">
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">経費区分の判定について</button>
+                  </td>
+                  <td><span class="label label-warning">未回答</span></td>
+                  <td>2026/08/09</td>
+                </tr>
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">申請書類の記載方法について</button>
+                  </td>
+                  <td><span class="label label-success">回答済</span></td>
+                  <td>2026/07/28</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 右：問合せ詳細 -->
+        <div class="col-md-5 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ内容</h3>
+              <button type="button" class="btn btn-link sks-new-link">新規問合せ</button>
+            </div>
+            <div class="panel-body">
+
+              <!-- 送信直後以外は alert-success（ng-if="c.created"）は表示しない -->
+
+              <h4 class="sks-detail-subject">経費区分の判定について</h4>
+              <p class="sks-detail-meta">
+                <span class="label label-warning">未回答</span>
+                <span class="sks-received">受付：2026/08/09 14:30</span>
+              </p>
+
+              <div class="sks-detail-block">
+                <h5>お問合せ内容</h5>
+                <p class="sks-body-text">クラウドサービス利用費の対象範囲について確認させてください。</p>
+              </div>
+
+              <!-- ng-if="!c.data.selected.replyBody" -->
+              <p class="text-muted sks-waiting">
+                事務局からの回答をお待ちください。回答が登録されるとこの欄に表示されます。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

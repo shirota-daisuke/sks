@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-02 仮登録画面 ③仮登録完了
+  ============================================================================
+  画面設計書  SC-02 ③アクション No.1「仮登録する」
+              → 処理No.1 仮登録受付／処理No.2 本登録案内メール送信
+              → 画面遷移せず、画面内に仮登録完了メッセージを表示し入力欄をクリアする
+  実装         src/fluent/sp-widget/register-form/client_script.js  c.view = 'done'
+              src/fluent/sp-widget/register-form/server_script.js   acceptTemporaryRegistration()
+  表示条件     c.view === 'done'（result.success === true）
+  ============================================================================
+  この時点で登録されるデータ（x_dent2_dentsusoke_user）
+    ・user_name                            = 入力したログインID
+    ・email                                = 入力したメールアドレス
+    ・u_registration_status                = 登録中（registering）※未登録 → 登録中
+    ・u_auth_method                        = 通常認証（standard）
+    ・u_registration_token                 = GUID×2（64桁）
+    ・u_registration_token_expires_on      = 7日後（options.token_valid_days 既定7）
+    → gs.eventQueue('x_dent2_dentsusoke.registration.invite', ...) で案内メールを起動
+  ============================================================================
+  注意
+    ・メールは対象ユーザの通知設定（sys_user.notification）が有効な場合のみ生成される。
+    ・完了メッセージにはアカウントの存在有無を推測させる情報を含めない。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-02 仮登録 ③仮登録完了</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <a class="mock-header-link" href="../SC-01/sc-01-01-login.html">ログイン</a>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③仮登録完了</b>：<code>c.view === 'done'</code>。
+      フォームを完了メッセージに差し替える（画面遷移なし）。入力値は <code>c.form</code> をクリアして保持しない。
+    </p>
+
+    <div class="sks-register">
+      <div class="panel panel-default sks-register-card">
+        <div class="panel-body">
+
+          <h2 class="sks-register-title">仮登録</h2>
+
+          <!-- ng-if="c.view === 'done'" -->
+          <div class="text-center sks-register-done">
+            <!-- 実装：<i class="fa fa-check-circle fa-3x text-success" aria-hidden="true"></i> -->
+            <svg class="mock-icon mock-icon-3x text-success" viewBox="0 0 24 24" aria-hidden="true" style="fill:#5cb85c">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+            </svg>
+            <p class="sks-done-lead">仮登録を受け付けました。</p>
+            <p class="text-muted">
+              <strong>taro.jigyo@example.co.jp</strong> 宛に本登録用のご案内をお送りしました。<br />
+              メール内のリンクから本登録にお進みください。
+            </p>
+            <p class="text-muted sks-done-note">
+              メールが届かない場合は、迷惑メールフォルダをご確認ください。
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

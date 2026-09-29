@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-01 申請入力：基本情報（STEP1／処理No.16 申請情報入力）
+  ============================================================================
+  位置づけ   ITCOM 主担当（申請機能）の未実装画面に対する【設計提案】のモック。
+             既存の SC-00〜SC-10 のモックは実装済みウィジェットの写しだが、
+             本フォルダの画面は実装が存在しないため、実装との一致を保証しない。
+             画面番号は画面設計書に未定義のため ITCOM-nn の仮番号を付けている。
+
+  想定する処理  処理No.16 申請情報入力
+  対象ユーザ    事業者ユーザ（applicant／applicant_admin）
+
+  参照した既存定義
+    T03 申請（x_dent2_dentsusoke_request）の列
+      u_organization_type          組織形態（法人／個人事業主／その他）
+      u_employee_count_category    従業員数区分（6区分）
+      u_sales_increase_target_month 売上増加率対象月
+      u_sales_increase_rate        売上増加率
+      u_special_measure_flag       特例措置対象フラグ
+      u_application_status         申請ステータス（input＝申請入力中）
+    T01 事業者の登録内容は参照表示のみ（変更は SC-06 自分の情報で行う）
+
+  現状の実装との差分
+    暫定実装（src/fluent/sp-page/apply/apply.now.ts）は本STEP1の項目と
+    対象経費合計金額だけを1画面に収めたもので、ステップ分割・経費明細・添付書類は無い。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・申請項目の正式な構成（設計書に項目一覧が無い）
+    ・組織形態の選択肢（T03 のコメントにも「設計書に定義がないため暫定値」とある）
+    ・売上増加率の算定方法と対象期間の終期（A07／A08）
+    ・公募回次（T03 に列が無く、複数回次の申請を表現できない）
+    ・一時保存の保持期間・提出期限
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-01 申請入力：基本情報（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      申請機能（処理No.16 以降）は ITCOM 主担当の範囲で未実装のため、この画面は実装の写しではなく提案です。
+      画面番号 <code>ITCOM-01</code> は仮番号で、画面設計書への追番が必要です。
+      現状の暫定実装（<code>src/fluent/sp-page/apply/apply.now.ts</code>）はステップ分割しておらず、経費明細・添付書類もありません。
+    </p>
+
+    <!-- 申請入力のステップ。STEP1〜4 を通して1件の申請（u_application_status='input'）を編集する -->
+    <ul class="sks-apply-steps">
+      <li class="is-active"><span class="sks-step-no">1</span>基本情報</li>
+      <li><span class="sks-step-no">2</span>対象経費</li>
+      <li><span class="sks-step-no">3</span>添付書類</li>
+      <li><span class="sks-step-no">4</span>内容確認・提出</li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請の入力 — 基本情報</h3>
+          </div>
+          <div class="panel-body">
+
+            <!-- 一時保存からの復帰時に表示する（申請入力中の申請が既にある場合） -->
+            <div class="alert alert-info">
+              入力中の申請を復元しました（最終保存 2026/09/24 14:32）。提出まで内容は公開されません。
+            </div>
+
+            <!-- ---------------------------------------------------------------
+                 事業者情報（参照のみ）
+                 T01 の登録内容をそのまま表示する。変更は SC-06 自分の情報で行うため、
+                 申請画面からは編集させない（同じ項目に2つの入口を作らない）。
+            ---------------------------------------------------------------- -->
+            <h4 class="sks-form-section">事業者情報</h4>
+            <p class="sks-form-section-note">
+              ご登録済みの内容を表示しています。変更が必要な場合は
+              <a href="../SC-06/sc-06-01-view.html">自分の情報</a>から先に更新してください。
+            </p>
+
+            <dl class="sks-confirm-list">
+              <dt>事業者名</dt>
+              <dd>株式会社テスト</dd>
+              <dt>法人番号</dt>
+              <dd>1234567890123</dd>
+              <dt>所在地</dt>
+              <dd>東京都千代田区丸の内1-2-3</dd>
+              <dt>業種</dt>
+              <dd>サービス業</dd>
+            </dl>
+
+            <!-- ---------------------------------------------------------------
+                 申請区分
+            ---------------------------------------------------------------- -->
+            <h4 class="sks-form-section">申請区分</h4>
+            <p class="sks-form-section-note">
+              従業員数区分は補助上限額（補助上限額マスタ）と補助率（補助率マスタ）の判定に使用します。
+            </p>
+
+            <div class="form-group">
+              <label for="organization-type">組織形態 <span class="text-danger">*</span></label>
+              <select id="organization-type" class="form-control">
+                <option>法人</option>
+                <option>個人事業主</option>
+                <option>その他</option>
+              </select>
+              <span class="help-block">
+                T03 <code>u_organization_type</code>。選択肢は設計書に定義がないため暫定値です。
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-category">従業員数区分 <span class="text-danger">*</span></label>
+              <select id="employee-category" class="form-control">
+                <option>個人事業主</option>
+                <option>5人以下</option>
+                <option selected>6～20人</option>
+                <option>21～50人</option>
+                <option>51～100人</option>
+                <option>101人以上</option>
+              </select>
+              <span class="help-block">公募要領「2.(1) 基本概要」の補助上限表の6区分。</span>
+            </div>
+
+            <!-- ---------------------------------------------------------------
+                 売上増加率
+                 算定方法・対象期間の終期が未確定（A07／A08）。
+                 本モックでは「対象月」と「増加率」を申請者の自己申告で受け取る構成としているが、
+                 前年同月の売上と当月の売上を入力させて画面側で算定する案もありうる。
+            ---------------------------------------------------------------- -->
+            <h4 class="sks-form-section">売上増加率</h4>
+            <p class="sks-form-section-note">
+              対象期間は2025年1月以降です。終期の確定が必要です（確認事項 A07）。
+            </p>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="target-month">売上増加率対象月 <span class="text-danger">*</span></label>
+                  <input type="month" id="target-month" class="form-control" value="2026-06" />
+                  <span class="help-block">T03 <code>u_sales_increase_target_month</code>（DateColumn。月初日で保持）。</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="increase-rate">売上増加率 <span class="text-danger">*</span></label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input type="text" id="increase-rate" class="form-control" value="15.0" />
+                    </div>
+                    <div class="col-md-6">
+                      <p class="form-control-static" style="padding-top:7px;">％</p>
+                    </div>
+                  </div>
+                  <span class="help-block">
+                    T03 <code>u_sales_increase_rate</code> は小数で保持します（15.0% → 0.15）。
+                    端数処理・前年売上ゼロ／欠損値の扱いが未確定です（A08）。
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ---------------------------------------------------------------
+                 特例措置
+                 該当すると補助上限額マスタの special_measure_flag=true の行が適用され上限が上がる。
+                 該当要件（賃上げ等）が未確定のため、本モックでは自己申告のチェックボックスとしている。
+                 要件が確定した場合は根拠書類の添付（STEP3）を必須にする想定。
+            ---------------------------------------------------------------- -->
+            <h4 class="sks-form-section">特例措置</h4>
+
+            <div class="radio">
+              <label>
+                <input type="radio" name="special" />
+                特例措置の対象ではない
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="special" checked />
+                特例措置の対象である
+              </label>
+            </div>
+            <p class="sks-judge-hint">
+              対象の場合、補助上限額が引き上げられます。該当要件と根拠書類は未確定です。
+            </p>
+
+            <div class="sks-form-actions">
+              <button type="button" class="btn btn-default">一時保存</button>
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-primary">次へ（対象経費）</button>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 右カラム：この時点で判定できる補助条件 -->
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">適用される補助条件</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-amount-summary">
+              <dt>従業員数区分</dt>
+              <dd>6～20人</dd>
+              <dt>特例措置</dt>
+              <dd>対象</dd>
+              <dt>補助率（補助率マスタ）</dt>
+              <dd>1/2</dd>
+              <dt>補助上限額（補助上限額マスタ）</dt>
+              <dd>20,000,000円</dd>
+            </dl>
+            <p class="text-muted" style="margin-top:12px; font-size:12px;">
+              補助金額は STEP2 で対象経費を入力すると試算されます。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請の進め方</h3>
+          </div>
+          <div class="panel-body">
+            <p class="text-muted" style="font-size:12px; line-height:1.9; margin:0;">
+              STEP1〜3 は「一時保存」で中断・再開できます。<br />
+              STEP4 で内容を確認して提出すると、申請番号が採番され事務局の審査が始まります。<br />
+              提出後は内容を変更できません。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：ステータスは提出まで <code>u_application_status='input'</code> のまま。
+      事務局のダッシュボード・一覧は <code>!=input</code> で絞っているため、入力中の申請は事務局へ露出しません。
+      ACL は <code>acl_request_create_applicant</code>／<code>acl_request_write_applicant</code>（自社かつ input のみ）で制御します。
+    </p>
+
+  </div>
+</main>
+
+</body>
+</html>

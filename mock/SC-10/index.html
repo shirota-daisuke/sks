@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 モック一覧（実装用HTML）
+  ============================================================================
+  SC-10 は1ページ内で表示状態が切り替わる構成のため、
+  表示状態ごとに1ファイルとして作成している。
+  DOM構造・class名・文言は実装（src/fluent/sp-widget/inquiry-form/template.html）と
+  同一に保ち、AngularJS ディレクティブを静的化してHTMLコメントで併記している。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 モック一覧</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+<style>
+  .idx-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 56px; }
+  .idx-head { margin-bottom: 24px; }
+  .idx-head h1 { margin: 0 0 6px; font-size: 22px; }
+  .idx-head p { margin: 0; color: #777; font-size: 13px; }
+  .idx-table { background: #fff; border: 1px solid #ddd; border-radius: 4px; }
+  .idx-table th, .idx-table td { padding: 10px 12px; border-top: 1px solid #eee; font-size: 13px; vertical-align: top; }
+  .idx-table thead th { background: #f5f5f5; border-top: 0; color: #555; font-weight: bold; white-space: nowrap; }
+  .idx-table td code { font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #a33; }
+  .idx-no { width: 44px; color: #777; white-space: nowrap; }
+  .idx-file { white-space: nowrap; }
+  .idx-section { margin: 32px 0 10px; font-size: 16px; font-weight: bold; }
+  .idx-list { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px 14px 34px; }
+  .idx-list li { margin-bottom: 8px; font-size: 13px; line-height: 1.8; }
+  .idx-list li:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div class="idx-wrap">
+
+  <div class="idx-head">
+    <h1>SC-10 問合せ一覧・作成画面 — 実装用HTML（表示状態別）</h1>
+    <p>
+      成長加速支援補助金 申請ポータル／ポータル系（HLC主担当）
+      ｜ 対応実装：<code>src/fluent/sp-widget/inquiry-form/</code>
+      ｜ 対応ページ：<code>x_dent2_dentsusoke_inquiries</code>
+    </p>
+  </div>
+
+  <table class="table idx-table">
+    <thead>
+      <tr>
+        <th class="idx-no">No</th>
+        <th>表示状態</th>
+        <th class="idx-file">ファイル</th>
+        <th>表示条件（AngularJS）</th>
+        <th>対応する設計書項目</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="idx-no">①</td>
+        <td>初期表示<br />（履歴＋新規問合せフォーム）</td>
+        <td class="idx-file"><a href="sc-10-01-list-new.html">sc-10-01-list-new.html</a></td>
+        <td><code>c.panel === 'new'</code></td>
+        <td>①レイアウト構成／②F1・F2／⑤表示条件</td>
+      </tr>
+      <tr>
+        <td class="idx-no">②</td>
+        <td>入力エラー<br />（サーバー検証エラー）</td>
+        <td class="idx-file"><a href="sc-10-02-new-error.html">sc-10-02-new-error.html</a></td>
+        <td><code>c.serverErrors.length &gt; 0</code></td>
+        <td>②F1（200文字）・F2（2000文字）</td>
+      </tr>
+      <tr>
+        <td class="idx-no">③</td>
+        <td>送信完了<br />（履歴に追加＋詳細表示）</td>
+        <td class="idx-file"><a href="sc-10-03-created.html">sc-10-03-created.html</a></td>
+        <td><code>c.created &amp;&amp; c.panel === 'detail'</code></td>
+        <td>③アクションNo.1／処理No.46</td>
+      </tr>
+      <tr>
+        <td class="idx-no">④</td>
+        <td>問合せ詳細<br />（未回答＝回答待ち）</td>
+        <td class="idx-file"><a href="sc-10-04-detail-open.html">sc-10-04-detail-open.html</a></td>
+        <td><code>c.panel === 'detail'</code>／<code>replyBody</code> 空</td>
+        <td>③アクションNo.2</td>
+      </tr>
+      <tr>
+        <td class="idx-no">⑤</td>
+        <td>問合せ詳細<br />（回答済＝事務局回答あり）</td>
+        <td class="idx-file"><a href="sc-10-05-detail-answered.html">sc-10-05-detail-answered.html</a></td>
+        <td><code>c.data.selected.replyBody</code> 非空</td>
+        <td>③アクションNo.2／処理No.47（SC-14で登録）</td>
+      </tr>
+      <tr>
+        <td class="idx-no">⑥</td>
+        <td>問合せ0件<br />（初回利用）</td>
+        <td class="idx-file"><a href="sc-10-06-empty.html">sc-10-06-empty.html</a></td>
+        <td><code>c.data.inquiries.length === 0</code></td>
+        <td>①レイアウト構成（空状態）</td>
+      </tr>
+      <tr>
+        <td class="idx-no">⑦</td>
+        <td>事業者ユーザ以外<br />（案内のみ）</td>
+        <td class="idx-file"><a href="sc-10-07-not-applicant.html">sc-10-07-not-applicant.html</a></td>
+        <td><code>c.data.isApplicant === false</code></td>
+        <td>権限設計書5章（画面アクセス制御）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="idx-section">実装との対応</div>
+  <ul class="idx-list">
+    <li>
+      画面の枠（ヘッダー・トップタブ）は <code>.mock-header</code>／<code>.mock-tabs</code> で再現したモック専用要素です。
+      実装では OOTB Stock Header と Header Menu（<code>src/fluent/sp-instance-menu/menu.now.ts</code> の5タブ）が描画します。
+    </li>
+    <li>
+      <code>&lt;div class="sks-inquiry"&gt;</code> 以下がウィジェットの描画範囲で、
+      <code>template.html</code> と同一の DOM 構造・class 名・文言です。分岐は
+      <code>&lt;!-- ng-if="..." --&gt;</code> の形でコメント併記しています。
+    </li>
+    <li>
+      スタイルは <code>assets/sc-10-mock.css</code> に集約しています。
+      前半は Bootstrap 3 相当の最小サブセット、後半が <code>styles.scss</code> 相当で、
+      SCSS変数（<code>$brand-primary</code>／<code>$text-muted</code>／<code>$table-bg-accent</code>／<code>$font-size-small</code>）は
+      Bootstrap 3 の既定値で解決しています。実際の色はポータルテーマ（OOTB Coral）により変わります。
+    </li>
+    <li>
+      アイコンは実装では Font Awesome（<code>&lt;i class="fa fa-comments-o"&gt;</code>）ですが、
+      モックは外部CSSを読み込まないためインラインSVGで代替しています。
+    </li>
+    <li>
+      表示データは検証環境のデモデータに沿えています（事業者：株式会社テスト／起票者：事業 太郎）。
+      「申請書類の記載方法について（回答済）」は回答表示を確認するための追加データで、実インスタンスには未登録です。
+    </li>
+  </ul>
+
+  <div class="idx-section">未反映・確認事項</div>
+  <ul class="idx-list">
+    <li>
+      <b>件数上限の明示</b>：<code>max_records=30</code> を超える場合のみ
+      <code>&lt;div class="panel-footer sks-truncated"&gt;</code> が表示されます。
+      ①のファイル内にコメントとして markup を残しています。
+    </li>
+    <li>
+      <b>参照範囲（Q05 未決）</b>：ウィジェットオプション <code>scope</code> は <code>self</code>（自身が起票した問合せのみ）で配置済みです。
+      <code>entity</code>（同一事業者の問合せ）へ切り替える場合、履歴に他ユーザの問合せが並ぶため、起票者列の追加要否を検討してください。
+    </li>
+    <li>
+      <b>やり取りの継続（SC-10 ⑥ 未確定）</b>：現在は「1問合せ＝1回答」の単一回答モデルです。
+      複数往復を認める場合は⑤の回答ブロックをスレッド表示に変更する必要があります。
+    </li>
+    <li>
+      <b>問合せ受付通知（SC-14 確認事項）</b>：受付時・回答時のメール通知は要否未確定のため未実装です。画面上の案内文にも含めていません。
+    </li>
+  </ul>
+
+</div>
+
+</body>
+</html>

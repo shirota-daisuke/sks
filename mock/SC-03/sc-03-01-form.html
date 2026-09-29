@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-03 本登録画面 ①フォーム表示（有効な仮登録トークン）
+  ============================================================================
+  画面設計書  SC-03 ①レイアウト構成（中央配置の本登録カード）
+              SC-03 ②F1 事業者名／事業者区分／F2 パスワード（8文字以上・暫定）／
+                      F3 パスワード確認／F4 法人番号・本人識別情報／F5 利用規約同意
+              SC-03 ③アクション No.1「本登録を完了する」
+                      → 処理No.3 本登録／処理No.4 前年登録判定／処理No.5 重複チェック
+  実装         src/fluent/sp-page/signup/signup.now.ts（public: true）
+              src/fluent/sp-widget/signup-form/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     data.state === 'form'
+              （URLパラメータ token が有効かつ対象ユーザの登録ステータスが「登録中」）
+  アクセス     未認証（guest）。仮登録案内メールのリンク
+              ?id=x_dent2_dentsusoke_signup&token=<64桁> からアクセスする。
+  ============================================================================
+  実装との対応
+    ・ログインID／メールアドレスはトークンから解決した確認表示（入力不可）。
+    ・「本登録を完了する」は c.canSubmit() が真のときのみ有効。条件は
+      利用規約同意 かつ 事業者名・事業者区分・法人番号・パスワード・確認 が入力済 かつ パスワード一致。
+      初期表示は未同意・未入力のため無効。
+    ・法人番号のプレースホルダ／ヒントは事業者区分により切り替わる（c.identifierHint()）。
+        法人 → 「13桁の数字」／個人事業主 → 「半角英数字13桁以内」
+    ・事業者区分の既定は「法人」（c.form.entity_type = 'corporate'）。
+    ・所在地・業種は SC-03 の入力項目ではないため未設定で事業者レコードを作成する
+      （テーブル定義書 T01 では必須。SC-06 で登録する運用を想定／要レビュー）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-03 本登録 ①フォーム表示</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">未ログイン（仮登録トークンでアクセス）</span>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①フォーム表示</b>：<code>data.state === 'form'</code>。
+      メールのリンク（<code>?id=x_dent2_dentsusoke_signup&amp;token=…</code>）から未認証でアクセスする。
+      ログインID・メールアドレスはトークンから解決した確認表示。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS 本登録フォーム）の描画範囲 -->
+    <div class="sks-signup">
+      <div class="panel panel-default sks-signup-card">
+        <div class="panel-body">
+
+          <!-- ng-if="c.data.state === 'form'" -->
+          <div>
+            <h2 class="sks-signup-title">本登録</h2>
+
+            <dl class="dl-horizontal sks-signup-account">
+              <dt>ログインID</dt>
+              <dd>taro0001</dd>
+              <dt>メールアドレス</dt>
+              <dd>taro.jigyo@example.co.jp</dd>
+            </dl>
+
+            <!-- サーバー検証エラー（ng-if="c.serverErrors.length"）は ②入力エラー を参照 -->
+
+            <form name="signupForm" novalidate>
+              <div class="form-group">
+                <label for="sks-business-name">事業者名（法人名／屋号） <span class="text-danger">*</span></label>
+                <input type="text" id="sks-business-name" name="businessName" class="form-control"
+                       placeholder="株式会社サンプル" maxlength="100" required />
+              </div>
+
+              <div class="form-group">
+                <label>事業者区分 <span class="text-danger">*</span></label>
+                <div class="radio">
+                  <label for="sks-entity-corporate">
+                    <input type="radio" id="sks-entity-corporate" name="entityType" value="corporate" checked />
+                    法人
+                  </label>
+                </div>
+                <div class="radio">
+                  <label for="sks-entity-sole">
+                    <input type="radio" id="sks-entity-sole" name="entityType" value="sole_proprietor" />
+                    個人事業主
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sks-corporate-number">法人番号／本人識別情報 <span class="text-danger">*</span></label>
+                <!-- placeholder="{{c.identifierHint()}}"（法人＝13桁の数字／個人事業主＝半角英数字13桁以内） -->
+                <input type="text" id="sks-corporate-number" name="corporateNumber" class="form-control"
+                       placeholder="13桁の数字" maxlength="13" required />
+                <span class="help-block">重複チェックのキーとして使用します（13桁の数字）。</span>
+              </div>
+
+              <div class="form-group">
+                <label for="sks-password">パスワード <span class="text-danger">*</span></label>
+                <input type="password" id="sks-password" name="password" class="form-control" maxlength="128" required />
+                <span class="help-block">8文字以上128文字以内で入力してください。</span>
+              </div>
+
+              <div class="form-group">
+                <label for="sks-password-confirm">パスワード（確認） <span class="text-danger">*</span></label>
+                <input type="password" id="sks-password-confirm" name="passwordConfirm" class="form-control" maxlength="128" required />
+                <!-- 不一致時のみ has-error ＋ help-block（②入力エラー を参照） -->
+              </div>
+
+              <div class="checkbox sks-agree">
+                <label for="sks-agreed">
+                  <input type="checkbox" id="sks-agreed" />
+                  利用規約に同意する <span class="text-danger">*</span>
+                </label>
+              </div>
+
+              <!-- ng-disabled="!c.canSubmit()"：未同意・未入力のため無効 -->
+              <button type="submit" class="btn btn-primary btn-block" disabled>本登録を完了する</button>
+            </form>
+
+            <p class="sks-signup-note">
+              完了後、前年度登録有無の判定・重複チェックを実施し、事務局承認後に利用開始となります。
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

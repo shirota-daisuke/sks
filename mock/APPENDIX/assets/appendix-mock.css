@@ -1,0 +1,187 @@
+/* ==========================================================================
+   付録：画面番号未定の実装済み画面 モック 追加スタイル
+   ==========================================================================
+   Bootstrap 3 相当の基礎スタイルは ../assets/sks-mock.css を先に読み込むこと。
+   本ファイルは、実装の styles.scss 相当のうち
+   ../assets/sks-mock.css に含まれていないものを定義する。
+
+   対応する実装
+     src/fluent/sp-widget/application-form/styles.scss（申請入力・提出）
+
+   SCSS 変数は Bootstrap 3 の既定値で解決している（既存モックと同じ方針）。
+     $font-size-base   14px
+     $font-size-large  18px
+     $font-size-small  12px
+     $font-size-h3     24px
+     $font-size-h4     18px
+     $text-color       #333
+     $text-muted       #777
+     $panel-default-border #ddd
+   実際の色はポータルテーマ（OOTB Coral）により変わる。
+   ========================================================================== */
+
+/* --- 申請入力・提出（sks-apply）---------------------------------------- */
+
+.sks-apply {
+    padding: 24px 0;
+}
+
+.sks-apply .sks-apply-card .panel-body,
+.sks-apply .sks-estimate-card .panel-body {
+    padding: 24px;
+}
+
+.sks-apply .sks-apply-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.sks-apply .sks-apply-entity {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.sks-apply .sks-apply-entity dt {
+    width: 100px;
+    color: #777;
+    font-weight: normal;
+}
+
+.sks-apply .sks-apply-entity dd {
+    margin-left: 116px;
+}
+
+.sks-apply .sks-error-list {
+    margin-bottom: 0;
+}
+
+.sks-apply .sks-apply-special {
+    margin-bottom: 20px;
+}
+
+/* ボタンは横並び。幅が狭い場合は折り返す */
+.sks-apply .sks-apply-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.sks-apply .sks-apply-note {
+    margin-top: 20px;
+    margin-bottom: 0;
+    font-size: 12px;
+    color: #777;
+}
+
+/* 完了・提出済みのメッセージ */
+.sks-apply .sks-apply-message {
+    padding: 16px 0;
+}
+
+.sks-apply .sks-apply-message .sks-apply-title {
+    margin-top: 16px;
+}
+
+.sks-apply .sks-apply-message .sks-done-lead {
+    font-size: 18px;
+    color: #333;
+}
+
+.sks-apply .sks-apply-message .sks-apply-result {
+    display: inline-block;
+    margin: 20px 0 0;
+    text-align: left;
+}
+
+.sks-apply .sks-apply-message .sks-apply-result dt {
+    width: 140px;
+    color: #777;
+    font-weight: normal;
+}
+
+.sks-apply .sks-apply-message .sks-apply-result dd {
+    margin-left: 156px;
+}
+
+.sks-apply .sks-apply-message .btn {
+    margin-top: 20px;
+}
+
+/* 試算パネル */
+.sks-apply .sks-estimate-list {
+    margin-bottom: 0;
+}
+
+.sks-apply .sks-estimate-list dt {
+    font-size: 12px;
+    color: #777;
+    font-weight: normal;
+}
+
+.sks-apply .sks-estimate-list dd {
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #333;
+}
+
+.sks-apply .sks-estimate-list .sks-estimate-total {
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+}
+
+.sks-apply .sks-estimate-list dd.sks-estimate-total {
+    margin-bottom: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sks-apply .sks-estimate-capped,
+.sks-apply .sks-estimate-disclaimer {
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-size: 12px;
+}
+
+/* --- モック注記 -------------------------------------------------------- */
+
+.mock-appendix {
+    margin: 0 0 20px;
+    padding: 10px 14px;
+    border: 1px solid #a6c9e2;
+    border-left-width: 4px;
+    border-radius: 3px;
+    background: #eef5fc;
+    color: #2b5f8c;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.mock-appendix b {
+    color: #1f4a6e;
+}
+
+.mock-appendix code {
+    padding: 1px 4px;
+    background: #fff;
+    border: 1px solid #cfe0ee;
+    border-radius: 3px;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 11px;
+    color: #a33;
+}
+
+/* 状態の区切り（1ファイルに複数状態を並べる場合） */
+.mock-state-divider {
+    margin: 32px 0 12px;
+    padding-top: 20px;
+    border-top: 2px dashed #ccc;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}

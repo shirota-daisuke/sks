@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-05 マイページ ③事業者に紐づかないユーザ（案内のみ）
+  ============================================================================
+  実装         src/fluent/sp-widget/mypage-summary/server_script.js
+                 PortalContextUtil.getMyEntityId() が空 → data.message を設定して return
+              src/fluent/sp-widget/mypage-notices/template.html      ng-if="!c.data.isApplicant"
+              src/fluent/sp-widget/mypage-applications/template.html ng-if="!c.data.isApplicant"
+  表示条件     data.isApplicant === false
+              （事業者ユーザ拡張テーブルに行がない、または u_business_entity 未設定）
+  ============================================================================
+  ★ 補足（単体テスト No.59 の保留事項）
+    ページ側のロール制御（sp_page.roles = applicant / applicant_admin）により、
+    ロールを持たないユーザは通常 404 ページ（OOTB）へ遷移する。
+    ただし admin は hasRole 判定で全ロールを保持するためページが開く場合があり、
+    そのときに表示されるのが本状態。ウィジェット3本すべてで安全側に倒している。
+
+    ・サマリカード     → alert-warning ＋ 案内文（データ取得を行わない）
+    ・最近のお知らせ   → 「事業者ユーザでログインするとお知らせが表示されます。」
+    ・申請状況         → 「事業者ユーザでログインすると申請状況が表示されます。」
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-05 マイページ ③事業者ユーザ以外</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">System Administrator 様</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li class="is-active"><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③事業者ユーザ以外</b>：<code>data.isApplicant === false</code>。
+      3つのウィジェットがそれぞれ案内メッセージを表示し、データ取得は行わない。
+    </p>
+
+    <!-- ===== サマリカード ===== -->
+    <div class="sks-summary">
+      <!-- ng-if="!c.data.isApplicant" -->
+      <div class="alert alert-warning" role="alert">
+        このページは事業者ユーザ向けです。事業者情報が紐づいたアカウントでログインしてください。
+      </div>
+      <!-- 以降の <div class="row" ng-if="c.data.isApplicant"> は描画されない -->
+    </div>
+
+    <div class="row">
+
+      <!-- ===== 最近のお知らせ ===== -->
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="panel panel-default sks-notices">
+          <div class="panel-heading">
+            <h3 class="panel-title">最近のお知らせ</h3>
+            <a class="sks-more" href="#">すべて見る</a>
+          </div>
+
+          <!-- ng-if="!c.data.isApplicant" -->
+          <div class="panel-body">
+            <p class="text-muted">事業者ユーザでログインするとお知らせが表示されます。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 申請状況 ===== -->
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="panel panel-default sks-applications">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請状況</h3>
+            <a class="sks-more" href="#">申請状況一覧へ</a>
+          </div>
+
+          <!-- ng-if="!c.data.isApplicant" -->
+          <div class="panel-body">
+            <p class="text-muted">事業者ユーザでログインすると申請状況が表示されます。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

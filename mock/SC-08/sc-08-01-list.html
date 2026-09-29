@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-08 お知らせ一覧画面 ①初期表示（未読・既読が混在）
+  ============================================================================
+  画面設計書  SC-08 ①レイアウト構成（状態／重要度／タイトル／公開日の4列）
+              SC-08 ②表示項目 D1（お知らせ作成処理No.39／既読・未読情報取得 処理No.43／重要度設定 処理No.44）
+              SC-08 ③アクション No.1 行クリック → 既読化（処理No.43）→ SC-09 お知らせ詳細
+              SC-08 ⑤表示条件（公開範囲設定 処理No.40 に合致するお知らせのみ）
+              SC-08 ⑥確認事項（絞込・並び替え要件は未確定 → 並び順はオプションで切替）
+  実装         src/fluent/sp-page/notices/notices.now.ts（roles: applicant / applicant_admin）
+              src/fluent/sp-widget/notice-list/{template.html, client_script.js, server_script.js, styles.scss}
+              src/server/script-includes/notice-util.js（applyVisibilityQuery／list／countUnread／markAsRead）
+  表示条件     data.isApplicant === true かつ data.notices.length > 0
+  ============================================================================
+  実装との対応
+    ・表示対象は NoticeUtil.applyVisibilityQuery() の条件を満たすお知らせのみ。
+        u_publish_status = published
+        u_publish_start_date <= 今日 かつ u_publish_end_date >= 今日
+        u_visibility_scope = all または ログインユーザの事業者区分（法人／個人）
+    ・並び順は options.sort（既定 publish_date＝公開日降順／priority＝高→中→低）。
+    ・重要度ラベル（NoticeUtil.PRIORITY_LABEL_CLASSES）
+        高 high → label-danger（赤系）／中 middle → label-info（青系）／低 low → label-default（グレー系）
+    ・未読行は .sks-unread（タイトルが太字）＋状態列に「未読」バッジ。既読行は「既読」表示。
+    ・行クリック時、未読なら markAsRead() を実行してから詳細へ遷移する。既読ならそのまま遷移する
+      （既読日時は更新しない）。
+    ・ヘッダーに「全 n 件」、未読が1件以上あるときのみ「／ 未読 m 件」を併記する。
+  ============================================================================
+  本モックの表示データ（検証環境のデモデータ準拠。未読1件の状態）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-08 お知らせ一覧 ①初期表示</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li class="is-active"><a href="#">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①初期表示</b>：公開中かつ公開範囲が合致するお知らせを公開日降順で一覧表示する。
+      未読行はタイトルを太字にし、状態列に「未読」を表示する。タイトルクリックで既読化してから SC-09 へ遷移する。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS お知らせ一覧）の描画範囲 -->
+    <div class="sks-notice-list">
+
+      <!-- ng-if="c.data.isApplicant" -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">お知らせ一覧</h3>
+          <span class="sks-count">
+            全 3 件<!-- ng-if="c.data.unreadCount" --> ／ 未読 1 件
+          </span>
+        </div>
+
+        <!-- ng-if="c.data.notices.length" -->
+        <table class="table table-hover sks-table">
+          <thead>
+            <tr>
+              <th class="sks-col-state">状態</th>
+              <th class="sks-col-priority">重要度</th>
+              <th>タイトル</th>
+              <th class="sks-col-date">公開日</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ng-class="{'sks-unread': !notice.read}"：未読 -->
+            <tr class="sks-unread">
+              <td><span class="sks-state">未読</span></td>
+              <td><span class="label label-danger">高</span></td>
+              <td>
+                <button type="button" class="btn btn-link sks-title-link">一次審査の開始について</button>
+              </td>
+              <td>2026/08/10</td>
+            </tr>
+            <!-- 既読 -->
+            <tr>
+              <td><span class="sks-state sks-state-read">既読</span></td>
+              <td><span class="label label-info">中</span></td>
+              <td>
+                <button type="button" class="btn btn-link sks-title-link">提出書類フォーマット変更のご案内</button>
+              </td>
+              <td>2026/08/05</td>
+            </tr>
+            <tr>
+              <td><span class="sks-state sks-state-read">既読</span></td>
+              <td><span class="label label-default">低</span></td>
+              <td>
+                <button type="button" class="btn btn-link sks-title-link">システムメンテナンスのお知らせ</button>
+              </td>
+              <td>2026/08/01</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!--
+          件数上限（max_records=50）で切り捨てた場合のみ表示（ng-if="c.data.truncated"）。
+          <div class="panel-footer sks-truncated">
+            50 件を表示しています（全 62 件）。
+          </div>
+        -->
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

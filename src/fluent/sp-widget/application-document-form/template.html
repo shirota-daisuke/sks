@@ -1,0 +1,175 @@
+<!-- 添付書類の提出（ITCOM-03）：書類種別ごとの提出状況＋アップロード -->
+<div class="sks-doc">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <!-- 下書きが無い／提出済みで編集できない -->
+  <div ng-if="c.data.isApplicant && c.data.state !== 'form'" class="panel panel-default sks-doc-card">
+    <div class="panel-body text-center sks-doc-message">
+      <svg class="mock-icon" viewBox="0 0 16 16" width="42" height="42"
+           ng-attr-style="{{c.data.state === 'locked' ? 'fill:#5bc0de' : 'fill:#f0ad4e'}}">
+        <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3.2a1 1 0 110 2 1 1 0 010-2zm1.2 9.3H6.8v-1h.8V7.8h-.8v-1h2.4v5.7h.8v1z" />
+      </svg>
+      <h2 class="sks-doc-title">添付書類を提出できません</h2>
+      <p class="text-muted">{{c.data.message}}</p>
+      <p>
+        <a class="btn btn-primary" ng-if="c.data.state === 'no_draft'" ng-href="{{c.data.applyUrl}}">申請の入力へ</a>
+        <a class="btn btn-primary" ng-if="c.data.state === 'locked'" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- 提出画面 -->
+  <div ng-if="c.data.isApplicant && c.data.state === 'form'">
+
+    <ul class="sks-doc-steps">
+      <li class="is-done">
+        <a ng-href="{{c.data.applyUrl}}"><span class="sks-step-no">1</span>基本情報</a>
+      </li>
+      <li class="is-done">
+        <a ng-href="{{c.data.expenseUrl}}"><span class="sks-step-no">2</span>対象経費</a>
+      </li>
+      <li class="is-active"><span class="sks-step-no">3</span>添付書類</li>
+      <li>
+        <a ng-href="{{c.data.confirmUrl}}"><span class="sks-step-no">4</span>内容確認・提出</a>
+      </li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default sks-doc-card">
+          <div class="panel-body">
+            <h2 class="sks-doc-title">添付書類の提出</h2>
+
+            <dl class="dl-horizontal sks-doc-meta">
+              <dt>事業者名</dt>
+              <dd>{{c.data.entityName}}</dd>
+              <dt>申請の状態</dt>
+              <dd>{{c.data.request.statusLabel}}（最終保存 {{c.data.request.updatedOn}}）</dd>
+              <dt>組織形態</dt>
+              <dd>
+                {{c.data.request.organizationTypeLabel || '未選択'}}
+                <span ng-if="c.data.request.specialMeasure">／特例措置：対象</span>
+              </dd>
+            </dl>
+
+            <div class="alert alert-success" ng-if="c.saved" role="alert">
+              {{c.data.saveResult.message}}
+            </div>
+
+            <div class="alert alert-danger" ng-if="c.clientErrors.length || c.serverErrors.length" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.clientErrors track by $index">{{err}}</li>
+                <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+              </ul>
+            </div>
+
+            <!--
+              ファイル入力は画面に1つだけ置き、行のボタンから click() して使う。
+              行ごとに置くと ng-repeat 内のスコープを DOM から辿る必要が出るため。
+            -->
+            <input type="file" class="sks-doc-file" accept="{{c.data.acceptAttribute}}"
+                   aria-hidden="true" tabindex="-1" />
+
+            <table class="table sks-doc-table">
+              <thead>
+                <tr>
+                  <th>書類種別</th>
+                  <th class="sks-col-file">提出ファイル</th>
+                  <th class="sks-col-action">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="doc in c.data.documents track by doc.sys_id"
+                    ng-class="{'sks-row-missing': doc.required && !doc.submitted}">
+                  <td>
+                    {{doc.documentTypeLabel}}
+                    <span class="label label-danger sks-doc-required" ng-if="doc.required">必須</span>
+                    <span class="label label-default sks-doc-optional" ng-if="!doc.required">任意</span>
+                  </td>
+                  <td class="sks-col-file">
+                    <span ng-if="doc.submitted">
+                      <a ng-href="{{doc.downloadUrl}}" target="_blank" rel="noopener">{{doc.fileName}}</a>
+                      <span class="sks-doc-size">{{doc.sizeLabel}}</span>
+                      <span class="sks-doc-date" ng-if="doc.submittedOn">（{{doc.submittedOn}}）</span>
+                    </span>
+                    <span class="text-muted" ng-if="!doc.submitted">未提出</span>
+                  </td>
+                  <td class="sks-col-action">
+                    <span ng-if="c.isUploading(doc)"><i class="fa fa-spinner fa-spin"></i> 登録中…</span>
+                    <span ng-if="!c.isUploading(doc)">
+                      <button type="button" class="btn btn-link" ng-click="c.pickFile(doc)"
+                              ng-disabled="c.uploading || c.removing">
+                        <span ng-if="!doc.submitted">ファイルを選択</span>
+                        <span ng-if="doc.submitted">差し替え</span>
+                      </button>
+                      <button type="button" class="btn btn-link sks-remove" ng-if="doc.submitted"
+                              ng-click="c.remove(doc)" ng-disabled="c.uploading || c.removing">削除</button>
+                    </span>
+                  </td>
+                </tr>
+                <tr ng-if="!c.data.documents.length">
+                  <td colspan="3" class="text-muted sks-empty">提出書類の一覧を取得できませんでした。</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="sks-doc-nav">
+              <a class="btn btn-default" ng-href="{{c.data.expenseUrl}}">対象経費へ戻る</a>
+              <a class="btn btn-primary" ng-href="{{c.data.confirmUrl}}">内容確認・提出へ進む</a>
+            </div>
+
+            <p class="sks-doc-note">{{c.data.note}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- 必須書類の充足状況 -->
+        <div class="panel panel-default sks-doc-side">
+          <div class="panel-heading">提出状況</div>
+          <div class="panel-body">
+            <p class="sks-doc-count">
+              必須書類 <strong>{{c.data.progress.requiredSubmitted}}</strong> / {{c.data.progress.required}} 件
+            </p>
+
+            <div class="alert alert-success sks-doc-complete" ng-if="c.data.complete.ok" role="alert">
+              必須書類はすべて提出されています。
+            </div>
+
+            <div class="alert alert-warning sks-doc-missing" ng-if="!c.data.complete.ok" role="alert">
+              次の必須書類が未提出です。
+              <ul class="sks-doc-missing-list">
+                <li ng-repeat="name in c.data.complete.missing track by $index">{{name}}</li>
+              </ul>
+            </div>
+
+            <p class="text-muted sks-doc-help">
+              必須書類がそろっていないと申請を提出できません。
+            </p>
+          </div>
+        </div>
+
+        <!-- ファイルの条件 -->
+        <div class="panel panel-default sks-doc-side">
+          <div class="panel-heading">ファイルの条件</div>
+          <div class="panel-body">
+            <dl class="sks-doc-spec">
+              <dt>形式</dt>
+              <dd>{{c.data.allowedExtensionsLabel}}</dd>
+              <dt>サイズ</dt>
+              <dd>1ファイル {{c.data.maxFileSizeLabel}} まで</dd>
+              <dt>件数</dt>
+              <dd>書類種別ごとに1ファイル</dd>
+            </dl>
+            <p class="text-muted sks-doc-help">
+              同じ書類種別に再度アップロードすると、前のファイルは差し替えられます。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

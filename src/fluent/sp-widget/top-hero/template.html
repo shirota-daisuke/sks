@@ -1,0 +1,10 @@
+<!-- SC-00 トップ（未ログイン）画面 ヒーローエリア -->
+<div class="sks-hero" ng-if="!c.data.redirectUrl">
+  <h1 class="sks-hero-title">{{c.data.heroTitle}}</h1>
+  <p class="sks-hero-lead">{{c.data.heroLead}}</p>
+
+  <div class="sks-hero-actions">
+    <a class="btn btn-primary btn-lg" href="{{c.data.loginUrl}}">ログイン</a>
+    <a class="btn btn-default btn-lg" href="{{c.data.registerUrl}}">新規登録</a>
+  </div>
+</div>

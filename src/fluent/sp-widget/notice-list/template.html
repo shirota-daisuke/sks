@@ -1,0 +1,56 @@
+<!-- SC-08 お知らせ一覧画面（状態／重要度／タイトル／公開日） -->
+<div class="sks-notice-list">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <div class="panel panel-default" ng-if="c.data.isApplicant">
+    <div class="panel-heading">
+      <h3 class="panel-title">お知らせ一覧</h3>
+      <span class="sks-count">
+        全 {{c.data.totalCount}} 件<span ng-if="c.data.unreadCount"> ／ 未読 {{c.data.unreadCount}} 件</span>
+      </span>
+    </div>
+
+    <table class="table table-hover sks-table" ng-if="c.data.notices.length">
+      <thead>
+        <tr>
+          <th class="sks-col-state">状態</th>
+          <th class="sks-col-priority">重要度</th>
+          <th>タイトル</th>
+          <th class="sks-col-date">公開日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="notice in c.data.notices track by notice.sys_id"
+            ng-class="{'sks-unread': !notice.read}">
+          <td>
+            <span class="sks-state" ng-if="!notice.read">未読</span>
+            <span class="sks-state sks-state-read" ng-if="notice.read">既読</span>
+          </td>
+          <td>
+            <span class="label" ng-class="notice.priorityClass" ng-bind="notice.priorityLabel"></span>
+          </td>
+          <td>
+            <button type="button" class="btn btn-link sks-title-link"
+                    ng-disabled="c.navigating"
+                    ng-click="c.openNotice(notice)">
+              {{notice.title}}
+            </button>
+          </td>
+          <td>{{notice.publishDate}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="panel-body text-center text-muted" ng-if="!c.data.notices.length">
+      <i class="fa fa-inbox fa-2x" aria-hidden="true"></i>
+      <p>公開中のお知らせはありません。</p>
+    </div>
+
+    <div class="panel-footer sks-truncated" ng-if="c.data.truncated">
+      {{c.data.notices.length}} 件を表示しています（全 {{c.data.totalCount}} 件）。
+    </div>
+  </div>
+</div>

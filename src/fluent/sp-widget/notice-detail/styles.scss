@@ -1,0 +1,70 @@
+/**
+ * SC-09 お知らせ詳細画面
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-notice-detail {
+    .sks-notice-title {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-notice-meta {
+        margin-bottom: 20px;
+
+        .label {
+            margin-right: 12px;
+        }
+
+        .sks-publish-date,
+        .sks-publish-end {
+            font-size: $font-size-small;
+            color: $text-muted;
+        }
+
+        .sks-publish-end {
+            margin-left: 12px;
+        }
+    }
+
+    .sks-notice-body-panel {
+        margin-bottom: 20px;
+
+        .panel-body {
+            padding: 24px;
+        }
+    }
+
+    // 事務局が登録したリッチテキストを描画する領域
+    .sks-notice-body {
+        line-height: 1.8;
+        color: $text-color;
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1em;
+            padding-left: 1.5em;
+        }
+
+        a {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 1em;
+
+            th,
+            td {
+                padding: 6px 8px;
+                border: 1px solid $panel-default-border;
+            }
+        }
+    }
+}

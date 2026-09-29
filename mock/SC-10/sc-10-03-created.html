@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 ③送信完了（問合せ作成処理 直後）
+  ============================================================================
+  画面設計書  SC-10 ③アクション定義 No.1「送信する」ボタン
+              → 問合せ作成処理（処理No.46）→ 左側の問合せ履歴に追加表示
+  実装         src/fluent/sp-widget/inquiry-form/server_script.js  createInquiry()
+              src/fluent/sp-widget/inquiry-form/client_script.js   c.submit()
+  表示条件     c.data.createResult.success === true
+              → c.created = true ／ c.panel = 'detail'
+              → server_script が selectedId = createResult.sys_id で詳細を再取得
+  登録値       事業者＝ログインユーザの所属事業者／起票者＝ログインユーザ
+              状態＝未回答（open）／受付日時＝作成時刻／件名・本文＝入力値
+  ============================================================================
+  実装との対応
+    ・alert-success は ng-if="c.created"（履歴行クリックや「新規問合せ」で false に戻る）
+    ・作成した問合せが履歴の先頭に来て、選択行として .sks-row-selected が付く
+    ・状態は必ず「未回答」で作成される（label-warning）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 ③送信完了</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li class="is-active"><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③送信完了</b>：<code>c.created === true</code> かつ <code>c.panel === 'detail'</code>。
+      送信した問合せが履歴の先頭に追加され（選択行）、右側は新規フォームから送信内容の詳細へ切り替わる。画面遷移は発生しない。
+    </p>
+
+    <div class="sks-inquiry">
+      <div class="row">
+
+        <!-- 左：問合せ履歴（送信した問合せが追加され、選択行になる） -->
+        <div class="col-md-7 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ履歴</h3>
+              <span class="sks-count">全 3 件</span>
+            </div>
+
+            <table class="table table-hover sks-table">
+              <thead>
+                <tr>
+                  <th>件名</th>
+                  <th class="sks-col-state">状態</th>
+                  <th class="sks-col-date">更新日</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- ng-class="{'sks-row-selected': c.isSelected(inquiry)}" -->
+                <tr class="sks-row-selected">
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">補助対象経費の追加について</button>
+                  </td>
+                  <td><span class="label label-warning">未回答</span></td>
+                  <td>2026/08/24</td>
+                </tr>
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">経費区分の判定について</button>
+                  </td>
+                  <td><span class="label label-warning">未回答</span></td>
+                  <td>2026/08/09</td>
+                </tr>
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">申請書類の記載方法について</button>
+                  </td>
+                  <td><span class="label label-success">回答済</span></td>
+                  <td>2026/07/28</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 右：問合せ詳細（ng-if="c.panel === 'detail' && c.data.selected"） -->
+        <div class="col-md-5 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ内容</h3>
+              <!-- ng-click="c.showNewForm()" -->
+              <button type="button" class="btn btn-link sks-new-link">新規問合せ</button>
+            </div>
+            <div class="panel-body">
+
+              <!-- ng-if="c.created" -->
+              <div class="alert alert-success" role="alert">
+                問合せを送信しました。事務局からの回答をお待ちください。
+              </div>
+
+              <h4 class="sks-detail-subject">補助対象経費の追加について</h4>
+              <p class="sks-detail-meta">
+                <span class="label label-warning">未回答</span>
+                <span class="sks-received">受付：2026/08/24 10:12</span>
+              </p>
+
+              <div class="sks-detail-block">
+                <h5>お問合せ内容</h5>
+                <p class="sks-body-text">当初申請時に計上していなかった外注費について、補助対象経費として追加できるかを確認させてください。
+
+・対象の外注費：システム設計の一部を外部委託した費用
+・発生時期：2026年7月
+・金額：1,200,000円
+
+追加が可能な場合、必要な手続きと提出書類をご教示ください。</p>
+              </div>
+
+              <!-- ng-if="!c.data.selected.replyBody" -->
+              <p class="text-muted sks-waiting">
+                事務局からの回答をお待ちください。回答が登録されるとこの欄に表示されます。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

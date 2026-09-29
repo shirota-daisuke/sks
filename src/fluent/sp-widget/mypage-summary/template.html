@@ -1,0 +1,43 @@
+<!-- SC-05 マイページ サマリカード（申請ステータス／未読のお知らせ／未対応の問合せ） -->
+<div class="sks-summary">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <div class="row" ng-if="c.data.isApplicant">
+
+    <!-- D1 申請ステータス -->
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <a class="sks-card" ng-class="'sks-tone-' + c.data.statusTone" href="{{c.data.applicationUrl}}">
+        <span class="sks-card-label">申請ステータス</span>
+        <span class="sks-card-value">{{c.data.statusLabel}}</span>
+        <span class="sks-card-sub" ng-if="c.data.applicationNumber">{{c.data.applicationNumber}}</span>
+      </a>
+    </div>
+
+    <!-- D2 未読のお知らせ件数 -->
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <a class="sks-card sks-tone-info" href="{{c.data.noticeUrl}}">
+        <span class="sks-card-label">未読のお知らせ</span>
+        <span class="sks-card-value">
+          {{c.data.unreadNoticeCount}} <small>件</small>
+        </span>
+        <span class="sks-card-sub" ng-if="!c.hasUnreadNotice()">未読はありません</span>
+      </a>
+    </div>
+
+    <!-- D3 未対応の問合せ件数 -->
+    <div class="col-md-4 col-sm-4 col-xs-12">
+      <a class="sks-card" ng-class="c.hasOpenInquiry() ? 'sks-tone-error' : 'sks-tone-neutral'"
+         href="{{c.data.inquiryUrl}}">
+        <span class="sks-card-label">未対応の問合せ</span>
+        <span class="sks-card-value">
+          {{c.data.openInquiryCount}} <small>件</small>
+        </span>
+        <span class="sks-card-sub" ng-if="!c.hasOpenInquiry()">未回答の問合せはありません</span>
+      </a>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,305 @@
+@charset "UTF-8";
+/* ==========================================================================
+ * SC-10 問合せ一覧・作成画面 — モック共通スタイル
+ *
+ * 本ファイルはモック（ブラウザ単体で確認するための静的HTML）専用です。
+ * 実装では以下が描画に使われるため、本CSSはデプロイ対象ではありません。
+ *   ・ウィジェットCSS : src/fluent/sp-widget/inquiry-form/styles.scss
+ *   ・共通スタイル     : Service Portal テーマ（OOTB Coral）＋ Bootstrap 3
+ *
+ * 構成
+ *   1. Bootstrap 3 相当の最小サブセット（テーマ相当の見た目を再現）
+ *   2. ポータル共通クロム（ヘッダー＋トップタブ）＝ OOTB Stock Header／Header Menu 相当
+ *   3. styles.scss の .sks-* をSCSS変数を解決した形で再掲
+ *
+ * SCSS変数の解決値（Bootstrap 3 既定値。実際の値はテーマにより異なります）
+ *   $brand-primary #337ab7 ／ $text-muted #777 ／ $table-bg-accent #f9f9f9
+ *   $font-size-base 14px ／ $font-size-small 12px ／ $panel-default-border #ddd
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 1. Bootstrap 3 相当の最小サブセット
+ * -------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background-color: #f5f5f5;
+    color: #333;
+    font-family: "Meiryo UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+
+h2, h3, h4, h5 { margin: 0 0 10px; font-weight: 500; }
+h2 { font-size: 24px; }
+h3 { font-size: 18px; }
+h4 { font-size: 16px; }
+h5 { font-size: 14px; }
+p { margin: 0 0 10px; }
+
+a { color: #337ab7; text-decoration: none; }
+a:hover, a:focus { color: #23527c; text-decoration: underline; }
+
+.container {
+    width: 100%;
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+.row > [class^="col-"] { padding: 0 15px; }
+.col-md-5 { width: 41.66666667%; }
+.col-md-7 { width: 58.33333333%; }
+.col-md-12 { width: 100%; }
+
+@media (max-width: 991px) {
+    .col-md-5, .col-md-7 { width: 100%; }
+    .col-sm-12 { width: 100%; }
+}
+
+.panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+}
+.panel-default { border-color: #ddd; }
+.panel-heading {
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px 3px 0 0;
+}
+.panel-title { margin: 0; font-size: 16px; }
+.panel-body { padding: 15px; }
+.panel-footer {
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 3px 3px;
+}
+
+.table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+.table > thead > tr > th,
+.table > tbody > tr > td {
+    padding: 8px;
+    border-top: 1px solid #ddd;
+    text-align: left;
+    vertical-align: top;
+}
+.table > thead > tr > th { border-bottom: 2px solid #ddd; border-top: 0; }
+.table-hover > tbody > tr:hover { background-color: #f5f5f5; }
+
+.label {
+    display: inline-block;
+    padding: .2em .6em .3em;
+    border-radius: .25em;
+    color: #fff;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+.label-warning { background-color: #f0ad4e; }
+.label-success { background-color: #5cb85c; }
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-image: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+.btn-primary { background-color: #337ab7; border-color: #2e6da4; color: #fff; }
+.btn-primary:hover { background-color: #286090; border-color: #204d74; }
+.btn-primary[disabled] { opacity: .65; cursor: not-allowed; }
+.btn-link { background: none; border: 0; color: #337ab7; }
+.btn-link:hover { text-decoration: underline; }
+.btn-link[disabled] { color: #777; cursor: not-allowed; text-decoration: none; }
+
+.form-group { margin-bottom: 15px; }
+label { display: inline-block; margin-bottom: 5px; font-weight: bold; }
+.form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #555;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+textarea.form-control { height: auto; resize: vertical; }
+.form-control:focus { border-color: #66afe9; outline: 0; box-shadow: 0 0 8px rgba(102, 175, 233, .6); }
+.has-error .form-control { border-color: #a94442; }
+.help-block { display: block; margin: 5px 0 10px; color: #737373; font-size: 12px; }
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+.alert-success { background-color: #dff0d8; border-color: #d6e9c6; color: #3c763d; }
+.alert-danger { background-color: #f2dede; border-color: #ebccd1; color: #a94442; }
+.alert-warning { background-color: #fcf8e3; border-color: #faebcc; color: #8a6d3b; }
+.alert-info { background-color: #d9edf7; border-color: #bce8f1; color: #31708f; }
+
+.text-muted { color: #777; }
+.text-danger { color: #a94442; }
+.text-center { text-align: center; }
+.list-unstyled { padding-left: 0; margin: 0; list-style: none; }
+
+/* --------------------------------------------------------------------------
+ * 2. ポータル共通クロム（モック用）
+ *    実装では OOTB Stock Header ＋ Header Menu（sp-instance-menu/menu.now.ts）が描画する。
+ * -------------------------------------------------------------------------- */
+.mock-header {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+.mock-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+}
+.mock-portal-title { font-size: 16px; font-weight: bold; }
+.mock-user { color: #777; font-size: 12px; }
+
+.mock-tabs {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+.mock-tabs ul {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.mock-tabs li a {
+    display: block;
+    padding: 12px 18px;
+    border-bottom: 3px solid transparent;
+    color: #333;
+    font-size: 13px;
+}
+.mock-tabs li a:hover { text-decoration: none; background-color: #f5f5f5; }
+.mock-tabs li.is-active a {
+    border-bottom-color: #337ab7;
+    color: #337ab7;
+    font-weight: bold;
+}
+
+.mock-main { padding: 24px 0 40px; }
+
+/* モック自身の説明ブロック（実装対象外） */
+.mock-note {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #337ab7;
+    background-color: #eef4fa;
+    color: #31708f;
+    font-size: 12px;
+    line-height: 1.7;
+}
+.mock-note b { color: #245a86; }
+.mock-note code {
+    padding: 1px 4px;
+    background-color: #fff;
+    border: 1px solid #cfe0ee;
+    border-radius: 3px;
+    font-family: Consolas, "Courier New", monospace;
+}
+
+/* 空状態などで使うアイコン（実装では Font Awesome の <i class="fa fa-*"> を使用） */
+.mock-icon { width: 32px; height: 32px; fill: currentColor; opacity: .5; }
+
+/* --------------------------------------------------------------------------
+ * 3. src/fluent/sp-widget/inquiry-form/styles.scss 相当
+ * -------------------------------------------------------------------------- */
+.sks-inquiry .panel-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.sks-inquiry .sks-count { font-size: 12px; color: #777; }
+
+.sks-inquiry .sks-new-link { padding: 0; border: 0; font-size: 12px; }
+
+.sks-inquiry .sks-table { margin-bottom: 0; }
+.sks-inquiry .sks-table th { font-size: 12px; font-weight: normal; color: #777; }
+.sks-inquiry .sks-table td { vertical-align: middle; }
+
+.sks-inquiry .sks-col-state { width: 100px; }
+.sks-inquiry .sks-col-date { width: 120px; white-space: nowrap; }
+
+.sks-inquiry .sks-row-selected { background-color: #f9f9f9; }
+
+.sks-inquiry .sks-subject-link {
+    padding: 0;
+    text-align: left;
+    white-space: normal;
+    border: 0;
+}
+
+.sks-inquiry .sks-truncated { font-size: 12px; color: #777; }
+
+.sks-inquiry .sks-error-list { margin-bottom: 0; }
+
+.sks-inquiry .sks-detail-subject {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.sks-inquiry .sks-detail-meta { margin-bottom: 20px; }
+.sks-inquiry .sks-detail-meta .sks-received {
+    margin-left: 10px;
+    font-size: 12px;
+    color: #777;
+}
+
+.sks-inquiry .sks-detail-block { margin-bottom: 20px; }
+.sks-inquiry .sks-detail-block h5 {
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #777;
+}
+
+/* 事業者・事務局が入力したプレーンテキストを改行込みで表示する */
+.sks-inquiry .sks-body-text {
+    margin-bottom: 0;
+    white-space: pre-wrap;
+    line-height: 1.8;
+}
+
+.sks-inquiry .sks-reply {
+    padding: 16px;
+    background-color: #f9f9f9;
+    border-left: 3px solid #337ab7;
+}
+
+.sks-inquiry .sks-replied {
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-size: 12px;
+    color: #777;
+}
+
+.sks-inquiry .sks-waiting { margin-bottom: 0; font-size: 12px; }

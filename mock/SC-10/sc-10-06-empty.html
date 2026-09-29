@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 ⑥問合せ0件（初回利用時）
+  ============================================================================
+  実装         src/fluent/sp-widget/inquiry-form/template.html
+              ng-if="!c.data.inquiries.length" の空状態ブロック
+  表示条件     data.inquiries.length === 0（自身が起票した問合せがまだない）
+              → 履歴テーブル・件数（全 n 件）は非表示、空状態メッセージのみを表示
+              → 右側は新規問合せフォーム（c.panel === 'new'）
+  ============================================================================
+  実装との対応
+    ・アイコンは実装では <i class="fa fa-comments-o fa-2x" aria-hidden="true"></i>（Font Awesome）。
+      本モックは外部CSSを読み込まないためインラインSVGで代替している。
+    ・件数表示 <span class="sks-count"> は ng-if="c.data.totalCount" のため0件では出力されない。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 ⑥問合せ0件</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li class="is-active"><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>⑥問合せ0件</b>：<code>c.data.inquiries.length === 0</code>。
+      履歴テーブルと件数表示は出力せず、空状態のメッセージのみを表示する。右側の新規問合せフォームは通常どおり利用できる。
+    </p>
+
+    <div class="sks-inquiry">
+      <div class="row">
+
+        <!-- 左：問合せ履歴（0件） -->
+        <div class="col-md-7 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ履歴</h3>
+              <!-- 0件のため <span class="sks-count"> は非表示 -->
+            </div>
+
+            <!-- ng-if="!c.data.inquiries.length" -->
+            <div class="panel-body text-center text-muted">
+              <!-- 実装：<i class="fa fa-comments-o fa-2x" aria-hidden="true"></i> -->
+              <svg class="mock-icon" viewBox="0 0 576 512" aria-hidden="true">
+                <path d="M416 192c0-88.4-93.1-160-208-160S0 103.6 0 192c0 34.3 14.1 65.9 38 92-13.4 30.2-35.5 54.2-35.8 54.5-2.2 2.3-2.8 5.7-1.5 8.7S4.8 352 8 352c36.6 0 66.9-12.3 88.7-25 32.2 15.7 70.3 25 111.3 25 114.9 0 208-71.6 208-160zm122 220c23.9-26 38-57.7 38-92 0-66.9-53.5-124.2-129.3-148.1.9 6.6 1.3 13.3 1.3 20.1 0 105.9-107.7 192-240 192-10.8 0-21.3-.8-31.7-1.9C207.8 439.6 281.8 480 368 480c41 0 79.1-9.2 111.3-25 21.8 12.7 52.1 25 88.7 25 3.2 0 6.1-1.9 7.3-4.8 1.3-2.9.7-6.3-1.5-8.7-.3-.3-22.4-24.2-35.8-54.5z"/>
+              </svg>
+              <p>問合せはまだありません。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右：新規問合せ -->
+        <div class="col-md-5 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">新規問合せ</h3>
+            </div>
+            <div class="panel-body">
+
+              <form name="inquiryForm" novalidate>
+                <div class="form-group">
+                  <label for="sks-inquiry-subject">件名 <span class="text-danger">*</span></label>
+                  <input type="text" id="sks-inquiry-subject" name="subject" class="form-control"
+                         placeholder="問合せ件名を入力" maxlength="200" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-inquiry-body">本文 <span class="text-danger">*</span></label>
+                  <textarea id="sks-inquiry-body" name="description" class="form-control" rows="8"
+                            maxlength="2000" required></textarea>
+                  <span class="help-block">2000文字以内で入力してください。</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" disabled>送信する</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

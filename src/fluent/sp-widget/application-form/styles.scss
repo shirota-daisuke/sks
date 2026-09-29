@@ -1,0 +1,181 @@
+/**
+ * 申請入力：基本情報（ITCOM-01）
+ * 左に入力フォーム、右に補助金額の試算パネル。
+ * 色は Service Portal テーマの SCSS 変数のみを使用する（他ウィジェットと同じ方針）。
+ */
+.sks-apply {
+    padding: 24px 0;
+
+    .sks-apply-card,
+    .sks-estimate-card {
+        .panel-body {
+            padding: 24px;
+        }
+    }
+
+    // --- ステップ表示（他の申請入力画面と同じ見え方にそろえる）-------------
+    .sks-apply-steps {
+        display: flex;
+        margin: 0 0 20px;
+        padding: 0;
+        list-style: none;
+        border: 1px solid $panel-default-border;
+        border-radius: $border-radius-base;
+        background: #fff;
+        overflow: hidden;
+
+        li {
+            flex: 1;
+            padding: 10px 8px;
+            border-left: 1px solid $table-border-color;
+            text-align: center;
+            font-size: $font-size-small;
+            color: $text-muted;
+
+            &:first-child {
+                border-left: 0;
+            }
+
+            a {
+                color: inherit;
+            }
+        }
+
+        li.is-done {
+            color: $brand-success;
+        }
+
+        li.is-active {
+            background: lighten($brand-primary, 45%);
+            color: $brand-primary;
+            font-weight: bold;
+        }
+
+        .sks-step-no {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+            border-radius: 50%;
+            background: $text-muted;
+            color: #fff;
+            line-height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        li.is-done .sks-step-no {
+            background: $brand-success;
+        }
+
+        li.is-active .sks-step-no {
+            background: $brand-primary;
+        }
+    }
+
+    .sks-apply-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-apply-entity {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid $panel-default-border;
+        font-size: $font-size-small;
+
+        dt {
+            width: 100px;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-left: 116px;
+        }
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    .sks-apply-special {
+        margin-bottom: 20px;
+    }
+
+    // 未保存の入力がある旨は見落とされないよう警告色にする
+    .sks-apply-dirty {
+        color: $brand-warning;
+    }
+
+    // ボタンは横並び。幅が狭い場合は折り返す
+    .sks-apply-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 24px;
+    }
+
+    .sks-apply-note {
+        margin-top: 20px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-apply-message {
+        padding: 16px 0;
+
+        .sks-apply-title {
+            margin-top: 16px;
+        }
+
+        // 提出完了の表示は内容確認・提出（ITCOM-04）へ移した
+
+        .btn {
+            margin-top: 20px;
+        }
+    }
+
+    // 試算パネル
+    .sks-estimate-list {
+        margin-bottom: 0;
+
+        dt {
+            font-size: $font-size-small;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-bottom: 12px;
+            font-size: $font-size-base;
+            color: $text-color;
+        }
+
+        .sks-estimate-total {
+            padding-top: 12px;
+            border-top: 1px solid $panel-default-border;
+
+            &dt {
+                color: $text-color;
+            }
+        }
+
+        dd.sks-estimate-total {
+            margin-bottom: 0;
+            font-size: $font-size-h4;
+            font-weight: bold;
+        }
+    }
+
+    .sks-estimate-capped,
+    .sks-estimate-disclaimer {
+        margin-top: 12px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+    }
+}

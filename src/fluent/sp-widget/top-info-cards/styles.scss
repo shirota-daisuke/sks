@@ -1,0 +1,32 @@
+/**
+ * SC-00 案内カード×3
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-info-cards {
+    .sks-info-card {
+        height: 100%;
+
+        .panel-body {
+            padding: 20px;
+        }
+    }
+
+    .sks-info-title {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: $font-size-h4;
+        font-weight: bold;
+        color: $text-color;
+
+        .fa {
+            margin-right: 8px;
+            color: $brand-primary;
+        }
+    }
+
+    .sks-info-body {
+        margin-bottom: 0;
+        color: $text-muted;
+        line-height: 1.7;
+    }
+}

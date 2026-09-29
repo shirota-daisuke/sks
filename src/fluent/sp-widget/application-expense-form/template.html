@@ -1,0 +1,245 @@
+<!-- 対象経費の入力（ITCOM-02／処理No.18）：明細一覧＋入力フォーム＋補助金額の試算 -->
+<div class="sks-expense">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <!-- 下書きが無い／提出済みで編集できない -->
+  <div ng-if="c.data.isApplicant && c.data.state !== 'form'" class="panel panel-default sks-expense-card">
+    <div class="panel-body text-center sks-expense-message">
+      <svg class="mock-icon" viewBox="0 0 16 16" width="42" height="42"
+           ng-attr-style="{{c.data.state === 'locked' ? 'fill:#5bc0de' : 'fill:#f0ad4e'}}">
+        <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3.2a1 1 0 110 2 1 1 0 010-2zm1.2 9.3H6.8v-1h.8V7.8h-.8v-1h2.4v5.7h.8v1z" />
+      </svg>
+      <h2 class="sks-expense-title">対象経費を入力できません</h2>
+      <p class="text-muted">{{c.data.message}}</p>
+      <p>
+        <a class="btn btn-primary" ng-if="c.data.state === 'no_draft'" ng-href="{{c.data.applyUrl}}">申請の入力へ</a>
+        <a class="btn btn-primary" ng-if="c.data.state === 'locked'" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- 入力画面 -->
+  <div ng-if="c.data.isApplicant && c.data.state === 'form'">
+
+    <ul class="sks-expense-steps">
+      <li class="is-done">
+        <a ng-href="{{c.data.applyUrl}}"><span class="sks-step-no">1</span>基本情報</a>
+      </li>
+      <li class="is-active"><span class="sks-step-no">2</span>対象経費</li>
+      <li>
+        <a ng-href="{{c.data.documentUrl}}"><span class="sks-step-no">3</span>添付書類</a>
+      </li>
+      <li>
+        <a ng-href="{{c.data.confirmUrl}}"><span class="sks-step-no">4</span>内容確認・提出</a>
+      </li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default sks-expense-card">
+          <div class="panel-body">
+            <h2 class="sks-expense-title">対象経費の入力</h2>
+
+            <dl class="dl-horizontal sks-expense-meta">
+              <dt>事業者名</dt>
+              <dd>{{c.data.entityName}}</dd>
+              <dt>申請の状態</dt>
+              <dd>{{c.data.request.statusLabel}}（最終保存 {{c.data.request.updatedOn}}）</dd>
+              <dt>従業員数区分</dt>
+              <dd>{{c.data.request.employeeCategoryLabel}}<span ng-if="c.data.request.specialMeasure">／特例措置：対象</span></dd>
+            </dl>
+
+            <div class="alert alert-success" ng-if="c.saved" role="alert">
+              {{c.data.saveResult.message}}
+            </div>
+
+            <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+              </ul>
+            </div>
+
+            <!-- 明細一覧 -->
+            <table class="table sks-expense-table">
+              <thead>
+                <tr>
+                  <th>経費区分</th>
+                  <th>内容</th>
+                  <th class="sks-col-days">日数</th>
+                  <th class="sks-col-amount">金額（円）</th>
+                  <th class="sks-col-action">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in c.data.items track by item.sys_id"
+                    ng-class="{'sks-row-editing': c.editingId === item.sys_id, 'sks-row-error': item.capError}">
+                  <td>
+                    {{item.categoryName}}
+                    <span class="sks-expert" ng-if="item.expertFeeName">（{{item.expertFeeName}}）</span>
+                  </td>
+                  <td>
+                    {{item.description}}
+                    <!-- 日額上限を超えている明細は行ごとに理由を出す -->
+                    <p class="sks-cap-error" ng-if="item.capError">{{item.capError}}</p>
+                  </td>
+                  <td class="sks-col-days">{{item.days === '' ? '—' : item.days}}</td>
+                  <td class="sks-col-amount">{{item.amountLabel}}</td>
+                  <td class="sks-col-action">
+                    <button type="button" class="btn btn-link" ng-click="c.edit(item)">編集</button>
+                    <button type="button" class="btn btn-link sks-remove" ng-click="c.remove(item)"
+                            ng-disabled="c.removing">削除</button>
+                  </td>
+                </tr>
+                <tr ng-if="!c.data.items.length">
+                  <td colspan="5" class="text-muted sks-empty">
+                    対象経費の明細がまだ登録されていません。下のフォームから追加してください。
+                  </td>
+                </tr>
+                <tr class="sks-expense-total" ng-if="c.data.items.length">
+                  <td colspan="3">対象経費合計</td>
+                  <td class="sks-col-amount">{{c.data.totalExpenseLabel}}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- 明細の入力フォーム -->
+            <div class="sks-item-form">
+              <h3 class="sks-item-form-title">
+                <span ng-if="!c.isEditing()">明細の追加</span>
+                <span ng-if="c.isEditing()">明細の編集</span>
+              </h3>
+
+              <div class="row">
+                <div class="col-md-5">
+                  <div class="form-group">
+                    <label for="sks-exp-category">経費区分 <span class="text-danger">*</span></label>
+                    <select id="sks-exp-category" class="form-control"
+                            ng-model="c.form.category_id" ng-change="c.onCategoryChange()">
+                      <option value="">選択してください</option>
+                      <option ng-repeat="cat in c.data.categories track by cat.sys_id"
+                              value="{{cat.sys_id}}">{{cat.name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-7">
+                  <div class="form-group">
+                    <label for="sks-exp-description">内容 <span class="text-danger">*</span></label>
+                    <input type="text" id="sks-exp-description" class="form-control" maxlength="200"
+                           ng-model="c.form.description" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="sks-exp-amount">金額（円） <span class="text-danger">*</span></label>
+                    <input type="text" id="sks-exp-amount" class="form-control" maxlength="10"
+                           ng-model="c.form.amount" />
+                  </div>
+                </div>
+                <!-- 日額上限ありの区分でのみ日数・専門家区分を入力する -->
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="sks-exp-days">日数</label>
+                    <input type="text" id="sks-exp-days" class="form-control" maxlength="4"
+                           ng-model="c.form.days" ng-disabled="!c.hasDailyCap()" />
+                    <span class="help-block" ng-if="!c.hasDailyCap()">日額上限のある区分のみ</span>
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <div class="form-group">
+                    <label for="sks-exp-expert">専門家区分</label>
+                    <select id="sks-exp-expert" class="form-control"
+                            ng-model="c.form.expert_fee_id" ng-disabled="!c.hasDailyCap()">
+                      <option value="">選択してください</option>
+                      <option ng-repeat="fee in c.data.expertFees track by fee.sys_id"
+                              value="{{fee.sys_id}}">{{fee.name}}（上限 {{fee.dailyCap | number}}円/日）</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sks-exp-note">備考</label>
+                <input type="text" id="sks-exp-note" class="form-control" maxlength="500" ng-model="c.form.note" />
+              </div>
+
+              <div class="sks-item-form-actions">
+                <button type="button" class="btn btn-primary" ng-click="c.save()" ng-disabled="!c.canSave()">
+                  <span ng-if="c.saving"><i class="fa fa-spinner fa-spin"></i> 保存中…</span>
+                  <span ng-if="!c.saving && !c.isEditing()">明細を追加</span>
+                  <span ng-if="!c.saving && c.isEditing()">明細を更新</span>
+                </button>
+                <button type="button" class="btn btn-default" ng-if="c.isEditing()" ng-click="c.cancelEdit()">
+                  編集をやめる
+                </button>
+              </div>
+            </div>
+
+            <div class="sks-expense-nav">
+              <a class="btn btn-default" ng-href="{{c.data.applyUrl}}">申請の入力へ戻る</a>
+              <a class="btn btn-primary" ng-href="{{c.data.documentUrl}}">添付書類へ進む</a>
+            </div>
+
+            <p class="sks-expense-note">{{c.data.note}}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 補助金額の試算（処理No.17） -->
+      <div class="col-md-4">
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">補助金額の試算</div>
+          <div class="panel-body">
+            <div ng-if="c.data.estimate.ok">
+              <dl class="sks-estimate-list">
+                <dt>対象経費合計</dt>
+                <dd>{{c.data.estimate.totalExpense}}</dd>
+                <dt>補助率</dt>
+                <dd>{{c.data.estimate.rateLabel}}</dd>
+                <dt>補助率適用後</dt>
+                <dd>{{c.data.estimate.byRate}}</dd>
+                <dt>補助上限額</dt>
+                <dd>{{c.data.estimate.capAmount}}</dd>
+                <dt class="sks-estimate-total">補助金額</dt>
+                <dd class="sks-estimate-total">{{c.data.estimate.subsidyAmount}}</dd>
+              </dl>
+              <p class="text-muted sks-estimate-capped" ng-if="c.data.estimate.cappedByLimit">
+                対象経費に補助率を適用した額が補助上限額を超えるため、上限額が適用されています。
+              </p>
+              <p class="text-muted sks-estimate-disclaimer">
+                試算値です。確定額は事務局の審査により決定します。
+              </p>
+            </div>
+
+            <div class="alert alert-warning" ng-if="!c.data.estimate.ok" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.data.estimate.errors track by $index">{{err}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">日額上限のある経費</div>
+          <div class="panel-body">
+            <p class="text-muted sks-cap-help">
+              専門家経費は専門家区分ごとに日額上限があります。金額 ÷ 日数が上限を超える明細は
+              一覧に理由を表示し、提出できません。
+            </p>
+            <ul class="list-unstyled sks-cap-list">
+              <li ng-repeat="fee in c.data.expertFees track by fee.sys_id">
+                {{fee.name}}<span class="sks-cap-amount">{{fee.dailyCap | number}}円/日</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

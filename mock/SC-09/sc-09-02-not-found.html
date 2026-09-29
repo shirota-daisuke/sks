@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-09 お知らせ詳細画面 ②対象が指定されていない／見つからない
+  ============================================================================
+  実装         src/fluent/sp-widget/notice-detail/server_script.js
+                 sys_id 未指定           → data.message = '表示するお知らせが指定されていません。'
+                 可視条件に合致しない     → data.message = 'お知らせが見つかりません。公開が終了した可能性があります。'
+              src/fluent/sp-widget/notice-detail/template.html
+                 ng-if="c.data.isApplicant && !c.data.found" の案内ブロック
+  表示条件     data.found === false（メッセージのみ差し替わる）
+  ============================================================================
+  ★ 実装ではこの2ケースは同じ markup でメッセージのみが異なります。
+    レビューしやすいよう1ファイルに並べています。
+
+  セキュリティ上の考え方
+    公開範囲外・公開期間外・非公開のお知らせの sys_id を直接指定しても、
+    NoticeUtil.applyVisibilityQuery() の条件で取得されないため本文は表示されない。
+    「権限がない」ではなく「見つかりません」と表示し、存在の有無を推測させない。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-09 お知らせ詳細 ②対象なし</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li class="is-active"><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②対象が指定されていない／見つからない</b>：<code>data.found === false</code>。
+      同一の markup でメッセージのみが切り替わる。★ 実装では片方のみ表示。
+    </p>
+
+    <!-- ============ sys_id 未指定 ============ -->
+    <div class="sks-notice-detail">
+      <!-- ng-if="c.data.isApplicant && !c.data.found" -->
+      <div>
+        <div class="alert alert-info" role="alert">
+          <!-- 実装：<i class="fa fa-info-circle" aria-hidden="true"></i> -->
+          <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          表示するお知らせが指定されていません。
+        </div>
+        <a class="btn btn-default" href="../SC-08/sc-08-01-list.html">一覧へ戻る</a>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- ============ 公開範囲外・公開期間外・非公開の sys_id を指定 ============ -->
+    <div class="sks-notice-detail">
+      <div>
+        <div class="alert alert-info" role="alert">
+          <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          お知らせが見つかりません。公開が終了した可能性があります。
+        </div>
+        <a class="btn btn-default" href="../SC-08/sc-08-01-list.html">一覧へ戻る</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

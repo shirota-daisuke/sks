@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-09 採択・不採択の確定（事務局）
+  ============================================================================
+  位置づけ   ITCOM 主担当（審査プロセス）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-09 は仮番号。
+
+  想定する処理  採択判定と確定
+                信用調査結果確認中 result_checking／信用調査免除 credit_exempt
+                  → 申請審査完了 review_done（採択）
+                  → 不採択       rejected
+
+  ■ 現状の欠落
+  ・review_done／rejected へ遷移させる処理が存在しない。
+    この遷移が無いため、以下が実質的に動かない。
+      SC-17 の「採択者一覧（申請審査完了）」帳票 … 常に0件
+      SC-15 ダッシュボードの「申請審査完了」カード … 常に0件
+      RPA 連携（添付ファイルの共有フォルダ転送） … 契機が発生しない
+  ・採択番号を保持する列が無い。
+    T03 にあるのは u_award_number_for_sync（前年度実績連携用採択番号）だけで、
+    これは前年度実績を Salesforce へ連携するための項目であり、
+    今年度の採択番号を採番して保持する列としては用途が異なる。
+  ・交付決定額（確定した補助金額）を保持する列が無い。
+    u_subsidy_cap_amount は上限額、u_subsidy_rate は補助率であり、
+    審査で確定した金額の保持先が存在しない。
+  ・不採択理由の記録項目が無い（SC-11 の却下理由と同じ問題）。
+
+  実装方式の想定
+    事務局ワークスペースのレコードフォーム＋ UI Action。
+    確定操作は staff_admin に限定する想定（権限設計書 A20「不採択確定等の最終確定操作」）。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・採択番号の採番規則
+    ・交付決定額の算定（申請額どおりか、査定による減額を認めるか）
+    ・採択通知・不採択通知の方式（IF-07。メール／お知らせ／書面）
+    ・採択結果の公表方法
+    ・確定操作の権限（本モックは staff_admin を仮置き）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-09 採択・不採択の確定（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-ws-header">
+  <div class="container">
+    <span class="mock-ws-title">SKS 事務局ワークスペース</span>
+    <span class="mock-ws-user">事務局 管理者（x_dent2_dentsusoke.staff_admin）</span>
+  </div>
+</header>
+
+<div class="mock-ws-body">
+
+  <nav class="mock-ws-nav">
+    <div class="mock-ws-nav-group">申請審査（提案）</div>
+    <ul>
+      <li><a href="itcom-06-review-list.html">一次審査：要対応 <span class="mock-ws-count">7</span></a></li>
+      <li><a href="itcom-08-credit-check.html">信用調査：要対応 <span class="mock-ws-count">3</span></a></li>
+      <li class="is-active"><a href="#">採択判定：要対応 <span class="mock-ws-count">2</span></a></li>
+      <li><a href="#">申請（すべて）</a></li>
+    </ul>
+    <div class="mock-ws-nav-group">帳票／レポート</div>
+    <ul>
+      <li><a href="#">採択者一覧</a></li>
+      <li><a href="#">不採択・取下げ一覧</a></li>
+    </ul>
+  </nav>
+
+  <div class="mock-ws-content">
+
+    <h1>APP-2026-00126 — 採択判定</h1>
+    <p class="mock-ws-sub">
+      株式会社ミライ工業 ｜ <span class="label label-warning">信用調査結果確認中</span> ｜ 確定操作は事務局管理者のみ
+    </p>
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      <code>review_done</code>／<code>rejected</code> へ遷移させる処理が存在しないため、
+      <b>SC-17 の採択者一覧・SC-15 のダッシュボード・RPA の添付転送がいずれも動きません</b>
+      （それぞれ常に0件、契機が発生しない）。
+      また<b>採択番号と交付決定額を保持する列がありません</b>。
+      <code>u_award_number_for_sync</code> は前年度実績を Salesforce へ連携するための項目で用途が異なります。
+    </p>
+
+    <div class="mock-ws-actions">
+      <button type="button" class="btn btn-primary">採択として確定する</button>
+      <button type="button" class="btn btn-default">不採択として確定する</button>
+      <button type="button" class="btn btn-default">一次審査へ差し戻す</button>
+    </div>
+
+    <div class="row">
+      <div class="col-md-7">
+
+        <!-- 審査結果の集約 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">審査結果の集約</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="sks-checklist">
+              <li>
+                <span class="sks-check-label">一次審査</span>
+                <span class="label label-success">完了</span>
+                <span class="sks-check-auto">2026/09/12 事務局 太郎</span>
+              </li>
+              <li>
+                <span class="sks-check-label">信用調査</span>
+                <span class="label label-success">問題なし</span>
+                <span class="sks-check-auto">2026/09/28 結果取込</span>
+              </li>
+              <li>
+                <span class="sks-check-label">重複申請の確認</span>
+                <span class="label label-success">重複なし</span>
+                <span class="sks-check-auto">同一法人番号での他申請なし</span>
+              </li>
+              <li>
+                <span class="sks-check-label">前年度採択実績</span>
+                なし
+                <span class="sks-check-auto">Salesforce 横断照合（IF-02）は未実装のため本システム内のみ</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 交付決定額 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">交付決定額の確定</h3>
+          </div>
+          <div class="panel-body">
+
+            <dl class="sks-confirm-list">
+              <dt>申請時の対象経費</dt>
+              <dd>18,000,000円</dd>
+              <dt>補助率</dt>
+              <dd>1/2</dd>
+              <dt>補助上限額</dt>
+              <dd>20,000,000円</dd>
+              <dt>申請時の補助金額</dt>
+              <dd>9,000,000円</dd>
+            </dl>
+
+            <div class="form-group" style="margin-top:16px;">
+              <label for="approved-expense">査定後の対象経費（円）</label>
+              <input type="text" id="approved-expense" class="form-control" value="17500000" style="max-width:260px;" />
+              <span class="help-block">
+                対象外と判断した経費を除いた額。査定による減額を認めるかが未確定です。
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="approved-amount">交付決定額（円）</label>
+              <input type="text" id="approved-amount" class="form-control" value="8750000" style="max-width:260px;" />
+              <span class="help-block">
+                査定後の対象経費 × 補助率（上限額で頭打ち）。<b>保持する列が T03 にありません。</b>
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="decision-note">判定理由・特記事項</label>
+              <textarea id="decision-note" class="form-control" rows="4">専門家経費のうち対象期間外の2日分（500,000円）を対象外とし、査定後の対象経費を17,500,000円とした。</textarea>
+              <span class="help-block">
+                記録項目が未定義です。SC-11 の却下理由と同じく列の追加が必要です。
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 採択番号 -->
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">採択番号</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="award-number">採択番号</label>
+              <input type="text" id="award-number" class="form-control" value="（確定時に採番）" disabled style="max-width:260px;" />
+              <span class="help-block">
+                採番規則が未確定です。保持する列も未定義（<code>u_award_number_for_sync</code> は
+                前年度実績の Salesforce 連携用で用途が異なります）。
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ★ 不採択として確定する場合 -->
+        <hr />
+        <p class="mock-note">
+          <b>★「不採択として確定する」を押した場合の入力</b>（実装では上記と排他）
+        </p>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">不採択の確定</h3>
+          </div>
+          <div class="panel-body">
+            <div class="alert alert-danger">
+              不採択は<b>終端状態</b>です。確定後は申請者側から再申請・修正ができません。
+            </div>
+
+            <div class="form-group">
+              <label for="reject-reason">不採択理由の区分</label>
+              <select id="reject-reason" class="form-control" style="max-width:340px;">
+                <option>選択してください</option>
+                <option>補助対象事業に該当しない</option>
+                <option>対象経費が要件を満たさない</option>
+                <option>売上増加率の要件を満たさない</option>
+                <option>信用調査の結果による</option>
+                <option>提出書類の不備が解消されない</option>
+                <option>その他</option>
+              </select>
+              <span class="help-block">区分の一覧は未確定です（自由記述のみとする案もあります）。</span>
+            </div>
+
+            <div class="form-group">
+              <label for="reject-note">申請者への通知文 <span class="text-danger">*</span></label>
+              <textarea id="reject-note" class="form-control" rows="4"></textarea>
+              <span class="help-block">
+                通知方式が未確定（IF-07）。メール／お知らせ／書面のいずれかを確定する必要があります。
+              </span>
+            </div>
+
+            <div class="sks-form-actions">
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-default">キャンセル</button>
+                <button type="button" class="btn btn-primary">不採択として確定する</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-5">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">確定後の処理</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="list-unstyled" style="margin:0; font-size:13px; line-height:2;">
+              <li>① ステータスを「申請審査完了」へ遷移</li>
+              <li>② 採択番号を採番（規則未確定）</li>
+              <li>③ 交付決定額を確定（保持列なし）</li>
+              <li>④ 申請者へ通知（IF-07 未確定）</li>
+              <li>⑤ SC-17「採択者一覧」帳票へ反映</li>
+              <li>⑥ 添付書類をファイルサーバへ複製（RPA 連携）</li>
+            </ul>
+            <p class="text-muted" style="margin:12px 0 0; font-size:12px;">
+              ⑤⑥ は実装済みですが、①の遷移処理が無いため現状は起動しません。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">処理履歴</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="sks-timeline">
+              <li>
+                <span class="sks-tl-when">2026/08/12 11:02</span>
+                <span class="sks-tl-what">申請を提出</span>
+              </li>
+              <li>
+                <span class="sks-tl-when">2026/09/05 09:30</span>
+                <span class="sks-tl-what">不備確認依頼 → 修正回答あり</span>
+              </li>
+              <li>
+                <span class="sks-tl-when">2026/09/12 16:45</span>
+                <span class="sks-tl-what">一次審査完了</span>
+                <span class="sks-tl-who">事務局 太郎</span>
+              </li>
+              <li>
+                <span class="sks-tl-when">2026/09/28 14:10</span>
+                <span class="sks-tl-what">信用調査 結果取込（問題なし）</span>
+                <span class="sks-tl-who">事務局 花子</span>
+              </li>
+              <li class="is-current">
+                <span class="sks-tl-when">—</span>
+                <span class="sks-tl-what">採択判定（確定待ち）</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">権限</h3>
+          </div>
+          <div class="panel-body">
+            <p class="text-muted" style="font-size:12px; line-height:1.9; margin:0;">
+              確定操作は <code>staff_admin</code>（事務局管理者）に限定する想定です
+              （権限設計書 A20「不採択確定等の最終確定操作」）。
+              一次審査・信用調査は <code>staff</code> が実施できます。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：T03 へ少なくとも「採択番号」「交付決定額」「査定後の対象経費」
+      「不採択理由区分」「不採択理由」「確定者」「確定日時」の列追加が必要です。
+      これらが無いままステータスだけを遷移させると、採択者一覧の帳票に金額が出ず、
+      不採択の理由も追跡できません。
+    </p>
+
+  </div>
+</div>
+
+</body>
+</html>

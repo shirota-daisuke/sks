@@ -1,0 +1,90 @@
+/**
+ * 登録不備修正画面
+ * 中央配置のカード。色は Service Portal テーマの SCSS 変数のみを使用する（SC-03 本登録と同じ方針）。
+ */
+.sks-defect {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+
+    .sks-defect-card {
+        width: 100%;
+        max-width: 560px;
+
+        .panel-body {
+            padding: 28px;
+        }
+    }
+
+    .sks-defect-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-defect-account {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid $panel-default-border;
+        font-size: $font-size-small;
+
+        dt {
+            width: 120px;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-left: 136px;
+        }
+    }
+
+    .sks-defect-note {
+        margin-bottom: 24px;
+
+        .sks-defect-note-title {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: $font-size-base;
+            font-weight: bold;
+        }
+
+        // 事務局の自由記述。改行をそのまま表示する
+        .sks-defect-note-body {
+            margin-bottom: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    .sks-defect-footer {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-defect-message {
+        padding: 12px 0;
+
+        .sks-defect-title {
+            margin-top: 16px;
+        }
+
+        .sks-done-lead {
+            font-size: $font-size-large;
+            font-weight: bold;
+            color: $text-color;
+        }
+
+        .btn {
+            margin-top: 20px;
+        }
+    }
+}

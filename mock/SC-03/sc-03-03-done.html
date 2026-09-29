@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-03 本登録画面 ③本登録完了（登録申請審査中）
+  ============================================================================
+  画面設計書  SC-03 ③アクション No.1「本登録を完了する」
+              → 処理No.3 本登録処理／処理No.4 前年登録判定／処理No.5 重複チェック
+              → 業務フロー「登録を申請」に相当。ステータスを 登録中 → 登録申請審査中 に遷移
+  実装         src/fluent/sp-widget/signup-form/server_script.js  completeRegistration()
+  表示条件     data.state === 'done'（result.success === true）
+  ============================================================================
+  この時点で登録・更新されるデータ
+    x_dent2_dentsusoke_entity（新規作成）
+      ・u_business_name / u_entity_type / u_corporate_number = 入力値
+      ・u_prior_year_awarded_flag / u_prior_year_award_number / u_salesforce_account_id
+        = 前年登録判定（処理No.4）で一致した場合のみ引き継ぐ
+      ・u_address / u_industry は未設定（SC-03 の入力項目外・要レビュー）
+    x_dent2_dentsusoke_user（更新）
+      ・u_business_entity            = 作成した事業者
+      ・user_password                = 入力パスワード（プラットフォームがハッシュ化）
+      ・u_duplicate_check_result     = 重複なし／重複あり（要確認）／重複あり（確定）
+      ・u_registration_status        = 登録申請審査中（review）
+      ・u_registration_requested_on  = 現在日時
+      ・u_registration_token         = 空（使い切り）／有効期限も空
+  ============================================================================
+  注意
+    ・重複あり（確定／要確認）でも画面表示は同じ。登録可否の確定は事務局審査（SC-11／処理No.6）。
+    ・トークンは使い切りのため、同じリンクを再度開くと「リンクが無効」（④）になる。
+    ・applicant ロールは事務局の承認時に付与するため、この時点ではポータルにログインできない。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-03 本登録 ③本登録完了</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">未ログイン（仮登録トークンでアクセス）</span>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③本登録完了</b>：<code>data.state === 'done'</code>。
+      フォームを審査中の案内に差し替える（画面遷移なし）。事務局の承認後に applicant ロールが付与され、ポータルを利用できる。
+    </p>
+
+    <div class="sks-signup">
+      <div class="panel panel-default sks-signup-card">
+        <div class="panel-body">
+
+          <!-- ng-if="c.data.state === 'done'" -->
+          <div class="text-center sks-signup-message">
+            <!-- 実装：<i class="fa fa-check-circle fa-3x text-success" aria-hidden="true"></i> -->
+            <svg class="mock-icon mock-icon-3x" viewBox="0 0 24 24" aria-hidden="true" style="fill:#5cb85c">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 15l-5-5 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+            </svg>
+            <h2 class="sks-signup-title">登録申請審査中</h2>
+            <p class="sks-done-lead">本登録を受け付けました。</p>
+            <p class="text-muted">
+              <strong>株式会社サンプル</strong> の登録申請を事務局が審査します。<br />
+              審査が完了すると、ご登録のメールアドレスへ結果をご連絡します。
+            </p>
+            <a class="btn btn-default" href="../SC-00/sc-00-01-top.html">トップへ戻る</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

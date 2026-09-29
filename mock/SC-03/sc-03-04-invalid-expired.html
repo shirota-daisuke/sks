@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-03 本登録画面 ④リンク無効／⑤有効期限切れ
+  ============================================================================
+  画面設計書  権限設計書6章（一時トークンによるアクセス制御）
+              SC-03 実装：仮登録トークンは使い切り・有効期限は暫定7日（未確定）
+  実装         src/fluent/sp-widget/signup-form/server_script.js  findUserByToken()
+              src/fluent/sp-widget/signup-form/template.html      state=invalid / expired ブロック
+  表示条件     ・data.state === 'invalid'
+                 token 未指定／32桁未満／該当ユーザなし／既に本登録済（トークン空・ステータスが登録中以外）
+              ・data.state === 'expired'
+                 トークンは一致するが u_registration_token_expires_on が現在日時より過去
+  ============================================================================
+  ★ 実装ではこの2状態は排他です（同時に表示されることはありません）。
+    レビューしやすいよう1ファイルに並べています。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-03 本登録 ④リンク無効／⑤有効期限切れ</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">未ログイン</span>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>④リンク無効（<code>state === 'invalid'</code>）</b>：token 未指定・不正な値・使用済みトークンの場合。<br />
+      <b>⑤有効期限切れ（<code>state === 'expired'</code>）</b>：トークンは一致するが有効期限（暫定7日）を超過した場合。<br />
+      ★ 実装では排他表示。本ファイルは確認用に2状態を並べて掲載している。
+    </p>
+
+    <!-- ============ ④リンク無効 ============ -->
+    <div class="sks-signup">
+      <div class="panel panel-default sks-signup-card">
+        <div class="panel-body">
+
+          <!-- ng-if="c.data.state === 'invalid'" -->
+          <div class="text-center sks-signup-message">
+            <!-- 実装：<i class="fa fa-exclamation-triangle fa-3x text-danger" aria-hidden="true"></i> -->
+            <svg class="mock-icon mock-icon-3x" viewBox="0 0 24 24" aria-hidden="true" style="fill:#a94442">
+              <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+            <h2 class="sks-signup-title">本登録用のリンクが無効です</h2>
+            <p class="text-muted">
+              リンクが正しくないか、本登録が既に完了しています。<br />
+              お心当たりがない場合は、お手数ですが再度仮登録をお願いします。
+            </p>
+            <a class="btn btn-default" href="../SC-02/sc-02-01-form.html">仮登録へ戻る</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ⑤有効期限切れ ============ -->
+    <div class="sks-signup">
+      <div class="panel panel-default sks-signup-card">
+        <div class="panel-body">
+
+          <!-- ng-if="c.data.state === 'expired'" -->
+          <div class="text-center sks-signup-message">
+            <!-- 実装：<i class="fa fa-clock-o fa-3x text-warning" aria-hidden="true"></i> -->
+            <svg class="mock-icon mock-icon-3x" viewBox="0 0 24 24" aria-hidden="true" style="fill:#8a6d3b">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13h-1.5v6l5 3 .75-1.23-4.25-2.52V7z"/>
+            </svg>
+            <h2 class="sks-signup-title">リンクの有効期限が切れています</h2>
+            <p class="text-muted">お手数ですが、再度仮登録からお手続きをお願いします。</p>
+            <a class="btn btn-primary" href="../SC-02/sc-02-01-form.html">仮登録へ進む</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

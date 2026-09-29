@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 ②入力エラー（サーバー検証エラーの表示）
+  ============================================================================
+  画面設計書  SC-10 ②画面項目定義 F1 件名（200文字以内）／F2 本文（2000文字以内）
+  実装         src/fluent/sp-widget/inquiry-form/server_script.js  createInquiry() の errors
+              src/fluent/sp-widget/inquiry-form/template.html      ng-if="c.serverErrors.length"
+  表示条件     c.panel === 'new' かつ c.serverErrors.length > 0
+              （createInquiry() が {success:false, errors:[...]} を返した場合）
+  ============================================================================
+  補足（単体テスト No.103 の保留事項）
+    件名 maxlength="200"／本文 maxlength="2000" と required により、
+    通常の画面操作では上限超過・未入力の送信自体ができない（ボタンが無効）。
+    本状態は API 直接呼び出し等でクライアント制御を経由しなかった場合の表示。
+    サーバー側メッセージは以下の4種。
+      ・件名を入力してください。
+      ・件名は200文字以内で入力してください。
+      ・本文を入力してください。
+      ・本文は2000文字以内で入力してください。
+      ・問合せの送信に失敗しました。時間をおいて再度お試しください。（insert 失敗時）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 ②入力エラー</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li class="is-active"><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②入力エラー</b>：<code>c.serverErrors.length &gt; 0</code>。
+      サーバー側の検証（<code>createInquiry()</code>）で弾かれたメッセージを、フォーム上部に箇条書きで表示する。入力値は保持したままとする。
+    </p>
+
+    <div class="sks-inquiry">
+      <div class="row">
+
+        <!-- 左：問合せ履歴（エラー時も一覧は再取得されて表示される） -->
+        <div class="col-md-7 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ履歴</h3>
+              <span class="sks-count">全 2 件</span>
+            </div>
+
+            <table class="table table-hover sks-table">
+              <thead>
+                <tr>
+                  <th>件名</th>
+                  <th class="sks-col-state">状態</th>
+                  <th class="sks-col-date">更新日</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">経費区分の判定について</button>
+                  </td>
+                  <td><span class="label label-warning">未回答</span></td>
+                  <td>2026/08/09</td>
+                </tr>
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">申請書類の記載方法について</button>
+                  </td>
+                  <td><span class="label label-success">回答済</span></td>
+                  <td>2026/07/28</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 右：新規問合せ（エラー表示あり） -->
+        <div class="col-md-5 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">新規問合せ</h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- ng-if="c.serverErrors.length" / ng-repeat="err in c.serverErrors track by $index" -->
+              <div class="alert alert-danger" role="alert">
+                <ul class="list-unstyled sks-error-list">
+                  <li>件名は200文字以内で入力してください。</li>
+                  <li>本文は2000文字以内で入力してください。</li>
+                </ul>
+              </div>
+
+              <form name="inquiryForm" novalidate>
+                <div class="form-group">
+                  <label for="sks-inquiry-subject">件名 <span class="text-danger">*</span></label>
+                  <input type="text" id="sks-inquiry-subject" name="subject" class="form-control"
+                         placeholder="問合せ件名を入力" maxlength="200" required
+                         value="補助対象経費の追加について（当初申請時に計上していなかった外注費の扱いと、対象期間の判定基準について確認させてください）" />
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-inquiry-body">本文 <span class="text-danger">*</span></label>
+                  <textarea id="sks-inquiry-body" name="description" class="form-control" rows="8"
+                            maxlength="2000" required>当初申請時に計上していなかった外注費について、補助対象経費として追加できるかを確認させてください。
+
+・対象の外注費：システム設計の一部を外部委託した費用
+・発生時期：2026年7月
+・金額：1,200,000円
+
+追加が可能な場合、必要な手続きと提出書類をご教示ください。</textarea>
+                  <span class="help-block">2000文字以内で入力してください。</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">送信する</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

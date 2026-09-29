@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-05 マイページ ②データなし（申請0件・未読0件・問合せ0件・お知らせ0件）
+  ============================================================================
+  画面設計書  SC-05 ②D1（申請がない場合の表示）／D2・D3（0件でもカード自体は表示する）
+  実装         src/fluent/sp-widget/mypage-summary/server_script.js  statusLabel='申請なし'
+              src/fluent/sp-widget/mypage-notices/template.html      空状態ブロック
+              src/fluent/sp-widget/mypage-applications/template.html 空状態ブロック
+  表示条件     data.isApplicant === true かつ 各データが0件
+              ・申請0件           → D1 は「申請なし」／tone=neutral／申請番号は非表示
+              ・未読0件           → 「未読はありません」のサブテキストを表示
+              ・未対応の問合せ0件 → 「未回答の問合せはありません」／tone=neutral
+              ・公開中お知らせ0件 → 「公開中のお知らせはありません。」
+              ・申請0件           → 「申請はまだ作成されていません。」
+  ============================================================================
+  想定ケース
+    事務局の承認直後（applicant ロール付与済／申請未作成）の初回ログイン時。
+    公開中のお知らせがない、または公開範囲が合致しないケースを含む。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-05 マイページ ②データなし</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li class="is-active"><a href="#">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-03-empty.html">申請</a></li>
+      <li><a href="../SC-08/sc-08-02-empty.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-06-empty.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②データなし</b>：申請・お知らせ・問合せがいずれも0件の状態。
+      サマリカードは0件でも必ず3枚表示し、テーブル側は空状態メッセージに切り替える。
+    </p>
+
+    <!-- ===== サマリカード（D1・D2・D3） ===== -->
+    <div class="sks-summary">
+      <div class="row">
+
+        <!-- D1 申請ステータス（申請0件） -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <a class="sks-card sks-tone-neutral" href="../SC-07/sc-07-03-empty.html">
+            <span class="sks-card-label">申請ステータス</span>
+            <span class="sks-card-value">申請なし</span>
+            <!-- 申請番号がないため .sks-card-sub は非表示 -->
+          </a>
+        </div>
+
+        <!-- D2 未読のお知らせ件数（0件） -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <a class="sks-card sks-tone-info" href="../SC-08/sc-08-02-empty.html">
+            <span class="sks-card-label">未読のお知らせ</span>
+            <span class="sks-card-value">0 <small>件</small></span>
+            <!-- ng-if="!c.hasUnreadNotice()" -->
+            <span class="sks-card-sub">未読はありません</span>
+          </a>
+        </div>
+
+        <!-- D3 未対応の問合せ件数（0件） -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <!-- 0件なので sks-tone-neutral -->
+          <a class="sks-card sks-tone-neutral" href="../SC-10/sc-10-06-empty.html">
+            <span class="sks-card-label">未対応の問合せ</span>
+            <span class="sks-card-value">0 <small>件</small></span>
+            <!-- ng-if="!c.hasOpenInquiry()" -->
+            <span class="sks-card-sub">未回答の問合せはありません</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+
+      <!-- ===== 最近のお知らせ（D4・0件） ===== -->
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="panel panel-default sks-notices">
+          <div class="panel-heading">
+            <h3 class="panel-title">最近のお知らせ</h3>
+            <a class="sks-more" href="../SC-08/sc-08-02-empty.html">すべて見る</a>
+          </div>
+
+          <!-- ng-if="c.data.isApplicant && !c.data.notices.length" -->
+          <div class="panel-body text-center text-muted">
+            <!-- 実装：<i class="fa fa-inbox fa-2x"></i> -->
+            <svg class="mock-icon mock-icon-2x" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10z"/></svg>
+            <p>公開中のお知らせはありません。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 申請状況（D5・0件） ===== -->
+      <div class="col-md-6 col-sm-12 col-xs-12">
+        <div class="panel panel-default sks-applications">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請状況</h3>
+            <a class="sks-more" href="../SC-07/sc-07-03-empty.html">申請状況一覧へ</a>
+          </div>
+
+          <!-- ng-if="c.data.isApplicant && !c.hasApplications()" -->
+          <div class="panel-body text-center text-muted">
+            <!-- 実装：<i class="fa fa-file-text-o fa-2x"></i> -->
+            <svg class="mock-icon mock-icon-2x" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <p>申請はまだ作成されていません。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

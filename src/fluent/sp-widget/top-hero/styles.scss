@@ -1,0 +1,33 @@
+/**
+ * SC-00 ヒーローエリア
+ * 色は Service Portal テーマの SCSS 変数のみを使用する（生の hex 値は使わない）。
+ */
+.sks-hero {
+    padding: 48px 24px;
+    background-color: $panel-bg;
+    border: 1px solid $panel-default-border;
+
+    .sks-hero-title {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: $font-size-h2;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-hero-lead {
+        max-width: 46em;
+        margin-bottom: 28px;
+        font-size: $font-size-large;
+        line-height: 1.7;
+        color: $text-muted;
+    }
+
+    .sks-hero-actions {
+        .btn {
+            min-width: 160px;
+            margin-right: 12px;
+            margin-bottom: 8px;
+        }
+    }
+}

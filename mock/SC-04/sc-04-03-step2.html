@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-04 パスワードリセット画面 ③STEP2 入力可（有効な再設定トークン）
+  ============================================================================
+  画面設計書  SC-04 ⑤表示条件（STEP2 はメール内の再設定用リンク経由のみ表示）
+              SC-04 ②F2 新しいパスワード（8文字以上・暫定）／F3 パスワード確認
+              SC-04 ③アクション No.2「パスワードを更新」（処理No.11 後半）
+  実装         src/fluent/sp-widget/password-reset-form/server_script.js  findUserByResetToken() / maskEmail()
+  表示条件     data.tokenState === 'valid'
+              （?id=x_dent2_dentsusoke_reset&token=<64桁> でアクセスし、有効期限内）
+  ============================================================================
+  実装との対応
+    ・対象アカウントは maskEmail() で部分マスク表示する（先頭2文字＋"***"＋ドメイン）。
+      例：taro.jigyo@example.co.jp → ta***@example.co.jp
+      ローカル部が2文字以下の場合は先頭1文字＋"***"。
+    ・更新ボタンは ng-disabled="c.updating || updateForm.$invalid || c.passwordMismatch()"。
+    ・STEP1 のフォームも同時に表示される（c.sent が false のため）。
+      リンク経由で来たユーザが再送信することも可能な構成。
+    ・更新成功後は ⑤更新完了 → 1.5秒後に SC-01 ログイン画面へ遷移する。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-04 パスワードリセット ③STEP2 入力可</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">未ログイン（再設定トークンでアクセス）</span>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③STEP2 入力可</b>：<code>data.tokenState === 'valid'</code>。
+      対象アカウントをマスク表示し、新しいパスワードの入力欄を表示する。
+    </p>
+
+    <div class="sks-reset">
+      <div class="panel panel-default sks-reset-card">
+        <div class="panel-body">
+
+          <!-- STEP1（リンク経由でも表示される） -->
+          <div class="sks-step">
+            <h3 class="sks-step-title">STEP1：再設定メールの送信</h3>
+
+            <form name="sendForm" novalidate>
+              <div class="form-group">
+                <label for="sks-reset-email">登録済みメールアドレス <span class="text-danger">*</span></label>
+                <input type="email" id="sks-reset-email" name="resetEmail" class="form-control"
+                       placeholder="example@company.co.jp" maxlength="256" required />
+              </div>
+              <button type="submit" class="btn btn-primary btn-block" disabled>再設定用リンクを送信</button>
+            </form>
+          </div>
+
+          <hr class="sks-step-divider" />
+
+          <!-- STEP2：新しいパスワードの設定 -->
+          <div class="sks-step">
+            <h3 class="sks-step-title">STEP2：新しいパスワードの設定</h3>
+
+            <!-- ng-if="c.data.tokenState === 'valid'" -->
+            <div>
+              <!-- ng-if="c.data.maskedEmail" -->
+              <p class="text-muted sks-target-account">
+                対象アカウント：ta***@example.co.jp
+              </p>
+
+              <!-- サーバー検証エラー（ng-if="c.updateErrors.length"）：
+                   ・新しいパスワードを入力してください。
+                   ・パスワードは8文字以上128文字以内で入力してください。
+                   ・新しいパスワード（確認）が一致していません。
+                   ・再設定用のリンクが無効です。／有効期限が切れています。
+                   ・パスワードの更新に失敗しました。時間をおいて再度お試しください。 -->
+
+              <form name="updateForm" novalidate>
+                <div class="form-group">
+                  <label for="sks-new-password">新しいパスワード <span class="text-danger">*</span></label>
+                  <input type="password" id="sks-new-password" name="newPassword" class="form-control" maxlength="128" required />
+                  <span class="help-block">8文字以上128文字以内で入力してください。</span>
+                </div>
+
+                <!-- ng-class="{'has-error': c.passwordMismatch()}" -->
+                <div class="form-group">
+                  <label for="sks-new-password-confirm">新しいパスワード（確認） <span class="text-danger">*</span></label>
+                  <input type="password" id="sks-new-password-confirm" name="newPasswordConfirm" class="form-control" maxlength="128" required />
+                  <!-- 不一致時：<span class="help-block">パスワードが一致していません。</span> -->
+                </div>
+
+                <!-- ng-disabled="c.updating || updateForm.$invalid || c.passwordMismatch()" -->
+                <button type="submit" class="btn btn-primary btn-block" disabled>パスワードを更新</button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

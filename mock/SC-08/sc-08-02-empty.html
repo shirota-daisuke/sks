@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-08 お知らせ一覧画面 ②お知らせ0件
+  ============================================================================
+  実装         src/fluent/sp-widget/notice-list/template.html
+              ng-if="!c.data.notices.length" の空状態ブロック
+  表示条件     data.notices.length === 0
+              ・公開中のお知らせが存在しない
+              ・または公開期間外／公開範囲が合致しない（処理No.40・41 の条件で除外された）
+  ============================================================================
+  除外条件（NoticeUtil.applyVisibilityQuery）
+    ・u_publish_status が 非公開（private）
+    ・u_publish_start_date が未来／u_publish_end_date が過去
+    ・u_visibility_scope が all でもログインユーザの事業者区分でもない
+      （例：公開範囲＝個人 のお知らせを、法人の事業者ユーザが見た場合）
+  ============================================================================
+  補足
+    ・事業者に紐づかないユーザの場合は本状態ではなく alert-warning
+      「このページは事業者ユーザ向けです。…」を表示する（SC-05 ③と同じ考え方）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-08 お知らせ一覧 ②お知らせ0件</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-02-no-data.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-03-empty.html">申請</a></li>
+      <li class="is-active"><a href="#">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-06-empty.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②お知らせ0件</b>：<code>data.notices.length === 0</code>。
+      公開中のお知らせがない、または公開期間・公開範囲の条件で全件除外された場合。
+      件数（全 n 件）は <code>ng-if="c.data.totalCount"</code> のため表示されない。
+    </p>
+
+    <div class="sks-notice-list">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">お知らせ一覧</h3>
+          <!-- 0件のため <span class="sks-count"> は非表示 -->
+        </div>
+
+        <!-- ng-if="!c.data.notices.length" -->
+        <div class="panel-body text-center text-muted">
+          <!-- 実装：<i class="fa fa-inbox fa-2x" aria-hidden="true"></i> -->
+          <svg class="mock-icon mock-icon-2x" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10z"/></svg>
+          <p>公開中のお知らせはありません。</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

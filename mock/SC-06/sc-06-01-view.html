@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-06 自分の情報参照・変更画面 ①参照モード
+  ============================================================================
+  画面設計書  SC-06 ①レイアウト構成（事業者情報カード／アカウント情報カードを左右に配置）
+              SC-06 ②F1 事業者名／F2 所在地／F3 業種／F4 従業員数（編集可）
+                      F5 メールアドレス（編集可）／F6 ユーザID（表示のみ・変更不可）
+              SC-06 ③アクション No.1「編集する」（事業者情報／処理No.14）
+                                 No.2「編集する」（アカウント情報／処理No.15）
+  実装         src/fluent/sp-page/profile/profile.now.ts（roles: applicant / applicant_admin）
+              src/fluent/sp-widget/profile-form/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     c.entityMode === 'view' かつ c.accountMode === 'view'（初期値）
+  ============================================================================
+  実装との対応
+    ・カード単位で参照／編集モードを切り替える（両方を同時に編集モードにもできる）。
+    ・事業者区分・法人番号／本人識別情報は参照のみ（重複判定キーのため変更不可）。
+      項目個別ACLでも applicant への write を付与していない。
+    ・所在地・業種が未登録の場合は「（未登録）」を表示する
+      （SC-03 本登録では所在地・業種を入力しないため、初回は未登録になり得る）。
+    ・ユーザIDは user_name（ログインID）を表示する。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-06 自分の情報 ①参照モード</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li class="is-active"><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①参照モード</b>：<code>c.entityMode === 'view'</code> かつ <code>c.accountMode === 'view'</code>。
+      カードごとに「編集する」で編集モードへ切り替える。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS 自分の情報）の描画範囲 -->
+    <div class="sks-profile">
+      <div class="row">
+
+        <!-- 事業者情報 -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default sks-profile-card">
+            <div class="panel-heading">
+              <h3 class="panel-title">事業者情報</h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- 更新完了（ng-if="c.entitySaved"）／エラー（ng-if="c.entityErrors.length"）は別ファイル参照 -->
+
+              <!-- ng-if="c.entityMode === 'view'" -->
+              <div>
+                <dl class="sks-field-list">
+                  <dt>事業者名（法人名／屋号）</dt>
+                  <dd>株式会社テスト</dd>
+                  <dt>所在地</dt>
+                  <dd>東京都千代田区丸の内1-2-3</dd>
+                  <dt>業種</dt>
+                  <dd>サービス業</dd>
+                  <dt>従業員数</dt>
+                  <dd>12 名</dd>
+                  <dt>事業者区分</dt>
+                  <dd>法人</dd>
+                  <dt>法人番号／本人識別情報</dt>
+                  <dd>1234567890123</dd>
+                </dl>
+                <button type="button" class="btn btn-primary">編集する</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- アカウント情報 -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default sks-profile-card">
+            <div class="panel-heading">
+              <h3 class="panel-title">アカウント情報</h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- ng-if="c.accountMode === 'view'" -->
+              <div>
+                <dl class="sks-field-list">
+                  <dt>メールアドレス</dt>
+                  <dd>sks.demo@example.co.jp</dd>
+                  <dt>ユーザID</dt>
+                  <dd>sks.demo</dd>
+                </dl>
+                <button type="button" class="btn btn-primary">編集する</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

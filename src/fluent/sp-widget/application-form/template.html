@@ -1,0 +1,248 @@
+<!-- 申請入力：基本情報（ITCOM-01。入力フォーム＋補助金額の試算パネル） -->
+<div class="sks-apply">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <!-- 既に提出済み（下書きなし） -->
+  <div ng-if="c.data.state === 'submitted'" class="panel panel-default sks-apply-card">
+    <div class="panel-body text-center sks-apply-message">
+      <i class="fa fa-info-circle fa-3x text-info" aria-hidden="true"></i>
+      <h2 class="sks-apply-title">申請は提出済みです</h2>
+      <p class="text-muted">
+        申請番号 <strong>{{c.data.latestSubmitted.number}}</strong>
+        （<span class="label" ng-class="c.data.latestSubmitted.statusClass"
+               ng-bind="c.data.latestSubmitted.statusLabel"></span>）<br />
+        <span ng-if="c.data.latestSubmitted.submittedOn">提出日時：{{c.data.latestSubmitted.submittedOn}}</span>
+      </p>
+      <p class="text-muted">
+        内容の変更が必要な場合は、お手数ですが事務局へお問い合わせください。
+      </p>
+      <a class="btn btn-primary" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a>
+    </div>
+  </div>
+
+  <!-- 入力フォーム -->
+  <div ng-if="c.data.isApplicant && c.data.state === 'form'">
+
+    <!--
+      ステップ表示。
+      入力しただけで保存していない値は次の画面へ渡らないため、
+      ステップの移動でも必ず保存してから遷移する（c.saveAndGo）。
+      ng-href のリンクにすると未保存の入力が失われる。
+    -->
+    <ul class="sks-apply-steps">
+      <li class="is-active"><span class="sks-step-no">1</span>基本情報</li>
+      <li ng-class="{'is-done': c.data.draft}">
+        <a href="" ng-click="c.saveAndGo(c.data.expenseUrl)"><span class="sks-step-no">2</span>対象経費</a>
+      </li>
+      <li ng-class="{'is-done': c.data.draft}">
+        <a href="" ng-click="c.saveAndGo(c.data.documentUrl)"><span class="sks-step-no">3</span>添付書類</a>
+      </li>
+      <li>
+        <a href="" ng-click="c.saveAndGo(c.data.confirmUrl)"><span class="sks-step-no">4</span>内容確認・提出</a>
+      </li>
+    </ul>
+
+    <div class="row">
+    <div class="col-md-8">
+      <div class="panel panel-default sks-apply-card">
+        <div class="panel-body">
+          <h2 class="sks-apply-title">申請の入力</h2>
+
+          <dl class="dl-horizontal sks-apply-entity">
+            <dt>事業者名</dt>
+            <dd>{{c.data.entityName}}</dd>
+            <dt ng-if="c.data.draft">保存日時</dt>
+            <dd ng-if="c.data.draft">{{c.data.draft.updatedOn}}（下書き）</dd>
+          </dl>
+
+          <div class="alert alert-success" ng-if="c.saved" role="alert">
+            {{c.data.saveResult.message}}
+          </div>
+
+          <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+            <ul class="list-unstyled sks-error-list">
+              <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+            </ul>
+          </div>
+
+          <!-- Enter キーでの送信は下書き保存に割り当てる（提出は ITCOM-04 で行う） -->
+          <form name="applyForm" ng-submit="c.saveDraft()" novalidate>
+            <div class="form-group">
+              <label for="sks-organization-type">組織形態 <span class="text-danger">*</span></label>
+              <select id="sks-organization-type" class="form-control" ng-model="c.form.organization_type">
+                <option value="">選択してください</option>
+                <option value="corporate">法人</option>
+                <option value="sole_proprietor">個人事業主</option>
+                <option value="other">その他</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="sks-employee-category">従業員数区分 <span class="text-danger">*</span></label>
+              <select id="sks-employee-category" class="form-control" ng-model="c.form.employee_category">
+                <option value="">選択してください</option>
+                <option value="sole_proprietor">個人事業主</option>
+                <option value="le5">5人以下</option>
+                <option value="le20">6～20人</option>
+                <option value="le50">21～50人</option>
+                <option value="le100">51～100人</option>
+                <option value="gt100">101人以上</option>
+              </select>
+              <span class="help-block">補助上限額と補助率の判定に使用します。</span>
+            </div>
+
+            <div class="form-group">
+              <label for="sks-target-month">売上増加率対象月 <span class="text-danger">*</span></label>
+              <!--
+                年月のみを扱う（保持は DateColumn のため月初日）。
+                ng-model には Date オブジェクトが入るため、送信時に文字列へ変換している
+                （client_script.js の toMonthText）。
+              -->
+              <input type="month" id="sks-target-month" name="target_month" class="form-control"
+                     max="{{c.data.currentMonth}}"
+                     ng-model="c.form.sales_increase_target_month" />
+              <span class="help-block text-danger" ng-if="applyForm.target_month.$error.max">
+                申請時点より後の月は指定できません。
+              </span>
+              <span class="help-block">
+                売上が増加した月を年月で選択してください。対象期間は2025年1月以降で、
+                申請時点より後の月は指定できません。
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="sks-increase-rate">売上増加率 <span class="text-danger">*</span></label>
+              <input type="text" id="sks-increase-rate" class="form-control" placeholder="0.15"
+                     ng-model="c.form.sales_increase_rate" />
+              <span class="help-block">小数で入力してください（例：15% は 0.15）。</span>
+            </div>
+
+            <div class="checkbox sks-apply-special">
+              <label for="sks-special-measure">
+                <input type="checkbox" id="sks-special-measure" ng-model="c.form.special_measure" />
+                特例措置の対象である
+              </label>
+              <span class="help-block">該当する場合、補助上限額が引き上げられます。</span>
+            </div>
+
+            <!--
+              対象経費は明細（ITCOM-02）から算出するため、この画面では入力させない。
+              下書きが無いうちは明細を登録できないため、先に保存を促す。
+            -->
+            <div class="form-group sks-expense-link">
+              <label>対象経費合計金額（円） <span class="text-danger">*</span></label>
+              <div class="sks-expense-summary">
+                <span class="sks-expense-total">{{c.data.expense.totalLabel}} 円</span>
+                <span class="sks-expense-count">（明細 {{c.data.expense.itemCount}} 件）</span>
+                <a class="btn btn-default btn-sm" ng-if="c.data.draft" ng-href="{{c.data.expenseUrl}}">
+                  対象経費を入力する
+                </a>
+              </div>
+              <span class="help-block" ng-if="!c.data.draft">
+                先に「入力内容を保存」すると、対象経費の明細を登録できるようになります。
+              </span>
+              <span class="help-block" ng-if="c.data.draft && !c.data.expense.itemCount">
+                明細が未登録です。提出するには1件以上の登録が必要です。
+              </span>
+            </div>
+
+            <!--
+              添付書類（ITCOM-03）も別画面で提出する。
+              必須書類がそろっていないと提出できないため、ここで充足状況を示す。
+            -->
+            <div class="form-group sks-expense-link">
+              <label>添付書類 <span class="text-danger">*</span></label>
+              <div class="sks-expense-summary">
+                <span class="sks-expense-total">
+                  必須 {{c.data.document.requiredSubmitted}} / {{c.data.document.required}} 件
+                </span>
+                <a class="btn btn-default btn-sm" ng-if="c.data.draft" ng-href="{{c.data.documentUrl}}">
+                  添付書類を提出する
+                </a>
+              </div>
+              <span class="help-block" ng-if="!c.data.draft">
+                先に「入力内容を保存」すると、添付書類を提出できるようになります。
+              </span>
+              <span class="help-block" ng-if="c.data.draft && !c.data.document.complete">
+                未提出の必須書類があります：{{c.data.document.missing.join('、')}}
+              </span>
+            </div>
+
+            <!--
+              提出はこの画面では行わない（入口は内容確認・提出＝ITCOM-04 に限る）。
+              次の画面へ進むボタンは保存を伴う。
+              入力しただけで保存していない値は次の画面（対象経費・添付書類・内容確認）へ
+              渡らないため、遷移だけを行うボタンは置かない。
+            -->
+            <div class="sks-apply-actions">
+              <button type="submit" class="btn btn-default" ng-disabled="c.saving">
+                <span ng-if="c.saving"><i class="fa fa-spinner fa-spin"></i> 保存中…</span>
+                <span ng-if="!c.saving">入力内容を保存</span>
+              </button>
+              <button type="button" class="btn btn-primary" ng-disabled="!c.canProceed()"
+                      ng-click="c.saveAndGo(c.data.expenseUrl)">
+                保存して対象経費へ進む
+              </button>
+              <button type="button" class="btn btn-default" ng-disabled="!c.canProceed()"
+                      ng-click="c.saveAndGo(c.data.confirmUrl)">
+                保存して内容確認へ
+              </button>
+            </div>
+
+            <!-- 未保存の入力があることを明示する（保存前に離れると値が失われるため） -->
+            <p class="help-block sks-apply-dirty" ng-if="c.isDirty()">
+              未保存の入力があります。「入力内容を保存」または「保存して…へ進む」で保存してください。
+            </p>
+            <p class="help-block" ng-if="!c.data.draft && !c.isDirty()">
+              入力して保存すると、対象経費・添付書類の登録と提出に進めます。
+            </p>
+          </form>
+
+          <p class="sks-apply-note">{{c.data.note}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 補助金額の試算（処理No.17） -->
+    <div class="col-md-4">
+      <div class="panel panel-default sks-estimate-card">
+        <div class="panel-heading">補助金額の試算</div>
+        <div class="panel-body">
+          <p class="text-muted" ng-if="!c.data.estimate">
+            従業員数区分を入力して「入力内容を保存」すると、対象経費の明細から補助金額を自動で試算します。
+          </p>
+
+          <div ng-if="c.data.estimate && c.data.estimate.ok">
+            <dl class="sks-estimate-list">
+              <dt>対象経費合計</dt>
+              <dd>{{c.data.estimate.totalExpense}}</dd>
+              <dt>補助率</dt>
+              <dd>{{c.data.estimate.rateLabel}}</dd>
+              <dt>補助上限額</dt>
+              <dd>{{c.data.estimate.capAmount}}</dd>
+              <dt class="sks-estimate-total">補助金額</dt>
+              <dd class="sks-estimate-total">{{c.data.estimate.subsidyAmount}}</dd>
+            </dl>
+            <p class="text-muted sks-estimate-capped" ng-if="c.data.estimate.cappedByLimit">
+              対象経費に補助率を適用した額が補助上限額を超えるため、上限額が適用されています。
+            </p>
+            <p class="text-muted sks-estimate-disclaimer">
+              試算値です。確定額は事務局の審査により決定します。
+            </p>
+          </div>
+
+          <div class="alert alert-warning" ng-if="c.data.estimate && !c.data.estimate.ok" role="alert">
+            <ul class="list-unstyled sks-error-list">
+              <li ng-repeat="err in c.data.estimate.errors track by $index">{{err}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>

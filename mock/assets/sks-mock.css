@@ -1,0 +1,550 @@
+@charset "UTF-8";
+/* ==========================================================================
+ * 成長加速支援補助金 申請ポータル — 画面モック共通スタイル（SC-00〜SC-09）
+ *
+ * 本ファイルはモック（ブラウザ単体で確認するための静的HTML）専用です。
+ * 実装では以下が描画に使われるため、本CSSはデプロイ対象ではありません。
+ *   ・ウィジェットCSS : src/fluent/sp-widget/<widget>/styles.scss
+ *   ・共通スタイル     : Service Portal テーマ（OOTB Coral）＋ Bootstrap 3
+ *
+ * 構成
+ *   1. Bootstrap 3 相当の最小サブセット
+ *   2. ポータル共通クロム（ヘッダー／トップタブ）＝ OOTB Stock Header／Header Menu 相当
+ *   3. 各ウィジェットの styles.scss を、SCSS変数を解決した形で再掲
+ *
+ * SCSS変数の解決値（Bootstrap 3 既定値。実際の値はポータルテーマにより異なります）
+ *   $brand-primary #337ab7 ／ $brand-success #5cb85c ／ $brand-warning #f0ad4e
+ *   $brand-danger  #d9534f ／ $text-color #333 ／ $text-muted #777 ／ $gray-light #777
+ *   $panel-bg #fff ／ $panel-default-border #ddd ／ $table-bg-accent #f9f9f9
+ *   $font-size-base 14px ／ $font-size-large 18px ／ $font-size-small 12px
+ *   $font-size-h2 30px ／ $font-size-h3 24px ／ $font-size-h4 18px
+ *   $border-radius-small 3px
+ *
+ * ※ SC-10 は mock/SC-10/assets/sc-10-mock.css に同等の内容を持っています。
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 1. Bootstrap 3 相当の最小サブセット
+ * -------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background-color: #f5f5f5;
+    color: #333;
+    font-family: "Meiryo UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+
+h1, h2, h3, h4, h5 { margin: 0 0 10px; font-weight: 500; }
+h1 { font-size: 36px; }
+h2 { font-size: 30px; }
+h3 { font-size: 24px; }
+h4 { font-size: 18px; }
+h5 { font-size: 14px; }
+p { margin: 0 0 10px; }
+hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
+small { font-size: 85%; }
+strong, b { font-weight: bold; }
+
+a { color: #337ab7; text-decoration: none; }
+a:hover, a:focus { color: #23527c; text-decoration: underline; }
+
+dl { margin: 0 0 20px; }
+dt { font-weight: bold; }
+dd { margin-left: 0; }
+.dl-horizontal dt { float: left; width: 160px; clear: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dl-horizontal dd { margin-left: 180px; }
+.dl-horizontal:after { content: ""; display: table; clear: both; }
+
+.container { width: 100%; max-width: 1170px; margin: 0 auto; padding: 0 15px; }
+
+.row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+.row > [class^="col-"] { padding: 0 15px; }
+.col-md-4 { width: 33.33333333%; }
+.col-md-5 { width: 41.66666667%; }
+.col-md-6 { width: 50%; }
+.col-md-7 { width: 58.33333333%; }
+.col-md-8 { width: 66.66666667%; }
+.col-md-12 { width: 100%; }
+
+@media (max-width: 991px) {
+    .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8 { width: 100%; }
+    .col-sm-4 { width: 33.33333333%; }
+    .col-sm-12 { width: 100%; }
+}
+@media (max-width: 767px) {
+    .col-sm-4 { width: 100%; }
+    .dl-horizontal dt { float: none; width: auto; }
+    .dl-horizontal dd { margin-left: 0; }
+}
+
+.panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+}
+.panel-default { border-color: #ddd; }
+.panel-heading {
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    border-radius: 3px 3px 0 0;
+}
+.panel-title { margin: 0; font-size: 16px; }
+.panel-body { padding: 15px; }
+.panel-body:after { content: ""; display: table; clear: both; }
+.panel-footer {
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 3px 3px;
+}
+
+.table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+.table > thead > tr > th,
+.table > tbody > tr > td {
+    padding: 8px;
+    border-top: 1px solid #ddd;
+    text-align: left;
+    vertical-align: top;
+}
+.table > thead > tr > th { border-bottom: 2px solid #ddd; border-top: 0; }
+.table-hover > tbody > tr:hover { background-color: #f5f5f5; }
+
+.label {
+    display: inline-block;
+    padding: .2em .6em .3em;
+    border-radius: .25em;
+    color: #fff;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+.label-success { background-color: #5cb85c; }
+.label-warning { background-color: #f0ad4e; }
+.label-danger  { background-color: #d9534f; }
+.label-info    { background-color: #5bc0de; }
+.label-default { background-color: #777; }
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-image: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+.btn-primary { background-color: #337ab7; border-color: #2e6da4; color: #fff; }
+.btn-primary:hover, .btn-primary:focus { background-color: #286090; border-color: #204d74; color: #fff; text-decoration: none; }
+.btn-default { background-color: #fff; border-color: #ccc; color: #333; }
+.btn-default:hover, .btn-default:focus { background-color: #e6e6e6; border-color: #adadad; color: #333; text-decoration: none; }
+.btn-link { background: none; border: 0; color: #337ab7; }
+.btn-link:hover { text-decoration: underline; }
+.btn-link[disabled] { color: #777; cursor: not-allowed; text-decoration: none; }
+.btn[disabled] { opacity: .65; cursor: not-allowed; }
+.btn-lg { padding: 10px 16px; border-radius: 6px; font-size: 18px; }
+.btn-block { display: block; width: 100%; }
+
+.form-group { margin-bottom: 15px; }
+label { display: inline-block; margin-bottom: 5px; font-weight: bold; }
+.form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #555;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+textarea.form-control { height: auto; resize: vertical; }
+select.form-control { height: 34px; }
+.form-control:focus { border-color: #66afe9; outline: 0; box-shadow: 0 0 8px rgba(102, 175, 233, .6); }
+.form-control[readonly] { background-color: #eee; }
+.has-error .form-control { border-color: #a94442; }
+.has-error label { color: #a94442; }
+.help-block { display: block; margin: 5px 0 10px; color: #737373; font-size: 12px; }
+
+.radio, .checkbox { position: relative; display: block; margin: 10px 0; }
+.radio label, .checkbox label { padding-left: 20px; margin-bottom: 0; font-weight: normal; cursor: pointer; }
+.radio input, .checkbox input { position: absolute; margin-left: -20px; margin-top: 4px; }
+
+.alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+.alert-success { background-color: #dff0d8; border-color: #d6e9c6; color: #3c763d; }
+.alert-danger  { background-color: #f2dede; border-color: #ebccd1; color: #a94442; }
+.alert-warning { background-color: #fcf8e3; border-color: #faebcc; color: #8a6d3b; }
+.alert-info    { background-color: #d9edf7; border-color: #bce8f1; color: #31708f; }
+
+.text-muted   { color: #777; }
+.text-danger  { color: #a94442; }
+.text-success { color: #3c763d; }
+.text-warning { color: #8a6d3b; }
+.text-center  { text-align: center; }
+.list-unstyled { padding-left: 0; margin: 0; list-style: none; }
+
+/* --------------------------------------------------------------------------
+ * 2. ポータル共通クロム（モック用）
+ *    実装では OOTB Stock Header ＋ Header Menu（sp-instance-menu/menu.now.ts）が描画する。
+ * -------------------------------------------------------------------------- */
+.mock-header { background-color: #fff; border-bottom: 1px solid #ddd; }
+.mock-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+}
+.mock-portal-title { font-size: 16px; font-weight: bold; }
+.mock-user { color: #777; font-size: 12px; }
+.mock-header-link { font-size: 13px; }
+
+.mock-tabs { background-color: #fff; border-bottom: 1px solid #ddd; }
+.mock-tabs ul { display: flex; padding: 0; margin: 0; list-style: none; }
+.mock-tabs li a {
+    display: block;
+    padding: 12px 18px;
+    border-bottom: 3px solid transparent;
+    color: #333;
+    font-size: 13px;
+}
+.mock-tabs li a:hover { text-decoration: none; background-color: #f5f5f5; }
+.mock-tabs li.is-active a { border-bottom-color: #337ab7; color: #337ab7; font-weight: bold; }
+
+.mock-main { padding: 24px 0 40px; }
+
+/* モック自身の説明ブロック（実装対象外） */
+.mock-note {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #337ab7;
+    background-color: #eef4fa;
+    color: #31708f;
+    font-size: 12px;
+    line-height: 1.7;
+}
+.mock-note b { color: #245a86; }
+.mock-note code {
+    padding: 1px 4px;
+    background-color: #fff;
+    border: 1px solid #cfe0ee;
+    border-radius: 3px;
+    font-family: Consolas, "Courier New", monospace;
+}
+
+/* アイコン（実装では Font Awesome の <i class="fa fa-*"> を使用） */
+.mock-icon { width: 20px; height: 20px; fill: currentColor; vertical-align: -3px; }
+.mock-icon-2x { width: 32px; height: 32px; opacity: .5; }
+.mock-icon-3x { width: 48px; height: 48px; }
+
+/* --------------------------------------------------------------------------
+ * 3-1. SC-00 ヒーローエリア（sp-widget/top-hero/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-hero {
+    padding: 48px 24px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.sks-hero .sks-hero-title {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-hero .sks-hero-lead {
+    max-width: 46em;
+    margin-bottom: 28px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #777;
+}
+.sks-hero .sks-hero-actions .btn { min-width: 160px; margin-right: 12px; margin-bottom: 8px; }
+
+/* --------------------------------------------------------------------------
+ * 3-2. SC-00 案内カード×3（sp-widget/top-info-cards/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-info-cards { margin-top: 24px; }
+.sks-info-cards .sks-info-card { height: 100%; }
+.sks-info-cards .sks-info-card .panel-body { padding: 20px; }
+.sks-info-cards .sks-info-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-info-cards .sks-info-title .fa,
+.sks-info-cards .sks-info-title .mock-icon { margin-right: 8px; color: #337ab7; }
+.sks-info-cards .sks-info-body { margin-bottom: 0; color: #777; line-height: 1.7; }
+
+/* --------------------------------------------------------------------------
+ * 3-3. SC-01 補足リンク・注記（sp-widget/login-links/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-login-links { max-width: 400px; margin: 0 auto; padding: 0 4px; }
+.sks-login-links .sks-link-list { margin-bottom: 12px; font-size: 12px; }
+.sks-login-links .sks-link-list li { margin-bottom: 6px; }
+.sks-login-links .sks-login-note { margin-bottom: 0; font-size: 12px; color: #777; line-height: 1.7; }
+.sks-login-links .sks-sso-note { margin-top: 16px; margin-bottom: 0; font-size: 12px; }
+.sks-login-links .sks-sso-note .fa,
+.sks-login-links .sks-sso-note .mock-icon { margin-right: 6px; }
+
+/* SC-01 のログインカード（実装は OOTB ログインウィジェット。モック用の再現） */
+.sp-login-widget { max-width: 400px; margin: 0 auto 16px; }
+
+/* --------------------------------------------------------------------------
+ * 3-4. SC-02 仮登録画面（sp-widget/register-form/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-register { display: flex; justify-content: center; padding: 32px 0; }
+.sks-register .sks-register-card { width: 100%; max-width: 460px; }
+.sks-register .sks-register-card .panel-body { padding: 28px; }
+.sks-register .sks-register-title {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-register .sks-error-list { margin-bottom: 0; }
+.sks-register .sks-register-note { margin-top: 16px; margin-bottom: 0; font-size: 12px; color: #777; }
+.sks-register .sks-register-done { padding: 12px 0; }
+.sks-register .sks-register-done .sks-done-lead {
+    margin-top: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-register .sks-register-done .sks-done-note { margin-top: 16px; font-size: 12px; }
+
+/* --------------------------------------------------------------------------
+ * 3-5. SC-03 本登録画面（sp-widget/signup-form/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-signup { display: flex; justify-content: center; padding: 32px 0; }
+.sks-signup .sks-signup-card { width: 100%; max-width: 520px; }
+.sks-signup .sks-signup-card .panel-body { padding: 28px; }
+.sks-signup .sks-signup-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-signup .sks-signup-account {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+}
+.sks-signup .sks-signup-account dt { width: 120px; color: #777; font-weight: normal; }
+.sks-signup .sks-signup-account dd { margin-left: 136px; }
+.sks-signup .sks-error-list { margin-bottom: 0; }
+.sks-signup .sks-agree { margin-bottom: 20px; }
+.sks-signup .sks-signup-note { margin-top: 16px; margin-bottom: 0; font-size: 12px; color: #777; }
+.sks-signup .sks-signup-message { padding: 12px 0; }
+.sks-signup .sks-signup-message .sks-signup-title { margin-top: 16px; }
+.sks-signup .sks-signup-message .sks-done-lead { font-size: 18px; font-weight: bold; color: #333; }
+.sks-signup .sks-signup-message .btn { margin-top: 20px; }
+
+/* --------------------------------------------------------------------------
+ * 3-6. SC-04 パスワードリセット画面（sp-widget/password-reset-form/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-reset { display: flex; justify-content: center; padding: 32px 0; }
+.sks-reset .sks-reset-card { width: 100%; max-width: 460px; }
+.sks-reset .sks-reset-card .panel-body { padding: 28px; }
+.sks-reset .sks-step-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-reset .sks-step-divider { margin: 28px 0; border-top: 1px solid #ddd; }
+.sks-reset .sks-target-account { margin-bottom: 16px; font-size: 12px; }
+.sks-reset .sks-error-list { margin-bottom: 0; }
+
+/* --------------------------------------------------------------------------
+ * 3-7. SC-05 サマリカード（sp-widget/mypage-summary/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-summary .sks-card {
+    display: block;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-left-color: #777;
+    text-decoration: none;
+    color: #333;
+}
+.sks-summary .sks-card:hover,
+.sks-summary .sks-card:focus {
+    text-decoration: none;
+    border-color: #337ab7;
+    border-left-color: #337ab7;
+}
+.sks-summary .sks-card-label { display: block; margin-bottom: 6px; font-size: 12px; color: #777; }
+.sks-summary .sks-card-value { display: block; font-size: 24px; font-weight: bold; line-height: 1.2; }
+.sks-summary .sks-card-sub { display: block; margin-top: 6px; font-size: 12px; color: #777; }
+.sks-summary .sks-tone-done { border-left-color: #5cb85c; }
+.sks-summary .sks-tone-done .sks-card-value { color: #5cb85c; }
+.sks-summary .sks-tone-progress { border-left-color: #f0ad4e; }
+.sks-summary .sks-tone-progress .sks-card-value { color: #f0ad4e; }
+.sks-summary .sks-tone-error { border-left-color: #d9534f; }
+.sks-summary .sks-tone-error .sks-card-value { color: #d9534f; }
+.sks-summary .sks-tone-info { border-left-color: #337ab7; }
+.sks-summary .sks-tone-info .sks-card-value { color: #337ab7; }
+.sks-summary .sks-tone-neutral { border-left-color: #777; }
+
+/* --------------------------------------------------------------------------
+ * 3-8. SC-05 最近のお知らせ（sp-widget/mypage-notices/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-notices .panel-heading { display: flex; align-items: baseline; justify-content: space-between; }
+.sks-notices .sks-more { font-size: 12px; }
+.sks-notices .sks-table { margin-bottom: 0; }
+.sks-notices .sks-table th { font-size: 12px; color: #777; font-weight: normal; }
+.sks-notices .sks-table td { vertical-align: middle; }
+.sks-notices .sks-col-priority { width: 90px; }
+.sks-notices .sks-col-date { width: 120px; white-space: nowrap; }
+.sks-notices .sks-title-link { padding: 0; text-align: left; white-space: normal; border: 0; }
+.sks-notices .sks-unread .sks-title-link { font-weight: bold; }
+.sks-notices .sks-badge-unread {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: #f0ad4e;
+    border: 1px solid #f0ad4e;
+    border-radius: 3px;
+}
+
+/* --------------------------------------------------------------------------
+ * 3-9. SC-05 申請状況（sp-widget/mypage-applications/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-applications .panel-heading { display: flex; align-items: baseline; justify-content: space-between; }
+.sks-applications .sks-more { font-size: 12px; }
+.sks-applications .sks-table { margin-bottom: 0; }
+.sks-applications .sks-table th { font-size: 12px; color: #777; font-weight: normal; }
+.sks-applications .sks-table td { vertical-align: middle; }
+.sks-applications .sks-col-status { width: 180px; }
+.sks-applications .sks-col-date { width: 120px; white-space: nowrap; }
+
+/* --------------------------------------------------------------------------
+ * 3-10. SC-06 自分の情報（sp-widget/profile-form/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-profile .sks-profile-card { height: 100%; }
+.sks-profile .sks-field-list { margin-bottom: 20px; }
+.sks-profile .sks-field-list dt { margin-bottom: 2px; font-size: 12px; font-weight: normal; color: #777; }
+.sks-profile .sks-field-list dd {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+}
+.sks-profile .sks-field-list dd:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.sks-profile .sks-error-list { margin-bottom: 0; }
+.sks-profile .sks-readonly-note { font-size: 12px; }
+.sks-profile .btn + .btn { margin-left: 8px; }
+
+/* --------------------------------------------------------------------------
+ * 3-11. SC-07 申請状況一覧・詳細（sp-widget/application-list/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-app-list .panel-heading { display: flex; align-items: baseline; justify-content: space-between; }
+.sks-app-list .sks-count { font-size: 12px; color: #777; }
+.sks-app-list .sks-table { margin-bottom: 0; }
+.sks-app-list .sks-table th { font-size: 12px; font-weight: normal; color: #777; }
+.sks-app-list .sks-table td { vertical-align: middle; }
+.sks-app-list .sks-col-status { width: 180px; }
+.sks-app-list .sks-col-date { width: 120px; white-space: nowrap; }
+.sks-app-list .sks-col-action { width: 80px; }
+.sks-app-list .sks-row-selected { background-color: #f9f9f9; }
+.sks-app-list .sks-detail-link { padding: 0; border: 0; }
+.sks-app-list .sks-truncated { font-size: 12px; color: #777; }
+.sks-app-list .sks-status-chip { margin-bottom: 20px; }
+.sks-app-list .sks-status-chip .label { font-size: 14px; padding: 6px 12px; }
+.sks-app-list .sks-status-chip .sks-special { margin-left: 10px; font-size: 12px; color: #337ab7; }
+.sks-app-list .sks-amount-list,
+.sks-app-list .sks-meta-list { margin-bottom: 20px; }
+.sks-app-list .sks-amount-list:after,
+.sks-app-list .sks-meta-list:after { content: ""; display: table; clear: both; }
+.sks-app-list .sks-amount-list dt,
+.sks-app-list .sks-meta-list dt {
+    float: left;
+    width: 140px;
+    clear: left;
+    font-size: 12px;
+    font-weight: normal;
+    color: #777;
+}
+.sks-app-list .sks-amount-list dd,
+.sks-app-list .sks-meta-list dd { margin-left: 152px; margin-bottom: 8px; }
+.sks-app-list .sks-amount-list dd { font-weight: bold; color: #333; }
+.sks-app-list .sks-error-list { margin-bottom: 0; }
+.sks-app-list .sks-fix-note { margin-bottom: 0; }
+.sks-app-list .sks-fix-note .fa,
+.sks-app-list .sks-fix-note .mock-icon { margin-right: 6px; }
+.sks-app-list .sks-withdraw { margin-left: 8px; }
+.sks-app-list .sks-note { margin-top: 20px; margin-bottom: 0; font-size: 12px; color: #777; }
+
+/* --------------------------------------------------------------------------
+ * 3-12. SC-08 お知らせ一覧（sp-widget/notice-list/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-notice-list .panel-heading { display: flex; align-items: baseline; justify-content: space-between; }
+.sks-notice-list .sks-count { font-size: 12px; color: #777; }
+.sks-notice-list .sks-table { margin-bottom: 0; }
+.sks-notice-list .sks-table th { font-size: 12px; font-weight: normal; color: #777; }
+.sks-notice-list .sks-table td { vertical-align: middle; }
+.sks-notice-list .sks-col-state { width: 80px; }
+.sks-notice-list .sks-col-priority { width: 90px; }
+.sks-notice-list .sks-col-date { width: 120px; white-space: nowrap; }
+.sks-notice-list .sks-state {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: #f0ad4e;
+    border: 1px solid #f0ad4e;
+    border-radius: 3px;
+}
+.sks-notice-list .sks-state-read { color: #777; border-color: #ddd; }
+.sks-notice-list .sks-title-link { padding: 0; text-align: left; white-space: normal; border: 0; }
+.sks-notice-list .sks-unread .sks-title-link { font-weight: bold; }
+.sks-notice-list .sks-truncated { font-size: 12px; color: #777; }
+
+/* --------------------------------------------------------------------------
+ * 3-13. SC-09 お知らせ詳細（sp-widget/notice-detail/styles.scss）
+ * -------------------------------------------------------------------------- */
+.sks-notice-detail .sks-notice-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+.sks-notice-detail .sks-notice-meta { margin-bottom: 20px; }
+.sks-notice-detail .sks-notice-meta .label { margin-right: 12px; }
+.sks-notice-detail .sks-notice-meta .sks-publish-date,
+.sks-notice-detail .sks-notice-meta .sks-publish-end { font-size: 12px; color: #777; }
+.sks-notice-detail .sks-notice-meta .sks-publish-end { margin-left: 12px; }
+.sks-notice-detail .sks-notice-body-panel { margin-bottom: 20px; }
+.sks-notice-detail .sks-notice-body-panel .panel-body { padding: 24px; }
+.sks-notice-detail .sks-notice-body { line-height: 1.8; color: #333; }
+.sks-notice-detail .sks-notice-body p { margin-bottom: 1em; }
+.sks-notice-detail .sks-notice-body ul,
+.sks-notice-detail .sks-notice-body ol { margin-bottom: 1em; padding-left: 1.5em; }
+.sks-notice-detail .sks-notice-body a { text-decoration: underline; }
+.sks-notice-detail .sks-notice-body table { width: 100%; margin-bottom: 1em; }
+.sks-notice-detail .sks-notice-body table th,
+.sks-notice-detail .sks-notice-body table td { padding: 6px 8px; border: 1px solid #ddd; }

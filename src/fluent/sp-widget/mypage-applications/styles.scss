@@ -1,0 +1,38 @@
+/**
+ * SC-05「申請状況」
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-applications {
+    .panel-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    .sks-more {
+        font-size: $font-size-small;
+    }
+
+    .sks-table {
+        margin-bottom: 0;
+
+        th {
+            font-size: $font-size-small;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+    }
+
+    .sks-col-status {
+        width: 180px;
+    }
+
+    .sks-col-date {
+        width: 120px;
+        white-space: nowrap;
+    }
+}

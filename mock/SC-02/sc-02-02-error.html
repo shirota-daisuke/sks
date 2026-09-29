@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-02 仮登録画面 ②入力エラー（クライアント検証＋サーバー検証）
+  ============================================================================
+  画面設計書  SC-02 ②F1 ログインID（半角英数字4〜20桁・暫定）／F2 メールアドレス
+              確認事項：ログインIDの命名規則は未確定（暫定仕様）
+  実装         src/fluent/sp-widget/register-form/template.html      help-block（クライアント検証）
+              src/fluent/sp-widget/register-form/server_script.js    validate()／重複チェック
+  表示条件     ・クライアント検証：入力欄が $touched かつ $invalid
+              ・サーバー検証    ：c.serverErrors.length > 0
+  ============================================================================
+  サーバー側メッセージ一覧（server_script.js）
+    ・ログインIDを入力してください。
+    ・ログインIDは半角英数字4～20桁で入力してください。
+    ・このログインIDは既に使用されています。別のIDをご入力ください。      … sys_user 全体で重複判定
+    ・メールアドレスを入力してください。／メールアドレスの形式が正しくありません。
+    ・メールアドレスは256文字以内で入力してください。
+    ・このメールアドレスは既に登録手続き中、または登録済です。…            … 登録中/審査中/不備/登録済 と重複
+    ・仮登録に失敗しました。時間をおいて再度お試しください。               … insert 失敗時
+  ============================================================================
+  本モックの状態
+    ・上部：サーバー検証エラー（ログインID重複）
+    ・ログインID欄：クライアント検証エラー（4桁未満）＝ .has-error ＋ help-block
+    ・メール欄    ：クライアント検証エラー（形式不正）＝ .has-error ＋ help-block
+      ※ 実装では $invalid の間ボタンが無効になるため、サーバーエラーと
+         クライアントエラーが同時に出るのは「送信後に入力を書き換えた」場合です。
+         レビュー用に両方のスタイルを1画面で確認できるようにしています。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-02 仮登録 ②入力エラー</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <a class="mock-header-link" href="../SC-01/sc-01-01-login.html">ログイン</a>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②入力エラー</b>：上部にサーバー検証エラー（<code>c.serverErrors</code>）を箇条書きで表示し、
+      各入力欄には <code>$touched &amp;&amp; $invalid</code> のとき <code>.has-error</code> と help-block を表示する。入力値は保持する。
+    </p>
+
+    <div class="sks-register">
+      <div class="panel panel-default sks-register-card">
+        <div class="panel-body">
+
+          <h2 class="sks-register-title">仮登録</h2>
+
+          <div>
+            <!-- ng-if="c.serverErrors.length" / ng-repeat="err in c.serverErrors track by $index" -->
+            <div class="alert alert-danger" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li>このログインIDは既に使用されています。別のIDをご入力ください。</li>
+              </ul>
+            </div>
+
+            <form name="registerForm" novalidate>
+              <!-- ng-class="{'has-error': registerForm.loginId.$touched && registerForm.loginId.$invalid}" -->
+              <div class="form-group has-error">
+                <label for="sks-login-id">ログインID <span class="text-danger">*</span></label>
+                <input type="text" id="sks-login-id" name="loginId" class="form-control"
+                       placeholder="半角英数字で入力" maxlength="20" required value="abc" />
+                <!-- ng-if="...$error.pattern" -->
+                <span class="help-block">半角英数字4～20桁で入力してください。</span>
+              </div>
+
+              <div class="form-group has-error">
+                <label for="sks-email">メールアドレス <span class="text-danger">*</span></label>
+                <input type="text" id="sks-email" name="email" class="form-control"
+                       placeholder="example@company.co.jp" maxlength="256" required value="taro.jigyo.example.co.jp" />
+                <!-- ng-if="...$error.email" -->
+                <span class="help-block">メールアドレスの形式が正しくありません。</span>
+              </div>
+
+              <!-- $invalid のため無効 -->
+              <button type="submit" class="btn btn-primary btn-block" disabled>仮登録する</button>
+            </form>
+
+            <p class="sks-register-note">ご入力のメールアドレス宛に、本登録用のご案内をお送りします。</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

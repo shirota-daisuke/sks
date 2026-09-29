@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npx now-sdk query sys_user_role -q 'nameSTARTSWITHx_dent2_dentsusoke' -f 'name' --limit 10 -o json)",
+      "PowerShell(npx now-sdk query sys_security_acl -q 'nameSTARTSWITHx_dent2_dentsusoke' -f 'name,operation' --limit 30 -o json)",
+      "PowerShell(npx now-sdk query sys_user_has_role -q 'user.user_name=sks.demo' -f 'user,role' --limit 5 -o json)",
+      "PowerShell(npx now-sdk query sys_script_include -q 'sys_scope=cb087751ec6040af97c6b79fbe958518' -f 'name,api_name' --limit 5 -o json)",
+      "PowerShell(npx now-sdk query sp_rectangle_menu_item -q 'sp_rectangle_menu=4fcd7062c1824ae282fc818dc850303c^ORDERBYorder' -f 'label,page' --display-value all --limit 10 -o json)",
+      "PowerShell(npx now-sdk query x_dent2_dentsusoke_entity -f \"sys_id,u_business_name,u_entity_type,u_corporate_number,u_address,u_industry,u_employee_count,u_capital,u_prior_year_awarded_flag\" --limit 10 -o json)",
+      "PowerShell(npx now-sdk query x_dent2_dentsusoke_user -f \"sys_id,user_name,name,email,u_business_entity,u_registration_status,u_auth_method,u_duplicate_check_result,notification,u_registration_token,u_password_reset_token\" --limit 10 -o json)",
+      "PowerShell(npx now-sdk query sys_email -q \"subjectLIKE�{�o�^�̂��ē�^ORDERBYDESCsys_created_on\" -f \"subject,recipients,body,sys_created_on\" --limit 1 -o json)",
+      "PowerShell(npx now-sdk query sys_dictionary -q \"nameSTARTSWITHx_dent2_dentsusoke^elementISNOTEMPTY^ORDERBYname^ORDERBYelement\" -f \"name,element,column_label,internal_type,max_length,mandatory,reference,default_value\" --limit 120 -o json 2>$null)",
+      "PowerShell(Get-ChildItem -Recurse dist -File | Where-Object { $_.Length -lt 2MB } | Select-String -Pattern 'sks_staff_workspace' -List | Select-Object -ExpandProperty Path)",
+      "PowerShell(Select-String -Path node_modules\\\\@servicenow\\\\sdk\\\\docs\\\\guides\\\\creating-workspaces-guide.md -Pattern 'aggregateFunction' -Context 30,30 | Select-Object -First 1 | ForEach-Object { $_.Context.PreContext; '>>> ' + $_.Line; $_.Context.PostContext })",
+      "PowerShell(npx now-sdk build 2>&1)",
+      "PowerShell(Select-String -Path src\\\\fluent\\\\generated\\\\keys.ts -Pattern 'sks_dashboard_tab|sks_widget' -Context 0,1 | ForEach-Object { $_.Line.Trim\\(\\) + ' -> ' + $_.Context.PostContext[0].Trim\\(\\) })",
+      "PowerShell(& \"D:\\\\Temp\\\\claude\\\\d--dev-sks\\\\c1725fc1-5596-488c-b786-4c26ab90af56\\\\scratchpad\\\\run-all.ps1\" 2>&1)",
+      "PowerShell(npm run build)"
+    ]
+  }
+}

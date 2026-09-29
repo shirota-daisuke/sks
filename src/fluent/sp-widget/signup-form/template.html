@@ -1,0 +1,122 @@
+<!-- SC-03 本登録画面（中央配置の本登録カード） -->
+<div class="sks-signup">
+  <div class="panel panel-default sks-signup-card">
+    <div class="panel-body">
+
+      <!-- トークン不正 -->
+      <div ng-if="c.data.state === 'invalid'" class="text-center sks-signup-message">
+        <i class="fa fa-exclamation-triangle fa-3x text-danger" aria-hidden="true"></i>
+        <h2 class="sks-signup-title">本登録用のリンクが無効です</h2>
+        <p class="text-muted">
+          リンクが正しくないか、本登録が既に完了しています。<br />
+          お心当たりがない場合は、お手数ですが再度仮登録をお願いします。
+        </p>
+        <a class="btn btn-default" href="{{c.data.registerUrl}}">仮登録へ戻る</a>
+      </div>
+
+      <!-- トークン期限切れ -->
+      <div ng-if="c.data.state === 'expired'" class="text-center sks-signup-message">
+        <i class="fa fa-clock-o fa-3x text-warning" aria-hidden="true"></i>
+        <h2 class="sks-signup-title">リンクの有効期限が切れています</h2>
+        <p class="text-muted">お手数ですが、再度仮登録からお手続きをお願いします。</p>
+        <a class="btn btn-primary" href="{{c.data.registerUrl}}">仮登録へ進む</a>
+      </div>
+
+      <!-- 本登録フォーム -->
+      <div ng-if="c.data.state === 'form'">
+        <h2 class="sks-signup-title">本登録</h2>
+
+        <dl class="dl-horizontal sks-signup-account">
+          <dt>ログインID</dt>
+          <dd>{{c.data.loginId}}</dd>
+          <dt>メールアドレス</dt>
+          <dd>{{c.data.email}}</dd>
+        </dl>
+
+        <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+          <ul class="list-unstyled sks-error-list">
+            <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+          </ul>
+        </div>
+
+        <form name="signupForm" ng-submit="c.submit()" novalidate>
+          <div class="form-group">
+            <label for="sks-business-name">事業者名（法人名／屋号） <span class="text-danger">*</span></label>
+            <input type="text" id="sks-business-name" name="businessName" class="form-control"
+                   placeholder="株式会社サンプル"
+                   ng-model="c.form.business_name" maxlength="100" required />
+          </div>
+
+          <div class="form-group">
+            <label>事業者区分 <span class="text-danger">*</span></label>
+            <div class="radio">
+              <label for="sks-entity-corporate">
+                <input type="radio" id="sks-entity-corporate" name="entityType"
+                       ng-model="c.form.entity_type" value="corporate" />
+                法人
+              </label>
+            </div>
+            <div class="radio">
+              <label for="sks-entity-sole">
+                <input type="radio" id="sks-entity-sole" name="entityType"
+                       ng-model="c.form.entity_type" value="sole_proprietor" />
+                個人事業主
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sks-corporate-number">法人番号／本人識別情報 <span class="text-danger">*</span></label>
+            <input type="text" id="sks-corporate-number" name="corporateNumber" class="form-control"
+                   placeholder="{{c.identifierHint()}}"
+                   ng-model="c.form.corporate_number" maxlength="13" required />
+            <span class="help-block">重複チェックのキーとして使用します（{{c.identifierHint()}}）。</span>
+          </div>
+
+          <div class="form-group">
+            <label for="sks-password">パスワード <span class="text-danger">*</span></label>
+            <input type="password" id="sks-password" name="password" class="form-control"
+                   ng-model="c.form.password" maxlength="128" required />
+            <span class="help-block">8文字以上128文字以内で入力してください。</span>
+          </div>
+
+          <div class="form-group" ng-class="{'has-error': c.passwordMismatch()}">
+            <label for="sks-password-confirm">パスワード（確認） <span class="text-danger">*</span></label>
+            <input type="password" id="sks-password-confirm" name="passwordConfirm" class="form-control"
+                   ng-model="c.form.password_confirm" maxlength="128" required />
+            <span class="help-block" ng-if="c.passwordMismatch()">パスワードが一致していません。</span>
+          </div>
+
+          <div class="checkbox sks-agree">
+            <label for="sks-agreed">
+              <input type="checkbox" id="sks-agreed" ng-model="c.form.agreed" />
+              利用規約に同意する <span class="text-danger">*</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" ng-disabled="!c.canSubmit()">
+            <span ng-if="c.submitting"><i class="fa fa-spinner fa-spin"></i> 送信中…</span>
+            <span ng-if="!c.submitting">本登録を完了する</span>
+          </button>
+        </form>
+
+        <p class="sks-signup-note">
+          完了後、前年度登録有無の判定・重複チェックを実施し、事務局承認後に利用開始となります。
+        </p>
+      </div>
+
+      <!-- 本登録完了（登録申請審査中） -->
+      <div ng-if="c.data.state === 'done'" class="text-center sks-signup-message">
+        <i class="fa fa-check-circle fa-3x text-success" aria-hidden="true"></i>
+        <h2 class="sks-signup-title">登録申請審査中</h2>
+        <p class="sks-done-lead">本登録を受け付けました。</p>
+        <p class="text-muted">
+          <strong>{{c.data.result.businessName}}</strong> の登録申請を事務局が審査します。<br />
+          審査が完了すると、ご登録のメールアドレスへ結果をご連絡します。
+        </p>
+        <a class="btn btn-default" href="{{c.data.topUrl}}">トップへ戻る</a>
+      </div>
+
+    </div>
+  </div>
+</div>

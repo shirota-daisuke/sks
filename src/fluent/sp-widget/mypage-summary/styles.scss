@@ -1,0 +1,82 @@
+/**
+ * SC-05 サマリカード
+ * 色は Service Portal テーマの SCSS 変数のみを使用する（生の hex 値は使わない）。
+ * 画面イメージ凡例の3区分（完了／処理中・要確認／エラー・不備）を tone クラスで表現する。
+ */
+.sks-summary {
+    .sks-card {
+        display: block;
+        padding: 16px 18px;
+        margin-bottom: 16px;
+        background-color: $panel-bg;
+        border: 1px solid $panel-default-border;
+        border-left-width: 4px;
+        border-left-style: solid;
+        border-left-color: $gray-light;
+        text-decoration: none;
+        color: $text-color;
+
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            border-color: $brand-primary;
+            border-left-color: $brand-primary;
+        }
+    }
+
+    .sks-card-label {
+        display: block;
+        font-size: $font-size-small;
+        color: $text-muted;
+        margin-bottom: 6px;
+    }
+
+    .sks-card-value {
+        display: block;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+
+    .sks-card-sub {
+        display: block;
+        margin-top: 6px;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    // 完了／問題なし系
+    .sks-tone-done {
+        border-left-color: $brand-success;
+        .sks-card-value {
+            color: $brand-success;
+        }
+    }
+
+    // 処理中／要確認系
+    .sks-tone-progress {
+        border-left-color: $brand-warning;
+        .sks-card-value {
+            color: $brand-warning;
+        }
+    }
+
+    // エラー／不備系
+    .sks-tone-error {
+        border-left-color: $brand-danger;
+        .sks-card-value {
+            color: $brand-danger;
+        }
+    }
+
+    .sks-tone-info {
+        border-left-color: $brand-primary;
+        .sks-card-value {
+            color: $brand-primary;
+        }
+    }
+
+    .sks-tone-neutral {
+        border-left-color: $gray-light;
+    }
+}

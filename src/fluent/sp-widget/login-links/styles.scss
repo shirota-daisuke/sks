@@ -1,0 +1,36 @@
+/**
+ * SC-01 ログイン画面 補足リンク・注記
+ * OOTB ログインウィジェットの直下に配置するため、幅を揃えて中央寄せする。
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-login-links {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0 4px;
+
+    .sks-link-list {
+        margin-bottom: 12px;
+        font-size: $font-size-small;
+
+        li {
+            margin-bottom: 6px;
+        }
+    }
+
+    .sks-login-note {
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+        line-height: 1.7;
+    }
+
+    .sks-sso-note {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+
+        .fa {
+            margin-right: 6px;
+        }
+    }
+}

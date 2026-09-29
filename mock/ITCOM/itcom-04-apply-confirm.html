@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-04 申請入力：内容確認・提出（STEP4）／★提出完了を併記
+  ============================================================================
+  位置づけ   ITCOM 主担当（申請機能）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-04 は仮番号。
+             ★ 既存モックの慣習にならい、実装では排他表示となる
+                「確認画面」と「提出完了」をレビュー用に1ファイルへ並べている。
+
+  想定する処理  申請の提出（申請入力中 input → 受付済 accepted）
+                提出時に申請番号を採番し、補助上限額・補助率・提出日時を確定する
+
+  現状の暫定実装との対応
+    src/server/script-includes/application-submit-util.js の submit() が
+    採番・金額判定・ステータス遷移を行う。本モックの確認画面は
+    そのロジックをそのまま使える構成にしている（表示項目を増やすだけ）。
+
+  ■ 判明している制約
+  補助金額を保存する列が T03 に存在しない。
+  T03 にあるのは u_subsidy_cap_amount（上限額）／u_subsidy_rate（補助率）／
+  u_total_expense_amount（対象経費）のみで、算出した補助金額の保持先が無い。
+  そのため確認画面・完了画面の「補助金額」は画面表示のみで、
+  事務局の一覧・帳票・ダッシュボードには出ない。列の追加が必要。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・申請受付メールの要否・テンプレート（IF-07）
+    ・提出後の修正可否（本モックは不可としている。不備確認依頼を経由する運用）
+    ・同意事項（申請要領の遵守・虚偽申請時の取消等）の文面
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-04 申請入力：内容確認・提出（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      補助金額を保存する列が T03 に存在しないため、「補助金額」は<b>画面表示のみ</b>で
+      事務局の一覧・帳票には出ません。列の追加が必要です。
+      ★ 実装では排他表示となる「確認画面」と「提出完了」をレビュー用に1ファイルへ並べています。
+    </p>
+
+    <!-- ========================================================== -->
+    <!-- ① 内容確認（提出前）                                        -->
+    <!-- ========================================================== -->
+    <p class="mock-note"><b>① 内容確認（提出前）</b></p>
+
+    <ul class="sks-apply-steps">
+      <li class="is-done"><span class="sks-step-no">1</span>基本情報</li>
+      <li class="is-done"><span class="sks-step-no">2</span>対象経費</li>
+      <li class="is-done"><span class="sks-step-no">3</span>添付書類</li>
+      <li class="is-active"><span class="sks-step-no">4</span>内容確認・提出</li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">申請内容の確認</h3>
+          </div>
+          <div class="panel-body">
+
+            <p class="sks-form-section-note" style="margin-bottom:20px;">
+              以下の内容で申請を提出します。<b>提出後は内容を変更できません。</b>
+              修正が必要な場合は各セクションの「修正」から戻ってください。
+            </p>
+
+            <!-- 事業者情報 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h4>事業者情報</h4>
+                <a href="../SC-06/sc-06-01-view.html">自分の情報で変更</a>
+              </div>
+              <dl class="sks-confirm-list">
+                <dt>事業者名</dt>
+                <dd>株式会社テスト</dd>
+                <dt>法人番号</dt>
+                <dd>1234567890123</dd>
+                <dt>所在地</dt>
+                <dd>東京都千代田区丸の内1-2-3</dd>
+                <dt>業種</dt>
+                <dd>サービス業</dd>
+              </dl>
+            </div>
+
+            <!-- 申請区分・売上増加率 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h4>申請区分・売上増加率</h4>
+                <a href="itcom-01-apply-basic.html">修正</a>
+              </div>
+              <dl class="sks-confirm-list">
+                <dt>組織形態</dt>
+                <dd>法人</dd>
+                <dt>従業員数区分</dt>
+                <dd>6～20人</dd>
+                <dt>売上増加率対象月</dt>
+                <dd>2026年6月</dd>
+                <dt>売上増加率</dt>
+                <dd>15.0%</dd>
+                <dt>特例措置</dt>
+                <dd>対象</dd>
+              </dl>
+            </div>
+
+            <!-- 対象経費 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h4>対象経費</h4>
+                <a href="itcom-02-apply-expenses.html">修正</a>
+              </div>
+              <table class="table sks-expense-table">
+                <thead>
+                  <tr>
+                    <th>経費区分</th>
+                    <th>内容</th>
+                    <th class="sks-col-days">日数</th>
+                    <th class="sks-col-amount">金額</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>クラウドサービス利用費</td>
+                    <td>受発注管理SaaS 年間利用料</td>
+                    <td>—</td>
+                    <td class="sks-amount">3,600,000</td>
+                  </tr>
+                  <tr>
+                    <td>設備費</td>
+                    <td>自動仕分け装置 1台</td>
+                    <td>—</td>
+                    <td class="sks-amount">4,000,000</td>
+                  </tr>
+                  <tr>
+                    <td>専門家経費</td>
+                    <td>業務設計コンサルティング</td>
+                    <td>12</td>
+                    <td class="sks-amount">600,000</td>
+                  </tr>
+                  <tr class="sks-expense-total">
+                    <td colspan="3">対象経費合計</td>
+                    <td class="sks-amount">8,200,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 添付書類 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h4>添付書類</h4>
+                <a href="itcom-03-apply-attachments.html">修正</a>
+              </div>
+              <dl class="sks-confirm-list">
+                <dt>決算書</dt>
+                <dd>決算書_2025年度.pdf</dd>
+                <dt>履歴事項全部証明書</dt>
+                <dd>登記簿_20260901.pdf</dd>
+                <dt>見積書</dt>
+                <dd>見積書_3社分.pdf</dd>
+                <dt>売上を証する書類</dt>
+                <dd>売上推移_2025-2026.xlsx</dd>
+              </dl>
+            </div>
+
+            <!-- 同意事項。文面は未確定 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h4>申請にあたっての確認</h4>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="checkbox" />
+                  記載内容および提出書類に虚偽がないことを確認しました。
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="checkbox" />
+                  公募要領の内容を確認し、これに従うことに同意します。
+                </label>
+              </div>
+              <p class="sks-judge-hint">同意事項の文面は未確定です。</p>
+            </div>
+
+            <div class="sks-form-actions">
+              <button type="button" class="btn btn-default">戻る（添付書類）</button>
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-primary btn-lg">申請を提出する</button>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">補助金額（試算）</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-amount-summary">
+              <dt>対象経費合計</dt>
+              <dd>8,200,000円</dd>
+              <dt>補助率</dt>
+              <dd>1/2</dd>
+              <dt>補助上限額</dt>
+              <dd>20,000,000円</dd>
+              <dt class="sks-total">補助金額</dt>
+              <dd class="sks-total">4,100,000円</dd>
+            </dl>
+            <p class="text-muted" style="margin-top:12px; font-size:12px;">
+              試算値です。確定額は事務局の審査により決定します。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- ========================================================== -->
+    <!-- ② 提出完了                                                 -->
+    <!-- ========================================================== -->
+    <p class="mock-note">
+      <b>② 提出完了</b>（実装では ① と排他。提出成功後に表示する）
+    </p>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-body text-center" style="padding:32px 24px;">
+            <svg class="mock-icon mock-icon-3x" viewBox="0 0 16 16" style="fill:#5cb85c;">
+              <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.7 5.3l-4.4 5.3a.7.7 0 01-1 .1L3.8 8.4a.7.7 0 01.9-1l1.9 1.6 3.9-4.7a.7.7 0 011.1.9z" />
+            </svg>
+            <h2 style="margin-top:16px;">申請を受け付けました</h2>
+            <p style="font-size:16px;">申請番号：<strong>APP-2026-00001</strong></p>
+
+            <dl class="sks-confirm-list" style="display:inline-block; text-align:left; margin-top:20px;">
+              <dt>提出日時</dt>
+              <dd>2026/09/24 15:08</dd>
+              <dt>ステータス</dt>
+              <dd><span class="label label-warning">受付済</span></dd>
+              <dt>補助上限額</dt>
+              <dd>20,000,000円</dd>
+              <dt>補助率</dt>
+              <dd>1/2</dd>
+              <dt>補助金額（試算）</dt>
+              <dd><strong>4,100,000円</strong></dd>
+            </dl>
+
+            <p class="text-muted" style="margin-top:20px;">
+              事務局にて審査を行います。審査状況は「申請」画面でご確認いただけます。<br />
+              <span style="font-size:12px;">
+                ※受付内容のメール通知は要否が未確定のため送信していません（IF-07）。
+              </span>
+            </p>
+
+            <p style="margin-top:20px;">
+              <a class="btn btn-primary" href="../SC-07/sc-07-01-list-detail.html">申請状況を確認する</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：申請番号の採番規則は <code>APP-&lt;西暦&gt;-&lt;5桁連番&gt;</code> を暫定としています
+      （<code>ApplicationSubmitUtil.generateApplicationNumber</code>）。
+      年度切替の基準・公募回次の反映が未確定で、T03 に公募回次の列がありません。
+    </p>
+
+  </div>
+</main>
+
+</body>
+</html>

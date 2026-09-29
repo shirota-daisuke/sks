@@ -1,0 +1,16 @@
+<!-- SC-00 トップ（未ログイン）画面 案内カード×3（対象者／申請方法／審査の流れ） -->
+<div class="sks-info-cards">
+  <div class="row">
+    <div class="col-md-4 col-sm-4 col-xs-12" ng-repeat="card in c.data.cards track by card.key">
+      <div class="panel panel-default sks-info-card">
+        <div class="panel-body">
+          <h3 class="sks-info-title">
+            <i class="fa" ng-class="'fa-' + card.glyph" aria-hidden="true"></i>
+            {{card.title}}
+          </h3>
+          <p class="sks-info-body">{{card.body}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

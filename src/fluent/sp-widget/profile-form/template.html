@@ -1,0 +1,151 @@
+<!-- SC-06 自分の情報参照・変更画面（事業者情報／アカウント情報を左右に並べる） -->
+<div class="sks-profile">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <div class="row" ng-if="c.data.isApplicant">
+
+    <!-- 事業者情報 -->
+    <div class="col-md-6 col-sm-12 col-xs-12">
+      <div class="panel panel-default sks-profile-card">
+        <div class="panel-heading">
+          <h3 class="panel-title">事業者情報</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="alert alert-success" ng-if="c.entitySaved" role="alert">
+            事業者情報を更新しました。
+          </div>
+          <div class="alert alert-danger" ng-if="c.entityErrors.length" role="alert">
+            <ul class="list-unstyled sks-error-list">
+              <li ng-repeat="err in c.entityErrors track by $index">{{err}}</li>
+            </ul>
+          </div>
+
+          <!-- 参照モード -->
+          <div ng-if="c.entityMode === 'view'">
+            <dl class="sks-field-list">
+              <dt>事業者名（法人名／屋号）</dt>
+              <dd>{{c.data.entity.business_name}}</dd>
+              <dt>所在地</dt>
+              <dd>{{c.data.entity.address || '（未登録）'}}</dd>
+              <dt>業種</dt>
+              <dd>{{c.data.entity.industry_label || '（未登録）'}}</dd>
+              <dt>従業員数</dt>
+              <dd>{{c.data.entity.employee_count}} 名</dd>
+              <dt>事業者区分</dt>
+              <dd>{{c.data.entity.entity_type_label}}</dd>
+              <dt>法人番号／本人識別情報</dt>
+              <dd>{{c.data.entity.corporate_number}}</dd>
+            </dl>
+            <button type="button" class="btn btn-primary" ng-click="c.editEntity()">編集する</button>
+          </div>
+
+          <!-- 編集モード -->
+          <form name="entityForm" ng-if="c.entityMode === 'edit'" ng-submit="c.saveEntity()" novalidate>
+            <div class="form-group">
+              <label for="sks-business-name">事業者名（法人名／屋号） <span class="text-danger">*</span></label>
+              <input type="text" id="sks-business-name" name="businessName" class="form-control"
+                     ng-model="c.entityForm.business_name" maxlength="100" required />
+            </div>
+
+            <div class="form-group">
+              <label for="sks-address">所在地 <span class="text-danger">*</span></label>
+              <input type="text" id="sks-address" name="address" class="form-control"
+                     ng-model="c.entityForm.address" maxlength="200" required />
+            </div>
+
+            <div class="form-group">
+              <label for="sks-industry">業種 <span class="text-danger">*</span></label>
+              <select id="sks-industry" name="industry" class="form-control"
+                      ng-model="c.entityForm.industry"
+                      ng-options="choice.value as choice.label for choice in c.data.industryChoices track by choice.value"
+                      required>
+                <option value="">選択してください</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="sks-employee-count">従業員数 <span class="text-danger">*</span></label>
+              <input type="number" id="sks-employee-count" name="employeeCount" class="form-control"
+                     ng-model="c.entityForm.employee_count" min="0" step="1" required />
+              <span class="help-block">0以上の整数で入力してください。</span>
+            </div>
+
+            <p class="text-muted sks-readonly-note">
+              事業者区分・法人番号／本人識別情報は変更できません。変更が必要な場合は事務局へお問い合わせください。
+            </p>
+
+            <button type="submit" class="btn btn-primary"
+                    ng-disabled="c.entitySaving || entityForm.$invalid">
+              <span ng-if="c.entitySaving"><i class="fa fa-spinner fa-spin"></i> 保存中…</span>
+              <span ng-if="!c.entitySaving">保存する</span>
+            </button>
+            <button type="button" class="btn btn-default" ng-click="c.cancelEntity()"
+                    ng-disabled="c.entitySaving">キャンセル</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- アカウント情報 -->
+    <div class="col-md-6 col-sm-12 col-xs-12">
+      <div class="panel panel-default sks-profile-card">
+        <div class="panel-heading">
+          <h3 class="panel-title">アカウント情報</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="alert alert-success" ng-if="c.accountSaved" role="alert">
+            アカウント情報を更新しました。
+          </div>
+          <div class="alert alert-danger" ng-if="c.accountErrors.length" role="alert">
+            <ul class="list-unstyled sks-error-list">
+              <li ng-repeat="err in c.accountErrors track by $index">{{err}}</li>
+            </ul>
+          </div>
+
+          <!-- 参照モード -->
+          <div ng-if="c.accountMode === 'view'">
+            <dl class="sks-field-list">
+              <dt>メールアドレス</dt>
+              <dd>{{c.data.account.email}}</dd>
+              <dt>ユーザID</dt>
+              <dd>{{c.data.account.user_id}}</dd>
+            </dl>
+            <button type="button" class="btn btn-primary" ng-click="c.editAccount()">編集する</button>
+          </div>
+
+          <!-- 編集モード -->
+          <form name="accountForm" ng-if="c.accountMode === 'edit'" ng-submit="c.saveAccount()" novalidate>
+            <div class="form-group">
+              <label for="sks-account-email">メールアドレス <span class="text-danger">*</span></label>
+              <input type="email" id="sks-account-email" name="accountEmail" class="form-control"
+                     ng-model="c.accountForm.email" maxlength="256" required />
+            </div>
+
+            <div class="form-group">
+              <label for="sks-account-user-id">ユーザID</label>
+              <input type="text" id="sks-account-user-id" class="form-control"
+                     value="{{c.data.account.user_id}}" readonly />
+              <span class="help-block">ユーザIDは変更できません。</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                    ng-disabled="c.accountSaving || accountForm.$invalid">
+              <span ng-if="c.accountSaving"><i class="fa fa-spinner fa-spin"></i> 保存中…</span>
+              <span ng-if="!c.accountSaving">保存する</span>
+            </button>
+            <button type="button" class="btn btn-default" ng-click="c.cancelAccount()"
+                    ng-disabled="c.accountSaving">キャンセル</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-06 一次審査：対象一覧（事務局）
+  ============================================================================
+  位置づけ   ITCOM 主担当（審査プロセス）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-06 は仮番号。
+
+  想定する処理  一次審査の対象抽出・担当者割当
+
+  ■ 現状の欠落
+  T03 の申請ステータスは16値あるが、遷移させる処理が存在するのは次の2つだけ。
+    input → accepted （先日追加した暫定実装）
+    → withdrawn      （実装済みだが A02 未決で既定非表示）
+  一次審査中・不備確認依頼・一次審査完了 以降へ進める手段が無い。
+  つまり受付済から先へ進められないため、本画面の一覧は
+  「受付済」で滞留した申請しか並ばない状態になる。
+
+  また審査担当者を保持する列が T03 に無い。
+  問合せ（T12 u_assigned_staff）と同様の列の追加が必要。
+
+  実装方式の想定
+    事務局向け画面は SC-11〜SC-17 と同じ事務局ワークスペース（Next Experience）で提供する。
+    一覧は UxListMenuConfig のリスト、審査操作は UI Action として実装する
+    （src/fluent/workspaces/staff-workspace/list-menu.now.ts に「申請審査」カテゴリを追加）。
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・審査の観点・チェック項目（ITCOM-07 参照）
+    ・担当者の割当方式（手動取得／自動割当／グループ配分）
+    ・審査の期限・SLA（本モックは受付から30日を仮置き）
+    ・複数人による審査（合議）の要否
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-06 一次審査：対象一覧（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-ws-header">
+  <div class="container">
+    <span class="mock-ws-title">SKS 事務局ワークスペース</span>
+    <span class="mock-ws-user">事務局 花子（x_dent2_dentsusoke.staff）</span>
+  </div>
+</header>
+
+<div class="mock-ws-body">
+
+  <!-- 左ナビ。既存の SC-11〜SC-17 のカテゴリに「申請審査」を追加する想定 -->
+  <nav class="mock-ws-nav">
+    <div class="mock-ws-nav-group">ユーザ管理</div>
+    <ul>
+      <li><a href="#">登録審査：要対応 <span class="mock-ws-count">4</span></a></li>
+      <li><a href="#">登録申請審査中</a></li>
+      <li><a href="#">事業者ユーザ（すべて）</a></li>
+    </ul>
+
+    <div class="mock-ws-nav-group">申請審査（提案）</div>
+    <ul>
+      <li class="is-active"><a href="#">一次審査：要対応 <span class="mock-ws-count">7</span></a></li>
+      <li><a href="itcom-08-credit-check.html">信用調査：要対応</a></li>
+      <li><a href="itcom-09-award-decision.html">採択判定：要対応</a></li>
+      <li><a href="#">申請（すべて）</a></li>
+    </ul>
+
+    <div class="mock-ws-nav-group">お知らせ管理</div>
+    <ul>
+      <li><a href="#">お知らせ（公開）</a></li>
+      <li><a href="#">お知らせ（非公開）</a></li>
+    </ul>
+
+    <div class="mock-ws-nav-group">問合せ管理</div>
+    <ul>
+      <li><a href="#">問合せ（未回答） <span class="mock-ws-count">2</span></a></li>
+    </ul>
+
+    <div class="mock-ws-nav-group">帳票／レポート</div>
+    <ul>
+      <li><a href="#">申請一覧（受付済）</a></li>
+      <li><a href="#">採択者一覧</a></li>
+    </ul>
+  </nav>
+
+  <div class="mock-ws-content">
+
+    <h1>一次審査：要対応</h1>
+    <p class="mock-ws-sub">
+      x_dent2_dentsusoke_request ｜ 絞込 <code>u_application_status IN accepted,first_review,defect_answered,re_review</code>
+    </p>
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      T03 の申請ステータス16値のうち、遷移させる処理が存在するのは
+      <code>input→accepted</code> と <code>→withdrawn</code> の2つだけです。
+      一次審査中以降へ進める手段が無いため、実際にはこの一覧に「受付済」で滞留した申請しか並びません。
+      <b>審査担当者を保持する列も T03 にありません</b>（問合せの <code>u_assigned_staff</code> 相当の追加が必要）。
+    </p>
+
+    <table class="table table-hover sks-review-table">
+      <thead>
+        <tr>
+          <th class="sks-col-number">申請番号</th>
+          <th>事業者</th>
+          <th>従業員数区分</th>
+          <th class="sks-col-amount">対象経費</th>
+          <th class="sks-col-amount">補助金額</th>
+          <th>ステータス</th>
+          <th>提出日</th>
+          <th>経過</th>
+          <th>担当者</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00123</a></td>
+          <td>株式会社テスト</td>
+          <td>6～20人</td>
+          <td class="sks-col-amount">8,200,000</td>
+          <td class="sks-col-amount">4,100,000</td>
+          <td><span class="label label-warning">一次審査中</span></td>
+          <td>2026/08/01</td>
+          <td class="sks-overdue">54日</td>
+          <td>事務局 花子</td>
+        </tr>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00124</a></td>
+          <td>有限会社サンプル</td>
+          <td>5人以下</td>
+          <td class="sks-col-amount">2,400,000</td>
+          <td class="sks-col-amount">1,600,000</td>
+          <td><span class="label label-warning">受付済</span></td>
+          <td>2026/09/18</td>
+          <td>6日</td>
+          <td class="text-muted">未割当</td>
+        </tr>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00125</a></td>
+          <td>山田商店</td>
+          <td>個人事業主</td>
+          <td class="sks-col-amount">900,000</td>
+          <td class="sks-col-amount">600,000</td>
+          <td><span class="label label-warning">受付済</span></td>
+          <td>2026/09/20</td>
+          <td>4日</td>
+          <td class="text-muted">未割当</td>
+        </tr>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00126</a></td>
+          <td>株式会社ミライ工業</td>
+          <td>21～50人</td>
+          <td class="sks-col-amount">18,000,000</td>
+          <td class="sks-col-amount">9,000,000</td>
+          <td><span class="label label-danger">不備修正回答あり</span></td>
+          <td>2026/08/12</td>
+          <td class="sks-overdue">43日</td>
+          <td>事務局 太郎</td>
+        </tr>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00127</a></td>
+          <td>合同会社ノース</td>
+          <td>6～20人</td>
+          <td class="sks-col-amount">6,500,000</td>
+          <td class="sks-col-amount">3,250,000</td>
+          <td><span class="label label-warning">再審査中</span></td>
+          <td>2026/08/20</td>
+          <td>35日</td>
+          <td>事務局 花子</td>
+        </tr>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00128</a></td>
+          <td>株式会社ひかり</td>
+          <td>51～100人</td>
+          <td class="sks-col-amount">24,000,000</td>
+          <td class="sks-col-amount">12,000,000</td>
+          <td><span class="label label-warning">受付済</span></td>
+          <td>2026/09/22</td>
+          <td>2日</td>
+          <td class="text-muted">未割当</td>
+        </tr>
+        <tr>
+          <td><a href="itcom-07-review-detail.html">APP-2026-00129</a></td>
+          <td>個人事業 佐藤</td>
+          <td>個人事業主</td>
+          <td class="sks-col-amount">450,000</td>
+          <td class="sks-col-amount">300,000</td>
+          <td><span class="label label-warning">受付済</span></td>
+          <td>2026/09/23</td>
+          <td>1日</td>
+          <td class="text-muted">未割当</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="mock-note" style="margin-top:18px;">
+      <b>一覧の考え方</b>：
+      「経過」は提出日からの日数で、審査期限（仮：30日）を超えたものを赤字で表示しています。
+      期限の定義が未確定のため、実装時は SLA の確定が必要です。
+      「補助金額」は T03 に保存列が無いため、一覧では表示できません（上限額・補助率・対象経費から
+      毎回算出するか、列を追加する必要があります）。
+    </p>
+
+    <p class="mock-note">
+      <b>実装方式</b>：一覧は <code>UxListMenuConfig</code> のリストとして
+      <code>src/fluent/workspaces/staff-workspace/list-menu.now.ts</code> に「申請審査」カテゴリを追加する想定。
+      審査操作は UI Action（<code>sys_ux_form_action</code>／<code>sys_ux_form_action_layout_item</code> の
+      2レコードを伴う）で実装します。既存の SC-11 の3アクションと同じ構成です。
+    </p>
+
+  </div>
+</div>
+
+</body>
+</html>

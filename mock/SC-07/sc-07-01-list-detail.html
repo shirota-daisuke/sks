@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-07 申請状況一覧・詳細画面 ①一覧＋詳細パネル（審査中）
+  ============================================================================
+  画面設計書  SC-07 ①レイアウト構成（上段：申請状況一覧／下段：申請詳細パネル）
+              SC-07 ②表示項目 D1 申請状況一覧（申請ID／ステータス／提出日／最終更新日／操作）
+                              D2 申請詳細：ステータスチップ（処理No.22）
+                              D3 申請詳細：金額情報（処理No.17 補助金額自動判定／処理No.18 対象経費）
+              SC-07 ③アクション No.1「詳細」／No.2「不備を修正する」／No.3「取下げる」（既定非表示）
+              SC-07 ⑤表示条件（自社の申請のみを表示）
+  実装         src/fluent/sp-page/applications/applications.now.ts（roles: applicant / applicant_admin）
+              src/fluent/sp-widget/application-list/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     data.isApplicant === true かつ data.selected != null
+              （「詳細」クリック、または ?sys_id=… 付きで遷移、いずれもなければ一覧先頭を初期選択）
+  ============================================================================
+  実装との対応
+    ・一覧は sys_updated_on 降順、max_records=20（sp_instance で設定）。
+    ・ステータスは ApplicationStatusUtil で事業者用表記へ変換（DB値 first_review → 「審査中」）。
+      色は getLabelClass()：done→label-success／progress→label-warning／error→label-danger／neutral→label-default
+    ・選択行は .sks-row-selected でハイライトし、「詳細」ボタンは選択中は無効化する。
+    ・金額の整形（server_script.js）
+        補助上限額 formatAmount() : 1万円単位で割り切れる場合「1,500万円」、それ以外は「n円」
+        補助率     formatRate()   : 1/2・2/3・1/3・3/4 に近い値は分数表記、それ以外は「n%」
+        対象経費   formatYen()    : 「8,200,000円」
+    ・参照専用画面。申請項目の入力・編集は申請入力機能（ITCOM主担当）側が担当する。
+  ============================================================================
+  本モックの表示データ（検証環境のデモデータ準拠）
+    APP-2026-00123／一次審査中→「審査中」／補助上限額15,000,000／補助率0.5／対象経費8,200,000
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-07 申請状況一覧・詳細 ①一覧＋詳細</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①一覧＋詳細パネル</b>：上段の一覧で「詳細」を押すと下段に詳細パネルを表示する（選択行はハイライト）。
+      マイページの申請IDリンクから <code>?sys_id=…</code> 付きで遷移した場合は、その申請が初期選択される。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS 申請状況一覧・詳細）の描画範囲 -->
+    <div class="sks-app-list">
+
+      <!-- 上段：D1 申請状況一覧 -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">申請状況一覧</h3>
+          <!-- ng-if="c.data.totalCount" -->
+          <span class="sks-count">全 1 件</span>
+        </div>
+
+        <table class="table table-hover sks-table">
+          <thead>
+            <tr>
+              <th>申請ID</th>
+              <th class="sks-col-status">ステータス</th>
+              <th class="sks-col-date">提出日</th>
+              <th class="sks-col-date">最終更新日</th>
+              <th class="sks-col-action">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- ng-class="{'sks-row-selected': c.isSelected(app)}" -->
+            <tr class="sks-row-selected">
+              <td>APP-2026-00123</td>
+              <td><span class="label label-warning">審査中</span></td>
+              <td>2026/08/01</td>
+              <td>2026/08/17</td>
+              <td>
+                <!-- ng-disabled="c.loading || c.isSelected(app)"：選択中は無効 -->
+                <button type="button" class="btn btn-link sks-detail-link" disabled>詳細</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!--
+          件数上限で切り捨てた場合のみ表示（ng-if="c.data.truncated"）。
+          実装の markup は以下。
+          <div class="panel-footer sks-truncated">
+            最新 20 件を表示しています（全 34 件）。
+          </div>
+        -->
+      </div>
+
+      <!-- 下段：D2／D3 申請詳細パネル（ng-if="c.data.selected"） -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">申請詳細（APP-2026-00123）</h3>
+        </div>
+        <div class="panel-body">
+
+          <!-- 取下げエラー（ng-if="c.withdrawErrors.length"）／取下げ完了（ng-if="c.data.withdrawResult.success"）は
+               取下げ機能を有効化した場合のみ表示される -->
+
+          <!-- D2 ステータスチップ -->
+          <p class="sks-status-chip">
+            <span class="label label-warning">審査中</span>
+            <!-- ng-if="c.data.selected.specialMeasure" のとき「特例措置対象」を併記 -->
+          </p>
+
+          <!-- D3 金額情報 -->
+          <dl class="sks-amount-list">
+            <dt>補助上限額</dt>
+            <dd>1,500万円</dd>
+            <dt>補助率</dt>
+            <dd>1/2</dd>
+            <dt>対象経費合計</dt>
+            <dd>8,200,000円</dd>
+          </dl>
+
+          <dl class="sks-meta-list">
+            <dt>従業員数区分</dt>
+            <dd>6～20人</dd>
+            <dt>組織形態</dt>
+            <dd>法人</dd>
+            <dt>提出日</dt>
+            <dd>2026/08/01</dd>
+            <dt>最終更新日</dt>
+            <dd>2026/08/17</dd>
+          </dl>
+
+          <!--
+            ③No.2「不備を修正する」は status === 'defect_fixing' のみ表示（②不備修正中 を参照）。
+            ③No.3「取下げる」は show_withdraw=false（既定）のため非表示（A02 未決）。
+          -->
+
+          <p class="sks-note">※申請項目の内容・入力編集画面は「申請」機能（ITCOM主担当）側の画面設計書を参照してください。本画面は状況参照が中心です。</p>
+        </div>
+      </div>
+
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

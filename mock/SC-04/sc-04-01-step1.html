@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-04 パスワードリセット画面 ①初期表示（STEP1 入力可／STEP2 案内のみ）
+  ============================================================================
+  画面設計書  SC-04 ①レイアウト構成（STEP1／STEP2 を1カード内に区切り線で分けて配置）
+              SC-04 ②F1 メールアドレス（形式・登録済みチェック）
+              SC-04 ③アクション No.1「再設定用リンクを送信」（処理No.11 前半）
+              SC-04 ⑤表示条件（STEP2 はメール内リンク経由のみ表示）
+  実装         src/fluent/sp-page/reset/reset.now.ts（public: true）
+              src/fluent/sp-widget/password-reset-form/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     data.tokenState === 'none'（URLパラメータ token なし）
+  ============================================================================
+  ★ 実装課題（単体テスト No.41／NG・軽微）
+    STEP1 のメールアドレス欄は type="email" のため形式不正時は送信ボタンが無効になるだけで、
+    形式エラーのメッセージが表示されない（SC-02 は help-block で表示している）。
+    修正案：入力欄の直後に以下を追加する。
+      <div class="form-group" ng-class="{'has-error': sendForm.resetEmail.$touched && sendForm.resetEmail.$invalid}">
+        ...
+        <span class="help-block" ng-if="sendForm.resetEmail.$touched && sendForm.resetEmail.$error.email">
+          メールアドレスの形式が正しくありません。
+        </span>
+      </div>
+  ============================================================================
+  セキュリティ方針（要レビュー）
+    設計書 ②F1 は「登録済みチェック」だが、実装は登録有無を画面に出さない。
+    該当ユーザが存在しない場合も STEP1 は同一の完了メッセージを返す（アカウント存在の非開示）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-04 パスワードリセット ①初期表示</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <a class="mock-header-link" href="../SC-01/sc-01-01-login.html">ログイン</a>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①初期表示</b>：<code>data.tokenState === 'none'</code>。
+      STEP1 は入力可、STEP2 はリンク未経由のため案内文のみを表示する（入力欄を出さない）。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS パスワードリセットフォーム）の描画範囲 -->
+    <div class="sks-reset">
+      <div class="panel panel-default sks-reset-card">
+        <div class="panel-body">
+
+          <!-- STEP1：再設定メールの送信 -->
+          <div class="sks-step">
+            <h3 class="sks-step-title">STEP1：再設定メールの送信</h3>
+
+            <!-- 送信完了（ng-if="c.sent"）は ②送信完了 を参照 -->
+            <!-- サーバー検証エラー（ng-if="c.sendErrors.length"）：メールアドレスを入力してください。／形式が正しくありません。 -->
+
+            <!-- ng-if="!c.sent" -->
+            <form name="sendForm" novalidate>
+              <div class="form-group">
+                <label for="sks-reset-email">登録済みメールアドレス <span class="text-danger">*</span></label>
+                <input type="email" id="sks-reset-email" name="resetEmail" class="form-control"
+                       placeholder="example@company.co.jp" maxlength="256" required />
+              </div>
+              <!-- ng-disabled="c.sending || sendForm.$invalid" -->
+              <button type="submit" class="btn btn-primary btn-block" disabled>再設定用リンクを送信</button>
+            </form>
+          </div>
+
+          <hr class="sks-step-divider" />
+
+          <!-- STEP2：新しいパスワードの設定（再設定用リンク経由でのみ入力可） -->
+          <div class="sks-step">
+            <h3 class="sks-step-title">STEP2：新しいパスワードの設定</h3>
+
+            <!-- ng-if="c.data.tokenState === 'none'" -->
+            <p class="text-muted">
+              メール内の再設定用リンクからアクセスすると、この欄で新しいパスワードを設定できます。
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

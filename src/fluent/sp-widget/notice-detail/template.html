@@ -1,0 +1,40 @@
+<!-- SC-09 お知らせ詳細画面（タイトル／重要度チップ／公開日／本文カード／一覧へ戻る） -->
+<div class="sks-notice-detail">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <!-- 対象が見つからない場合 -->
+  <div ng-if="c.data.isApplicant && !c.data.found">
+    <div class="alert alert-info" role="alert">
+      <i class="fa fa-info-circle" aria-hidden="true"></i>
+      {{c.data.message}}
+    </div>
+    <a class="btn btn-default" ng-href="{{c.data.listUrl}}">一覧へ戻る</a>
+  </div>
+
+  <div ng-if="c.data.found">
+    <!-- D1 タイトル／重要度／公開日 -->
+    <h2 class="sks-notice-title">{{c.data.notice.title}}</h2>
+
+    <p class="sks-notice-meta">
+      <span class="label" ng-class="c.data.notice.priorityClass" ng-bind="c.data.notice.priorityLabel"></span>
+      <span class="sks-publish-date">公開日：{{c.data.notice.publishDate}}</span>
+      <span class="sks-publish-end" ng-if="c.data.notice.publishEndDate">
+        掲載終了：{{c.data.notice.publishEndDate}}
+      </span>
+    </p>
+
+    <!-- D2 本文（リッチテキスト） -->
+    <div class="panel panel-default sks-notice-body-panel">
+      <div class="panel-body">
+        <div class="sks-notice-body" ng-if="c.hasBody()" ng-bind-html="c.data.notice.body"></div>
+        <p class="text-muted" ng-if="!c.hasBody()">本文は登録されていません。</p>
+      </div>
+    </div>
+
+    <!-- ③アクション No.1 一覧へ戻る -->
+    <a class="btn btn-default" ng-href="{{c.data.listUrl}}">一覧へ戻る</a>
+  </div>
+</div>

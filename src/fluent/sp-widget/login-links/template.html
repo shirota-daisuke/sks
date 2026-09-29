@@ -1,0 +1,20 @@
+<!-- SC-01 ログイン画面 補足リンク・注記（認証本体は OOTB ログインウィジェットが担当） -->
+<div class="sks-login-links">
+
+  <ul class="list-unstyled sks-link-list">
+    <li>
+      <a ng-href="{{c.data.resetUrl}}">パスワードをお忘れですか？</a>
+    </li>
+    <li>
+      アカウントをお持ちでない方は <a ng-href="{{c.data.registerUrl}}">新規登録</a>
+    </li>
+  </ul>
+
+  <p class="sks-login-note">{{c.data.note}}</p>
+
+  <div class="alert alert-info sks-sso-note" ng-if="c.data.showSsoNote" role="alert">
+    <i class="fa fa-info-circle" aria-hidden="true"></i>
+    {{c.data.ssoNote}}
+  </div>
+
+</div>

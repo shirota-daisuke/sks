@@ -1,0 +1,132 @@
+<!-- SC-10 問合せ一覧・作成画面（左：問合せ履歴／右：新規問合せ・問合せ詳細） -->
+<div class="sks-inquiry">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <div class="row" ng-if="c.data.isApplicant">
+
+    <!-- 左：問合せ履歴 -->
+    <div class="col-md-7 col-sm-12 col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">問合せ履歴</h3>
+          <span class="sks-count" ng-if="c.data.totalCount">全 {{c.data.totalCount}} 件</span>
+        </div>
+
+        <table class="table table-hover sks-table" ng-if="c.data.inquiries.length">
+          <thead>
+            <tr>
+              <th>件名</th>
+              <th class="sks-col-state">状態</th>
+              <th class="sks-col-date">更新日</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="inquiry in c.data.inquiries track by inquiry.sys_id"
+                ng-class="{'sks-row-selected': c.isSelected(inquiry)}">
+              <td>
+                <button type="button" class="btn btn-link sks-subject-link"
+                        ng-disabled="c.loading"
+                        ng-click="c.showDetail(inquiry)">{{inquiry.subject}}</button>
+              </td>
+              <td><span class="label" ng-class="inquiry.stateClass" ng-bind="inquiry.stateLabel"></span></td>
+              <td>{{inquiry.updatedOn}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="panel-body text-center text-muted" ng-if="!c.data.inquiries.length">
+          <i class="fa fa-comments-o fa-2x" aria-hidden="true"></i>
+          <p>問合せはまだありません。</p>
+        </div>
+
+        <div class="panel-footer sks-truncated" ng-if="c.data.truncated">
+          {{c.data.inquiries.length}} 件を表示しています（全 {{c.data.totalCount}} 件）。
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：新規問合せ／問合せ詳細 -->
+    <div class="col-md-5 col-sm-12 col-xs-12">
+
+      <!-- 新規問合せ -->
+      <div class="panel panel-default" ng-if="c.panel === 'new'">
+        <div class="panel-heading">
+          <h3 class="panel-title">新規問合せ</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+            <ul class="list-unstyled sks-error-list">
+              <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+            </ul>
+          </div>
+
+          <form name="inquiryForm" ng-submit="c.submit()" novalidate>
+            <div class="form-group">
+              <label for="sks-inquiry-subject">件名 <span class="text-danger">*</span></label>
+              <input type="text" id="sks-inquiry-subject" name="subject" class="form-control"
+                     placeholder="問合せ件名を入力"
+                     ng-model="c.form.subject" maxlength="200" required />
+            </div>
+
+            <div class="form-group">
+              <label for="sks-inquiry-body">本文 <span class="text-danger">*</span></label>
+              <textarea id="sks-inquiry-body" name="description" class="form-control" rows="8"
+                        ng-model="c.form.description" maxlength="2000" required></textarea>
+              <span class="help-block">2000文字以内で入力してください。</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                    ng-disabled="c.submitting || inquiryForm.$invalid">
+              <span ng-if="c.submitting"><i class="fa fa-spinner fa-spin"></i> 送信中…</span>
+              <span ng-if="!c.submitting">送信する</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 問合せ詳細・返信内容 -->
+      <div class="panel panel-default" ng-if="c.panel === 'detail' && c.data.selected">
+        <div class="panel-heading">
+          <h3 class="panel-title">問合せ内容</h3>
+          <button type="button" class="btn btn-link sks-new-link" ng-click="c.showNewForm()">
+            新規問合せ
+          </button>
+        </div>
+        <div class="panel-body">
+
+          <div class="alert alert-success" ng-if="c.created" role="alert">
+            問合せを送信しました。事務局からの回答をお待ちください。
+          </div>
+
+          <h4 class="sks-detail-subject">{{c.data.selected.subject}}</h4>
+          <p class="sks-detail-meta">
+            <span class="label" ng-class="c.data.selected.stateClass" ng-bind="c.data.selected.stateLabel"></span>
+            <span class="sks-received">受付：{{c.data.selected.receivedOn}}</span>
+          </p>
+
+          <div class="sks-detail-block">
+            <h5>お問合せ内容</h5>
+            <p class="sks-body-text">{{c.data.selected.description}}</p>
+          </div>
+
+          <div class="sks-detail-block sks-reply" ng-if="c.data.selected.replyBody">
+            <h5>事務局からの回答</h5>
+            <p class="sks-body-text">{{c.data.selected.replyBody}}</p>
+            <p class="sks-replied" ng-if="c.data.selected.repliedOn">
+              回答日時：{{c.data.selected.repliedOn}}
+            </p>
+          </div>
+
+          <p class="text-muted sks-waiting" ng-if="!c.data.selected.replyBody">
+            事務局からの回答をお待ちください。回答が登録されるとこの欄に表示されます。
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

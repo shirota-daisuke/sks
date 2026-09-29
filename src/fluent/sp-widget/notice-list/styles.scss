@@ -1,0 +1,73 @@
+/**
+ * SC-08 お知らせ一覧画面
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-notice-list {
+    .panel-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    .sks-count {
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-table {
+        margin-bottom: 0;
+
+        th {
+            font-size: $font-size-small;
+            font-weight: normal;
+            color: $text-muted;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+    }
+
+    .sks-col-state {
+        width: 80px;
+    }
+
+    .sks-col-priority {
+        width: 90px;
+    }
+
+    .sks-col-date {
+        width: 120px;
+        white-space: nowrap;
+    }
+
+    .sks-state {
+        display: inline-block;
+        padding: 1px 6px;
+        font-size: $font-size-small;
+        color: $brand-warning;
+        border: 1px solid $brand-warning;
+        border-radius: $border-radius-small;
+    }
+
+    .sks-state-read {
+        color: $text-muted;
+        border-color: $panel-default-border;
+    }
+
+    .sks-title-link {
+        padding: 0;
+        text-align: left;
+        white-space: normal;
+        border: 0;
+    }
+
+    .sks-unread .sks-title-link {
+        font-weight: bold;
+    }
+
+    .sks-truncated {
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+}

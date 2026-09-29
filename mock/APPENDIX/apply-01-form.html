@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  申請入力・提出画面 ①入力フォーム（初期表示／下書きなし）
+  ============================================================================
+  位置づけ   実装済みだが画面設計書に画面番号が無い画面。
+             既存の SC-00〜SC-10 と同じ「実装の写し」として作成している
+             （mock/ITCOM 配下の設計提案とは位置づけが異なる）。
+
+  実装       src/fluent/sp-page/apply/apply.now.ts（pageId: x_dent2_dentsusoke_apply）
+             roles: applicant / applicant_admin
+             src/fluent/sp-widget/application-form/{template.html, client_script.js,
+                                                    server_script.js, styles.scss}
+             src/server/script-includes/application-submit-util.js
+
+  対応する処理  処理No.16 申請情報入力（下書き保存・提出）
+                処理No.17 補助金額自動判定（試算表示）
+
+  表示条件   data.isApplicant === true かつ data.state === 'form'
+             （下書きが無く、提出済みの申請も無い状態）
+
+  DOM 構造・class 名・文言は template.html と同一に保ち、
+  AngularJS ディレクティブを静的化して HTML コメントで併記している。
+  ============================================================================
+  実装との対応
+    ・ボタンの活性条件（client_script.js）
+        入力内容を保存  ng-disabled="c.saving"（常に押せる。未入力でも保存可）
+        補助金額を試算  ng-disabled="!c.canEstimate()"
+                        → 従業員数区分 と 対象経費合計金額 の両方が必要
+        申請を提出      ng-disabled="!c.canSubmit()"
+                        → 組織形態・従業員数区分・対象月・売上増加率・対象経費 がすべて必要
+      本モックは初期表示のため「試算」「提出」を disabled にしている。
+    ・提出は $window.confirm() の確認ダイアログを経由する（提出後は変更不可のため）。
+    ・売上増加率は小数で保持（15% → 0.15）。T03 u_sales_increase_rate。
+    ・事業者名は自社の T01 から取得（PortalContextUtil.getMyEntityId → get()）。
+  ============================================================================
+  本モックの表示データ
+    事業者：株式会社テスト（検証環境のデモデータ）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>申請入力・提出 ①入力フォーム（初期表示）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/appendix-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li class="is-active"><a href="#">申請の入力</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-appendix">
+      <b>実装済みの画面です（実装の写し）。</b>
+      ただし画面設計書に対応する画面番号がありません（SC-07 は申請状況の参照）。
+      申請機能は ITCOM 主担当の範囲であり、この画面は「事業者が申請を提出する経路が無かった」ために
+      追加した最小限の実装です。ITCOM 側の申請入力機能が確定した時点で置き換えるか項目構成をそろえる必要があります。
+      あるべき姿の提案は <a href="../ITCOM/index.html">ITCOM 担当範囲の画面モック</a>（ITCOM-01〜04）を参照してください。
+    </p>
+
+    <p class="mock-note">
+      <b>①入力フォーム（初期表示／下書きなし）</b>：
+      トップタブ「申請の入力」から遷移した直後の状態。
+      <code>data.draft === null</code> のため「保存日時」行は表示されず、右パネルは案内文のみ。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS 申請入力フォーム）の描画範囲 -->
+    <div class="sks-apply">
+
+      <!-- ng-if="!c.data.isApplicant" の警告は事業者ユーザ以外のみ表示（③権限外 を参照） -->
+
+      <!-- ng-if="c.data.isApplicant && c.data.state === 'form'" -->
+      <div class="row">
+
+        <div class="col-md-8">
+          <div class="panel panel-default sks-apply-card">
+            <div class="panel-body">
+              <h2 class="sks-apply-title">申請の入力</h2>
+
+              <dl class="dl-horizontal sks-apply-entity">
+                <dt>事業者名</dt>
+                <dd>株式会社テスト</dd>
+                <!-- ng-if="c.data.draft" のため下書きが無い初期表示では非表示
+                <dt>保存日時</dt>
+                <dd>2026/09/24 14:32（下書き）</dd>
+                -->
+              </dl>
+
+              <!--
+                ng-if="c.saved"（保存完了）／ng-if="c.serverErrors.length"（エラー）は
+                操作後のみ表示される。②下書きあり・③入力エラー を参照。
+              -->
+
+              <form name="applyForm" novalidate>
+                <div class="form-group">
+                  <label for="sks-organization-type">組織形態 <span class="text-danger">*</span></label>
+                  <select id="sks-organization-type" class="form-control">
+                    <option value="" selected>選択してください</option>
+                    <option value="corporate">法人</option>
+                    <option value="sole_proprietor">個人事業主</option>
+                    <option value="other">その他</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-employee-category">従業員数区分 <span class="text-danger">*</span></label>
+                  <select id="sks-employee-category" class="form-control">
+                    <option value="" selected>選択してください</option>
+                    <option value="sole_proprietor">個人事業主</option>
+                    <option value="le5">5人以下</option>
+                    <option value="le20">6～20人</option>
+                    <option value="le50">21～50人</option>
+                    <option value="le100">51～100人</option>
+                    <option value="gt100">101人以上</option>
+                  </select>
+                  <span class="help-block">補助上限額と補助率の判定に使用します。</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-target-month">売上増加率対象月 <span class="text-danger">*</span></label>
+                  <input type="date" id="sks-target-month" class="form-control" />
+                  <span class="help-block">売上増加率の算定対象となる月を選択してください。</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-increase-rate">売上増加率 <span class="text-danger">*</span></label>
+                  <input type="text" id="sks-increase-rate" class="form-control" placeholder="0.15" />
+                  <span class="help-block">小数で入力してください（例：15% は 0.15）。</span>
+                </div>
+
+                <div class="checkbox sks-apply-special">
+                  <label for="sks-special-measure">
+                    <input type="checkbox" id="sks-special-measure" />
+                    特例措置の対象である
+                  </label>
+                  <span class="help-block">該当する場合、補助上限額が引き上げられます。</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-total-expense">対象経費合計金額（円） <span class="text-danger">*</span></label>
+                  <input type="text" id="sks-total-expense" class="form-control" placeholder="10000000" maxlength="10" />
+                  <span class="help-block">半角数字で入力してください。</span>
+                </div>
+
+                <div class="sks-apply-actions">
+                  <!-- ng-disabled="c.saving"：未入力でも押せる（下書き保存は必須項目を要求しない） -->
+                  <button type="button" class="btn btn-default">入力内容を保存</button>
+                  <!-- ng-disabled="!c.canEstimate()"：従業員数区分 と 対象経費 が必要 -->
+                  <button type="button" class="btn btn-default" disabled>補助金額を試算</button>
+                  <!-- ng-disabled="!c.canSubmit()"：必須5項目が必要 -->
+                  <button type="submit" class="btn btn-primary" disabled>申請を提出</button>
+                </div>
+              </form>
+
+              <!-- {{c.data.note}}（ウィジェットオプション note の既定値） -->
+              <p class="sks-apply-note">対象経費は合計金額のみを入力します。経費明細の登録は「申請」機能（ITCOM主担当）側の画面で行います。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 補助金額の試算（処理No.17） -->
+        <div class="col-md-4">
+          <div class="panel panel-default sks-estimate-card">
+            <div class="panel-heading">補助金額の試算</div>
+            <div class="panel-body">
+              <!-- ng-if="!c.data.estimate" -->
+              <p class="text-muted">
+                従業員数区分と対象経費合計金額を入力し「補助金額を試算」を実行してください。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

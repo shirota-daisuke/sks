@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  付録：画面番号未定の実装済み画面 モック一覧
+  ============================================================================
+  mock/index.html（SC-00〜SC-10）と同じ「実装の写し」だが、
+  画面設計書に画面番号が無いため付録として分けている。
+  mock/ITCOM（設計提案）とは位置づけが異なる。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>付録：画面番号未定の実装済み画面 モック一覧</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/appendix-mock.css" />
+<style>
+  .idx-wrap { max-width: 1180px; margin: 0 auto; padding: 32px 16px 56px; }
+  .idx-head { margin-bottom: 24px; }
+  .idx-head h1 { margin: 0 0 6px; font-size: 22px; }
+  .idx-head p { margin: 0; color: #777; font-size: 13px; line-height: 1.8; }
+  .idx-table { background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 28px; }
+  .idx-table th, .idx-table td { padding: 9px 12px; border-top: 1px solid #eee; font-size: 13px; vertical-align: top; }
+  .idx-table thead th { background: #f5f5f5; border-top: 0; color: #555; font-weight: bold; white-space: nowrap; }
+  .idx-table td code, .idx-head code, .idx-list code {
+      padding: 1px 4px; background: #f7f7f9; border: 1px solid #e1e1e8; border-radius: 3px;
+      font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #a33;
+  }
+  .idx-sc { width: 96px; white-space: nowrap; font-weight: bold; }
+  .idx-file { white-space: nowrap; }
+  .idx-section { margin: 28px 0 10px; font-size: 16px; font-weight: bold; }
+  .idx-list { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px 14px 34px; margin-bottom: 20px; }
+  .idx-list li { margin-bottom: 8px; font-size: 13px; line-height: 1.8; }
+  .idx-list li:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div class="idx-wrap">
+
+  <div class="idx-head">
+    <h1>付録：画面番号未定の実装済み画面 — 実装用HTML</h1>
+    <p>
+      成長加速支援補助金 申請ポータル／実装済みだが画面設計書に画面番号が無い画面<br />
+      スコープ <code>x_dent2_dentsusoke</code>／ポータル <code>/x_dent2_dentsusoke_sks</code>
+      ｜ <a href="../index.html">SC-00〜SC-10 モック一覧</a>
+      ｜ <a href="../ITCOM/index.html">ITCOM 担当範囲の設計提案</a>
+    </p>
+  </div>
+
+  <p class="mock-appendix">
+    <b>本フォルダは「実装の写し」です。</b>
+    DOM 構造・class 名・文言は実装（<code>src/fluent/sp-widget/&lt;widget&gt;/template.html</code>）と同一に保ち、
+    AngularJS ディレクティブを静的化して HTML コメントで併記しています。この点は
+    <a href="../index.html">SC-00〜SC-10</a> と同じ扱いです。
+    <br />
+    分けている理由は<b>画面設計書に対応する画面番号が無い</b>ことだけです。
+    いずれも当初の設計範囲外で、必要に迫られて追加した画面のため、画面設計書への追番が必要です。
+    <br />
+    あるべき姿の提案（ステップ分割・経費明細・添付書類を含む構成）は
+    <a href="../ITCOM/index.html">ITCOM 担当範囲の画面モック</a>（ITCOM-01〜04）を参照してください。
+  </p>
+
+  <div class="idx-section">画面・表示状態の一覧</div>
+  <table class="table idx-table">
+    <thead>
+      <tr>
+        <th class="idx-sc">画面</th>
+        <th>表示状態</th>
+        <th class="idx-file">ファイル</th>
+        <th>表示条件</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="idx-sc">申請の入力</td>
+        <td>入力フォーム 初期表示（下書きなし）</td>
+        <td class="idx-file"><a href="apply-01-form.html">apply-01-form.html</a></td>
+        <td><code>data.state === 'form'</code> かつ <code>data.draft === null</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>下書きあり＋試算表示（★保存完了・入力エラー・上限適用・判定不可を併記）</td>
+        <td class="idx-file"><a href="apply-02-draft-estimate.html">apply-02-draft-estimate.html</a></td>
+        <td><code>data.state === 'form'</code> かつ <code>data.draft != null</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>提出完了／★提出済み／★権限外</td>
+        <td class="idx-file"><a href="apply-03-done-submitted.html">apply-03-done-submitted.html</a></td>
+        <td><code>data.state === 'done' / 'submitted'</code>、<code>data.isApplicant === false</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">登録不備修正</td>
+        <td colspan="3" class="text-muted">
+          未作成。実装済み（<code>src/fluent/sp-page/defect-fix/</code>／
+          <code>src/fluent/sp-widget/defect-fix-form/</code>）で、
+          トークン不正・期限切れ・再提出済み・フォーム・完了の5状態を持ちます。
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="idx-section">対象画面の実装</div>
+  <ul class="idx-list">
+    <li>
+      <b>申請の入力</b>（<code>x_dent2_dentsusoke_apply</code>）：
+      <code>src/fluent/sp-page/apply/apply.now.ts</code>（roles: applicant / applicant_admin）、
+      <code>src/fluent/sp-widget/application-form/</code>、
+      <code>src/server/script-includes/application-submit-util.js</code>。
+      ヘッダメニューの「申請の入力」タブから遷移します
+      （<code>src/fluent/sp-instance-menu/menu.now.ts</code>、order 250）。
+    </li>
+    <li>
+      処理No.16 申請情報入力（下書き保存・提出）と処理No.17 補助金額自動判定（試算表示）に対応します。
+      ATF は <code>src/fluent/tests/sc-apply.now.ts</code>（2テスト）。
+    </li>
+  </ul>
+
+  <div class="idx-section">この画面の実装上の制約</div>
+  <ul class="idx-list">
+    <li>
+      <b>経費明細を登録できません。</b>対象経費は合計金額のみを受け取ります。
+      T03 申請には <code>u_total_expense_amount</code> の1列しかなく、明細の登録先がありません。
+      処理No.18 対象経費登録は未実装です。
+    </li>
+    <li>
+      <b>添付書類を提出できません。</b><code>sys_attachment</code> を扱うコードがアプリ内に存在せず、
+      ACL も未定義です。
+    </li>
+    <li>
+      <b>補助金額を保存する列がありません。</b>上限額・補助率・対象経費はありますが、
+      算出した補助金額の保持先が無いため、試算値は画面表示のみで一覧・帳票には出ません。
+    </li>
+    <li>
+      <b>補助率の精度</b>：T03 <code>u_subsidy_rate</code> は格納精度2桁で 2/3 が 0.67 になります。
+      補助金額の算出はマスタの分子・分母（整数）で行い、丸め誤差を回避しています
+      （ATF で 0.67 による計算結果と一致しないことを検証）。
+    </li>
+    <li>
+      <b>1事業者1申請の想定</b>：下書きは1件に限定し、提出済みの申請がある場合は入力フォームを出しません。
+      T03 に公募回次の列が無く、複数回次・複数件の申請を表現できません。
+    </li>
+    <li>
+      <b>提出後の修正経路がありません。</b>ACL <code>acl_request_write_applicant</code> が
+      「自社かつ申請入力中のみ」に限定しているため、不備修正時の再入力もできません
+      （提案は <a href="../ITCOM/itcom-05-defect-fix.html">ITCOM-05</a>）。
+    </li>
+    <li>
+      <b>申請受付メールを送信しません。</b>要否・テンプレートが未確定（IF-07）のため、
+      提出結果に警告を返すだけです。
+    </li>
+  </ul>
+
+  <div class="idx-section">未確定事項</div>
+  <ul class="idx-list">
+    <li><b>画面番号</b>：画面設計書への追番が必要です。</li>
+    <li><b>申請項目の正式な構成</b>：本画面は T03 の既存列のみで組んだ暫定です。組織形態の選択肢も暫定値です。</li>
+    <li><b>申請番号の採番規則</b>：<code>APP-&lt;西暦&gt;-&lt;5桁連番&gt;</code> は暫定。年度切替の基準・公募回次の反映が未確定です。</li>
+    <li><b>売上増加率</b>：算定方法・対象期間の終期・端数処理が未確定（A07／A08）。現在は自己申告値をそのまま受け取ります。</li>
+    <li><b>特例措置の要件</b>：未確定のため自己申告のチェックボックスとしています。根拠書類の要否も未定です。</li>
+    <li><b>端数処理</b>：補助金額は切り捨てを暫定としています（A08）。</li>
+  </ul>
+
+</div>
+
+</body>
+</html>

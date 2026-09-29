@@ -1,0 +1,350 @@
+/**
+ * 申請の不備修正（ITCOM-05）
+ * 左に指摘・修正内容・回答、右に補助金額の試算と経過。
+ * 色は Service Portal テーマの SCSS 変数のみを使用する（他ウィジェットと同じ方針）。
+ */
+.sks-defect {
+    padding: 24px 0;
+
+    .sks-defect-card .panel-body,
+    .sks-estimate-card .panel-body {
+        padding: 24px;
+    }
+
+    .sks-estimate-card {
+        margin-bottom: 16px;
+    }
+
+    .sks-defect-title {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: $font-size-h3;
+        font-weight: bold;
+        color: $text-color;
+    }
+
+    .sks-defect-status {
+        margin-bottom: 20px;
+
+        .sks-defect-due {
+            margin-left: 12px;
+            font-size: $font-size-small;
+            color: $text-muted;
+        }
+    }
+
+    // --- 事務局からの指摘 -----------------------------------------------
+    .sks-defect-note {
+        .sks-defect-note-title {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: $font-size-base;
+            font-weight: bold;
+        }
+
+        // 事務局が改行して入力した指摘をそのまま読めるようにする
+        .sks-defect-note-body {
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+
+        .sks-defect-note-meta {
+            margin: 0;
+            font-size: $font-size-small;
+        }
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    // --- 再提出できない理由 ---------------------------------------------
+    .sks-blockers {
+        .sks-blockers-title {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .sks-blockers-list {
+            margin: 0;
+            padding-left: 20px;
+            font-size: $font-size-small;
+
+            li {
+                padding: 2px 0;
+            }
+
+            a {
+                margin-left: 8px;
+            }
+        }
+    }
+
+    // --- 修正内容のブロック ---------------------------------------------
+    .sks-defect-block {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid $panel-default-border;
+    }
+
+    .sks-defect-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 12px;
+
+        h3 {
+            margin: 0;
+            font-size: $font-size-base;
+            font-weight: bold;
+            color: $text-color;
+        }
+
+        a {
+            font-size: $font-size-small;
+        }
+    }
+
+    .sks-defect-list {
+        margin-bottom: 0;
+        font-size: $font-size-small;
+
+        dt {
+            float: left;
+            clear: left;
+            width: 170px;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-left: 186px;
+            margin-bottom: 8px;
+            color: $text-color;
+        }
+
+        // 未提出の必須書類は色で分かるようにする
+        dd.sks-doc-unsubmitted {
+            color: $brand-danger;
+        }
+
+        .sks-doc-required {
+            margin-left: 6px;
+            font-weight: normal;
+        }
+
+        .sks-doc-size,
+        .sks-doc-date {
+            margin-left: 6px;
+            color: $text-muted;
+            font-size: 11px;
+        }
+    }
+
+    .sks-defect-table {
+        margin-bottom: 0;
+
+        th {
+            background: $table-bg-accent;
+            font-size: $font-size-small;
+            white-space: nowrap;
+        }
+
+        td {
+            vertical-align: top;
+            font-size: $font-size-small;
+        }
+
+        .sks-col-days {
+            width: 70px;
+            text-align: right;
+        }
+
+        .sks-col-amount {
+            width: 120px;
+            text-align: right;
+        }
+
+        .sks-row-error > td {
+            background: lighten($brand-danger, 42%);
+        }
+
+        .sks-expert {
+            color: $text-muted;
+            font-size: 11px;
+        }
+
+        .sks-cap-error {
+            margin: 4px 0 0;
+            color: $brand-danger;
+            font-size: 11px;
+        }
+
+        .sks-empty {
+            padding: 20px 8px;
+            text-align: center;
+        }
+
+        .sks-defect-total {
+            font-weight: bold;
+
+            td {
+                border-top: 2px solid $panel-default-border;
+            }
+        }
+    }
+
+    // --- 回答 -----------------------------------------------------------
+    .sks-defect-reply {
+        .sks-reply-count {
+            float: right;
+            color: $text-muted;
+        }
+    }
+
+    .sks-defect-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid $panel-default-border;
+    }
+
+    .sks-defect-note-text {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    // --- 完了・該当なしの表示 -------------------------------------------
+    .sks-defect-done,
+    .sks-defect-message {
+        padding: 32px 24px;
+
+        .sks-defect-title {
+            margin-top: 16px;
+        }
+
+        .sks-done-lead {
+            font-size: $font-size-h4;
+        }
+
+        .sks-done-list {
+            display: inline-block;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .sks-done-note,
+        .sks-done-warning {
+            margin-top: 20px;
+            font-size: $font-size-small;
+        }
+
+        .sks-done-warning {
+            margin-top: 4px;
+            font-size: 11px;
+        }
+
+        .btn {
+            margin-top: 20px;
+        }
+    }
+
+    // --- 試算パネル -----------------------------------------------------
+    .sks-estimate-list {
+        margin-bottom: 0;
+
+        dt {
+            font-size: $font-size-small;
+            color: $text-muted;
+            font-weight: normal;
+        }
+
+        dd {
+            margin-bottom: 12px;
+            font-size: $font-size-base;
+            color: $text-color;
+        }
+
+        .sks-estimate-total {
+            padding-top: 12px;
+            border-top: 1px solid $panel-default-border;
+        }
+
+        dd.sks-estimate-total {
+            margin-bottom: 0;
+            font-size: $font-size-h4;
+            font-weight: bold;
+        }
+    }
+
+    .sks-estimate-capped,
+    .sks-estimate-disclaimer,
+    .sks-timeline-empty,
+    .sks-help-text {
+        margin-top: 12px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+    }
+
+    .sks-timeline-empty,
+    .sks-help-text {
+        margin-top: 0;
+        margin-bottom: 12px;
+    }
+
+    // --- これまでの経過 -------------------------------------------------
+    .sks-timeline {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: $font-size-small;
+
+        li {
+            position: relative;
+            padding: 8px 0 8px 16px;
+            border-top: 1px solid $table-border-color;
+
+            &:first-child {
+                border-top: 0;
+            }
+
+            // 時系列の目印
+            &:before {
+                position: absolute;
+                top: 14px;
+                left: 0;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: $text-muted;
+                content: '';
+            }
+        }
+
+        li.is-current:before {
+            background: $brand-danger;
+        }
+
+        .sks-tl-when {
+            display: block;
+            color: $text-muted;
+            font-size: 11px;
+        }
+
+        .sks-tl-what {
+            display: block;
+            color: $text-color;
+        }
+
+        .sks-tl-detail,
+        .sks-tl-who {
+            display: block;
+            color: $text-muted;
+            font-size: 11px;
+        }
+    }
+}

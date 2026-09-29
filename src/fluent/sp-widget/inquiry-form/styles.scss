@@ -1,0 +1,116 @@
+/**
+ * SC-10 問合せ一覧・作成画面
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-inquiry {
+    .panel-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    .sks-count {
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-new-link {
+        padding: 0;
+        border: 0;
+        font-size: $font-size-small;
+    }
+
+    .sks-table {
+        margin-bottom: 0;
+
+        th {
+            font-size: $font-size-small;
+            font-weight: normal;
+            color: $text-muted;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+    }
+
+    .sks-col-state {
+        width: 100px;
+    }
+
+    .sks-col-date {
+        width: 120px;
+        white-space: nowrap;
+    }
+
+    .sks-row-selected {
+        background-color: $table-bg-accent;
+    }
+
+    .sks-subject-link {
+        padding: 0;
+        text-align: left;
+        white-space: normal;
+        border: 0;
+    }
+
+    .sks-truncated {
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    .sks-detail-subject {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .sks-detail-meta {
+        margin-bottom: 20px;
+
+        .sks-received {
+            margin-left: 10px;
+            font-size: $font-size-small;
+            color: $text-muted;
+        }
+    }
+
+    .sks-detail-block {
+        margin-bottom: 20px;
+
+        h5 {
+            margin-bottom: 8px;
+            font-size: $font-size-small;
+            color: $text-muted;
+        }
+    }
+
+    // 事業者・事務局が入力したプレーンテキストを改行込みで表示する
+    .sks-body-text {
+        margin-bottom: 0;
+        white-space: pre-wrap;
+        line-height: 1.8;
+    }
+
+    .sks-reply {
+        padding: 16px;
+        background-color: $table-bg-accent;
+        border-left: 3px solid $brand-primary;
+    }
+
+    .sks-replied {
+        margin-top: 10px;
+        margin-bottom: 0;
+        font-size: $font-size-small;
+        color: $text-muted;
+    }
+
+    .sks-waiting {
+        margin-bottom: 0;
+        font-size: $font-size-small;
+    }
+}

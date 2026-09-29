@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM-02 申請入力：対象経費明細（STEP2／処理No.18 対象経費登録）
+  ============================================================================
+  位置づけ   ITCOM 主担当（申請機能）の未実装画面に対する【設計提案】のモック。
+             画面番号 ITCOM-02 は仮番号。
+
+  想定する処理  処理No.18 対象経費登録／処理No.17 補助金額自動判定（試算表示）
+  対象ユーザ    事業者ユーザ（applicant／applicant_admin）
+
+  ■ 実装上の前提が欠けている点（最重要）
+  経費明細を保持するテーブルが存在しない。
+  T03 申請にあるのは u_total_expense_amount（対象経費合計金額）の1列のみで、
+  明細（区分・内容・金額・日数）を登録する先が無い。
+  本画面を実装するには T03 の子テーブル（例 x_dent2_dentsusoke_expense_item）の追加が前提となる。
+  対象経費区分マスタ（x_dent2_dentsusoke_expense）のコメントにも
+  「経費明細を保持するテーブルは ITCOM 主担当の申請機能側の範囲」と記載されている。
+
+  参照した既存定義
+    対象経費区分マスタ x_dent2_dentsusoke_expense
+      u_code / u_name / u_has_daily_cap（日額上限の有無）/ u_active
+    専門家経費日額上限マスタ x_dent2_dentsusoke_expert_fee
+      u_code / u_name / u_daily_cap_amount
+    補助上限額マスタ x_dent2_dentsusoke_cap／補助率マスタ x_dent2_dentsusoke_rate
+  ============================================================================
+  未確定事項（本モックで仮置きしたもの）
+    ・明細テーブルの項目構成（区分・内容・金額・日数・単価・備考のどこまで持つか）
+    ・経費区分ごとの上限・按分ルール
+    ・専門家経費の日額上限チェックの単位（1人1日あたりか、延べ日数か）
+    ・見積書等の証憑を明細単位で添付するか、申請単位でまとめるか
+    ・端数処理（現状の暫定実装は切り捨て。A08 未確定）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM-02 申請入力：対象経費明細（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-proposal">
+      <b>設計提案のモックです。</b>
+      この画面の実装には <b>経費明細を保持するテーブルの追加が前提</b>です。
+      T03 申請にあるのは <code>u_total_expense_amount</code>（合計金額）の1列のみで、明細の登録先がありません。
+      対象経費区分マスタ・専門家経費日額上限マスタは参照元として実装済みですが、突き合わせる相手が存在しない状態です。
+    </p>
+
+    <ul class="sks-apply-steps">
+      <li class="is-done"><span class="sks-step-no">1</span>基本情報</li>
+      <li class="is-active"><span class="sks-step-no">2</span>対象経費</li>
+      <li><span class="sks-step-no">3</span>添付書類</li>
+      <li><span class="sks-step-no">4</span>内容確認・提出</li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">対象経費の入力</h3>
+          </div>
+          <div class="panel-body">
+
+            <p class="sks-form-section-note" style="margin-bottom:16px;">
+              補助対象となる経費を区分ごとに入力してください。区分は対象経費区分マスタから取得します。
+              専門家経費は日額上限（専門家経費日額上限マスタ）の範囲内である必要があります。
+            </p>
+
+            <!-- 日額上限の超過を検出した場合に表示する -->
+            <div class="alert alert-danger">
+              <ul class="list-unstyled" style="margin:0;">
+                <li>3行目：専門家経費の日額が上限（50,000円/日）を超えています。金額または日数をご確認ください。</li>
+              </ul>
+            </div>
+
+            <table class="table sks-expense-table">
+              <thead>
+                <tr>
+                  <th class="sks-col-category">経費区分</th>
+                  <th>内容</th>
+                  <th class="sks-col-days">日数</th>
+                  <th class="sks-col-amount">金額（円）</th>
+                  <th class="sks-col-remove">削除</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <select class="form-control">
+                      <option selected>クラウドサービス利用費</option>
+                      <option>広告宣伝費</option>
+                      <option>専門家経費</option>
+                      <option>設備費</option>
+                    </select>
+                  </td>
+                  <td><input type="text" class="form-control" value="受発注管理SaaS 年間利用料" /></td>
+                  <td><input type="text" class="form-control" disabled /></td>
+                  <td><input type="text" class="form-control" value="3600000" /></td>
+                  <td class="sks-col-remove"><button type="button" class="btn btn-link">削除</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <select class="form-control">
+                      <option>クラウドサービス利用費</option>
+                      <option selected>設備費</option>
+                      <option>専門家経費</option>
+                      <option>広告宣伝費</option>
+                    </select>
+                  </td>
+                  <td><input type="text" class="form-control" value="自動仕分け装置 1台" /></td>
+                  <td><input type="text" class="form-control" disabled /></td>
+                  <td><input type="text" class="form-control" value="4000000" /></td>
+                  <td class="sks-col-remove"><button type="button" class="btn btn-link">削除</button></td>
+                </tr>
+                <!-- 日額上限ありの区分（u_has_daily_cap=true）を選ぶと「日数」が入力可になる -->
+                <tr>
+                  <td>
+                    <select class="form-control">
+                      <option>クラウドサービス利用費</option>
+                      <option>設備費</option>
+                      <option selected>専門家経費</option>
+                      <option>広告宣伝費</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" value="業務設計コンサルティング" />
+                    <p class="sks-cap-warning">日額 60,000円 &gt; 上限 50,000円／日（専門家区分：中小企業診断士）</p>
+                  </td>
+                  <td><input type="text" class="form-control" value="10" /></td>
+                  <td><input type="text" class="form-control has-error" value="600000" /></td>
+                  <td class="sks-col-remove"><button type="button" class="btn btn-link">削除</button></td>
+                </tr>
+                <tr class="sks-expense-total">
+                  <td colspan="3">対象経費合計</td>
+                  <td class="sks-amount">8,200,000</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <button type="button" class="btn btn-default" style="margin-top:12px;">行を追加</button>
+
+            <div class="sks-form-actions">
+              <button type="button" class="btn btn-default">戻る（基本情報）</button>
+              <button type="button" class="btn btn-default">一時保存</button>
+              <span class="sks-actions-right">
+                <button type="button" class="btn btn-primary">次へ（添付書類）</button>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 右カラム：処理No.17 の試算 -->
+      <div class="col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">補助金額の試算</h3>
+          </div>
+          <div class="panel-body">
+            <dl class="sks-amount-summary">
+              <dt>対象経費合計</dt>
+              <dd>8,200,000円</dd>
+              <dt>補助率</dt>
+              <dd>1/2</dd>
+              <dt>補助率適用後</dt>
+              <dd>4,100,000円</dd>
+              <dt>補助上限額</dt>
+              <dd>20,000,000円</dd>
+              <dt class="sks-total">補助金額</dt>
+              <dd class="sks-total">4,100,000円</dd>
+            </dl>
+            <p class="text-muted" style="margin-top:12px; font-size:12px;">
+              試算値です。確定額は事務局の審査により決定します。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">経費区分ごとの上限</h3>
+          </div>
+          <div class="panel-body">
+            <p class="text-muted" style="font-size:12px; line-height:1.9; margin:0;">
+              専門家経費は日額上限あり（専門家区分ごとに設定）。<br />
+              その他の区分に個別上限を設ける場合はマスタへの列追加が必要です。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="mock-note">
+      <b>実装時の注意</b>：合計金額は明細の合計を保存時に T03 <code>u_total_expense_amount</code> へ書き戻す構成を想定。
+      補助金額の算出は補助率マスタの分子・分母（整数）で行うこと。
+      T03 <code>u_subsidy_rate</code> は格納精度2桁のため 2/3 が 0.67 になり、
+      対象経費1,000万円で33,300円ずれます（<code>ApplicationSubmitUtil.judgeAmount</code> と同じ方針）。
+    </p>
+
+  </div>
+</main>
+
+</body>
+</html>

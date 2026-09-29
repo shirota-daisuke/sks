@@ -1,0 +1,260 @@
+<!-- 申請の不備修正（ITCOM-05）：事務局の指摘・修正内容の確認・回答の再提出 -->
+<div class="sks-defect">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <!-- 再提出の完了 -->
+  <div ng-if="c.data.state === 'done'" class="panel panel-default sks-defect-card">
+    <div class="panel-body text-center sks-defect-done">
+      <svg class="mock-icon" viewBox="0 0 16 16" width="48" height="48" style="fill:#5cb85c;">
+        <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.7 5.3l-4.4 5.3a.7.7 0 01-1 .1L3.8 8.4a.7.7 0 01.9-1l1.9 1.6 3.9-4.7a.7.7 0 011.1.9z" />
+      </svg>
+      <h2 class="sks-defect-title">修正内容を提出しました</h2>
+      <p class="sks-done-lead">申請番号：<strong>{{c.data.submitResult.applicationNumber}}</strong></p>
+
+      <dl class="sks-defect-list sks-done-list">
+        <dt>対象経費合計</dt>
+        <dd>{{c.data.submitResult.totalExpense | number}}円</dd>
+        <dt>補助金額（試算）</dt>
+        <dd><strong>{{c.data.submitResult.subsidyAmount | number}}円</strong></dd>
+      </dl>
+
+      <p class="text-muted sks-done-note">
+        事務局が再審査を行います。状況は「申請」画面でご確認いただけます。
+      </p>
+      <p class="text-muted sks-done-warning" ng-repeat="w in c.data.submitResult.warnings track by $index">
+        {{w}}
+      </p>
+
+      <a class="btn btn-primary" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a>
+    </div>
+  </div>
+
+  <!-- 対応が必要な申請が無い -->
+  <div ng-if="c.data.isApplicant && c.data.state === 'none'" class="panel panel-default sks-defect-card">
+    <div class="panel-body text-center sks-defect-message">
+      <svg class="mock-icon" viewBox="0 0 16 16" width="42" height="42" style="fill:#5bc0de;">
+        <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3.2a1 1 0 110 2 1 1 0 010-2zm1.2 9.3H6.8v-1h.8V7.8h-.8v-1h2.4v5.7h.8v1z" />
+      </svg>
+      <h2 class="sks-defect-title">対応が必要な申請はありません</h2>
+      <p class="text-muted">{{c.data.message}}</p>
+      <p><a class="btn btn-primary" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a></p>
+    </div>
+  </div>
+
+  <!-- 不備修正 -->
+  <div ng-if="c.data.isApplicant && c.data.state === 'form'">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default sks-defect-card">
+          <div class="panel-body">
+            <h2 class="sks-defect-title">申請 {{c.data.defect.applicationNumber}} の不備修正</h2>
+
+            <p class="sks-defect-status">
+              <span class="label label-danger">{{c.data.defect.statusLabel}}</span>
+              <span class="sks-defect-due" ng-if="c.data.defect.dueOn">
+                回答期限：{{c.data.defect.dueOn}}
+                <span ng-if="c.data.defect.daysLeft !== null && !c.data.defect.overdue">
+                  （あと{{c.data.defect.daysLeft}}日）
+                </span>
+                <span class="text-danger" ng-if="c.data.defect.overdue">（期限を過ぎています）</span>
+              </span>
+              <span class="sks-defect-due text-muted" ng-if="!c.data.defect.dueOn">回答期限：未設定</span>
+            </p>
+
+            <!-- 事務局からの指摘。改行を保持して表示する -->
+            <div class="alert alert-warning sks-defect-note" role="alert">
+              <h3 class="sks-defect-note-title">事務局からの確認事項</h3>
+              <p class="sks-defect-note-body" ng-if="c.data.defect.defectNote">{{c.data.defect.defectNote}}</p>
+              <p class="sks-defect-note-body text-muted" ng-if="!c.data.defect.defectNote">
+                不備内容が登録されていません。お手数ですが事務局へお問い合わせください。
+              </p>
+              <p class="sks-defect-note-meta text-muted">
+                <span ng-if="c.data.defect.requestedOn">指摘日時：{{c.data.defect.requestedOn}}</span>
+                <span ng-if="c.data.defect.reviewer">／担当：{{c.data.defect.reviewer}}</span>
+              </p>
+            </div>
+
+            <div class="alert alert-success" ng-if="c.saved" role="alert">
+              {{c.data.saveResult.message}}
+            </div>
+
+            <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+              </ul>
+            </div>
+
+            <!-- 再提出できない理由 -->
+            <div class="alert alert-warning sks-blockers" ng-if="c.data.blockers.length" role="alert">
+              <p class="sks-blockers-title">次の項目を直さないと再提出できません。</p>
+              <ul class="sks-blockers-list">
+                <li ng-repeat="b in c.data.blockers track by $index">
+                  {{b.message}}
+                  <a ng-if="b.url" ng-href="{{b.url}}">{{b.label}}</a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- 対象経費。修正は対象経費の入力画面で行う -->
+            <div class="sks-defect-block">
+              <div class="sks-defect-head">
+                <h3>対象経費</h3>
+                <a ng-href="{{c.data.expenseUrl}}">修正する</a>
+              </div>
+              <table class="table sks-defect-table">
+                <thead>
+                  <tr>
+                    <th>経費区分</th>
+                    <th>内容</th>
+                    <th class="sks-col-days">日数</th>
+                    <th class="sks-col-amount">金額（円）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="item in c.data.items track by item.sys_id"
+                      ng-class="{'sks-row-error': item.capError}">
+                    <td>
+                      {{item.categoryName}}
+                      <span class="sks-expert" ng-if="item.expertFeeName">（{{item.expertFeeName}}）</span>
+                    </td>
+                    <td>
+                      {{item.description}}
+                      <p class="sks-cap-error" ng-if="item.capError">{{item.capError}}</p>
+                    </td>
+                    <td class="sks-col-days">{{item.days === '' ? '—' : item.days}}</td>
+                    <td class="sks-col-amount">{{item.amountLabel}}</td>
+                  </tr>
+                  <tr ng-if="!c.data.items.length">
+                    <td colspan="4" class="text-muted sks-empty">対象経費の明細が登録されていません。</td>
+                  </tr>
+                  <tr class="sks-defect-total" ng-if="c.data.items.length">
+                    <td colspan="3">対象経費合計</td>
+                    <td class="sks-col-amount">{{c.data.totalExpenseLabel}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 添付書類。差し替えは添付書類の提出画面で行う -->
+            <div class="sks-defect-block">
+              <div class="sks-defect-head">
+                <h3>添付書類</h3>
+                <a ng-href="{{c.data.documentUrl}}">差し替える</a>
+              </div>
+              <dl class="sks-defect-list">
+                <dt ng-repeat-start="doc in c.data.documents track by doc.sys_id">
+                  {{doc.documentTypeLabel}}
+                  <span class="label label-danger sks-doc-required" ng-if="doc.required">必須</span>
+                </dt>
+                <dd ng-repeat-end ng-class="{'sks-doc-unsubmitted': doc.required && !doc.submitted}">
+                  <span ng-if="doc.submitted">
+                    <a ng-href="{{doc.downloadUrl}}" target="_blank" rel="noopener">{{doc.fileName}}</a>
+                    <span class="sks-doc-size">{{doc.sizeLabel}}</span>
+                    <span class="sks-doc-date" ng-if="doc.submittedOn">（{{doc.submittedOn}}）</span>
+                  </span>
+                  <span ng-if="!doc.submitted">未提出</span>
+                </dd>
+              </dl>
+            </div>
+
+            <!-- 事務局への回答 -->
+            <div class="sks-defect-block sks-defect-reply">
+              <div class="sks-defect-head">
+                <h3>事務局への回答</h3>
+              </div>
+              <div class="form-group">
+                <label for="sks-defect-reply">修正内容の説明 <span class="text-danger">*</span></label>
+                <textarea id="sks-defect-reply" class="form-control" rows="6"
+                          ng-model="c.reply" ng-attr-maxlength="{{c.data.maxReplyLength}}"></textarea>
+                <span class="help-block">
+                  どの指摘にどう対応したかをご記入ください（{{c.data.maxReplyLength}}文字以内）。
+                  <span class="sks-reply-count">{{c.replyLength()}} / {{c.data.maxReplyLength}}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="sks-defect-actions">
+              <button type="button" class="btn btn-default" ng-click="c.save()" ng-disabled="!c.canSave()">
+                <span ng-if="c.saving"><i class="fa fa-spinner fa-spin"></i> 保存中…</span>
+                <span ng-if="!c.saving">一時保存</span>
+              </button>
+              <button type="button" class="btn btn-primary" ng-click="c.submit()" ng-disabled="!c.canSubmit()">
+                <span ng-if="c.submitting"><i class="fa fa-spinner fa-spin"></i> 送信中…</span>
+                <span ng-if="!c.submitting">修正内容を提出する</span>
+              </button>
+            </div>
+
+            <p class="sks-defect-note-text">{{c.data.note}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <!-- 補助金額（修正後の試算） -->
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">補助金額（修正後の試算）</div>
+          <div class="panel-body">
+            <div ng-if="c.data.estimate.ok">
+              <dl class="sks-estimate-list">
+                <dt>対象経費合計</dt>
+                <dd>{{c.data.estimate.totalExpense}}</dd>
+                <dt>補助率</dt>
+                <dd>{{c.data.estimate.rateLabel}}</dd>
+                <dt>補助率適用後</dt>
+                <dd>{{c.data.estimate.byRate}}</dd>
+                <dt>補助上限額</dt>
+                <dd>{{c.data.estimate.capAmount}}</dd>
+                <dt class="sks-estimate-total">補助金額</dt>
+                <dd class="sks-estimate-total">{{c.data.estimate.subsidyAmount}}</dd>
+              </dl>
+              <p class="text-muted sks-estimate-capped" ng-if="c.data.estimate.cappedByLimit">
+                対象経費に補助率を適用した額が補助上限額を超えるため、上限額が適用されています。
+              </p>
+              <p class="text-muted sks-estimate-disclaimer">
+                試算値です。確定額は事務局の審査により決定します。
+              </p>
+            </div>
+
+            <div class="alert alert-warning" ng-if="!c.data.estimate.ok" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.data.estimate.errors track by $index">{{err}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- これまでの経過 -->
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">これまでの経過</div>
+          <div class="panel-body">
+            <ul class="sks-timeline" ng-if="c.data.timeline.length">
+              <li ng-repeat="log in c.data.timeline track by log.sys_id"
+                  ng-class="{'is-current': $last}">
+                <span class="sks-tl-when">{{log.occurredOn}}</span>
+                <span class="sks-tl-what">{{log.actionLabel}}</span>
+                <span class="sks-tl-detail" ng-if="log.detail">{{log.detail}}</span>
+                <span class="sks-tl-who" ng-if="log.actor">{{log.actor}}</span>
+              </li>
+            </ul>
+            <p class="text-muted sks-timeline-empty" ng-if="!c.data.timeline.length">
+              表示できる経過がありません。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">お困りの場合</div>
+          <div class="panel-body">
+            <p class="text-muted sks-help-text">
+              指摘内容が分からない場合や、基本情報の変更が必要な場合は事務局へお問い合わせください。
+            </p>
+            <a class="btn btn-default btn-sm" ng-href="{{c.data.inquiriesUrl}}">問合せを作成する</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

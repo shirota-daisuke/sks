@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-07 申請状況一覧・詳細画面 ②不備修正中（「不備を修正する」の表示制御）
+  ============================================================================
+  画面設計書  SC-07 ③アクション No.2「不備を修正する」
+              → 申請入力機能（ITCOM主担当）の該当申請へ遷移する
+              SC-07 ⑥確認事項／A03：申請入力・編集画面との連携方式が未確定
+  実装         src/fluent/sp-widget/application-list/server_script.js
+                 detail.canFixDefect = (status === 'defect_fixing')
+                 detail.fixUrl = canFixDefect && options.application_form_url ? buildFixUrl() : ''
+              src/fluent/sp-widget/application-list/template.html
+                 ng-if="c.data.selected.canFixDefect" の中で
+                   fixUrl あり → ボタン「不備を修正する」
+                   fixUrl なし → 案内（.sks-fix-note）
+  表示条件     選択中の申請の u_application_status === 'defect_fixing'
+              （事業者用表記は「要対応：不備修正中」／tone=error）
+  ============================================================================
+  現状の挙動
+    ウィジェットオプション application_form_url が未設定のため、ボタンは表示せず案内文のみを表示する。
+    連携方式が確定したら application_form_url を設定する（{sys_id} を含めると差し替え、
+    含めない場合は末尾に ?sys_id=… を付与する）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-07 申請状況一覧・詳細 ②不備修正中</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li class="is-active"><a href="#">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②不備修正中</b>：ステータスが「要対応：不備修正中」（DB値 <code>defect_fixing</code>）のときのみ
+      不備修正の導線を表示する。連携先URL（<code>application_form_url</code>）が未設定のため、ボタンではなく案内文を表示する。
+    </p>
+
+    <div class="sks-app-list">
+
+      <!-- 上段：申請状況一覧（2件・1件目が不備修正中） -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">申請状況一覧</h3>
+          <span class="sks-count">全 2 件</span>
+        </div>
+
+        <table class="table table-hover sks-table">
+          <thead>
+            <tr>
+              <th>申請ID</th>
+              <th class="sks-col-status">ステータス</th>
+              <th class="sks-col-date">提出日</th>
+              <th class="sks-col-date">最終更新日</th>
+              <th class="sks-col-action">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="sks-row-selected">
+              <td>APP-2026-00124</td>
+              <td><span class="label label-danger">要対応：不備修正中</span></td>
+              <td>2026/08/20</td>
+              <td>2026/08/23</td>
+              <td><button type="button" class="btn btn-link sks-detail-link" disabled>詳細</button></td>
+            </tr>
+            <tr>
+              <td>APP-2026-00123</td>
+              <td><span class="label label-warning">審査中</span></td>
+              <td>2026/08/01</td>
+              <td>2026/08/17</td>
+              <td><button type="button" class="btn btn-link sks-detail-link">詳細</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 下段：申請詳細パネル -->
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">申請詳細（APP-2026-00124）</h3>
+        </div>
+        <div class="panel-body">
+
+          <p class="sks-status-chip">
+            <span class="label label-danger">要対応：不備修正中</span>
+          </p>
+
+          <dl class="sks-amount-list">
+            <dt>補助上限額</dt>
+            <dd>1,500万円</dd>
+            <dt>補助率</dt>
+            <dd>1/2</dd>
+            <dt>対象経費合計</dt>
+            <dd>6,400,000円</dd>
+          </dl>
+
+          <dl class="sks-meta-list">
+            <dt>従業員数区分</dt>
+            <dd>6～20人</dd>
+            <dt>組織形態</dt>
+            <dd>法人</dd>
+            <dt>提出日</dt>
+            <dd>2026/08/20</dd>
+            <dt>最終更新日</dt>
+            <dd>2026/08/23</dd>
+          </dl>
+
+          <!-- ng-if="c.data.selected.canFixDefect" -->
+          <div>
+            <!--
+              連携先URLが設定済みの場合のみボタンを表示する。
+              <button type="button" class="btn btn-primary" ng-if="c.data.selected.fixUrl"
+                      ng-click="c.fixDefect()">不備を修正する</button>
+            -->
+            <!-- ng-if="!c.data.selected.fixUrl" -->
+            <div class="alert alert-info sks-fix-note" role="alert">
+              <!-- 実装：<i class="fa fa-info-circle" aria-hidden="true"></i> -->
+              <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              不備の修正が必要です。修正画面（申請入力機能）との連携先が未設定のため、事務局からのご案内に従ってお手続きください。
+            </div>
+          </div>
+
+          <p class="sks-note">※申請項目の内容・入力編集画面は「申請」機能（ITCOM主担当）側の画面設計書を参照してください。本画面は状況参照が中心です。</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

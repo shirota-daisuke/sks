@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-00 トップ（未ログイン）画面 ①初期表示
+  ============================================================================
+  画面設計書  SC-00 ①レイアウト構成（ヘッダー／ヒーローエリア／案内カード×3）
+              SC-00 ③アクション定義 No.1「ログイン」→SC-01／No.2「新規登録」→SC-02
+              SC-00 ⑤表示条件（ログイン済み事業者は SC-05 マイページへ自動遷移）
+              SC-00 ⑥文言はウィジェットオプションで差し替え可（文言未確定への対応）
+  実装         src/fluent/sp-page/top/top.now.ts（public: true／roles 指定なし）
+              src/fluent/sp-widget/top-hero/{template.html, client_script.js, server_script.js, styles.scss}
+              src/fluent/sp-widget/top-info-cards/{template.html, server_script.js, styles.scss}
+  表示条件     data.redirectUrl === ''（未ログイン、または事業者に紐づかないユーザ）
+              → ヒーローは ng-if="!c.data.redirectUrl"
+  ============================================================================
+  実装との対応
+    ・ログイン済み事業者ユーザ（PortalContextUtil.isApplicant() が真）の場合は
+      client_script が $window.location.href = data.redirectUrl でマイページへ遷移するため、
+      本画面は描画されない（＝この状態のモックは存在しない）。
+      事務局ユーザ・システム管理者・未ログインは本画面がそのまま表示される。
+    ・文言（hero_title／hero_lead／card1〜3_title／card1〜3_body）はすべて optionSchema 定義済で、
+      Portal Designer から変更できる（コード変更不要）。本モックは既定値。
+    ・アイコンは実装では Font Awesome（fa-building-o／fa-pencil-square-o／fa-check-square-o）。
+      モックは外部CSSを読み込まないためインラインSVGで代替している。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-00 トップ（未ログイン） ①初期表示</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<!-- ポータル共通ヘッダー（実装：OOTB Stock Header。未ログイン時はログインリンクのみ） -->
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <a class="mock-header-link" href="../SC-01/sc-01-01-login.html">ログイン</a>
+  </div>
+</header>
+
+<!-- 未ログインのためトップタブ（Header Menu）は表示されない -->
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①初期表示（未ログイン）</b>：<code>data.redirectUrl === ''</code>。
+      ヒーローエリアと案内カード3枚を表示する。ログイン済みの事業者ユーザがアクセスした場合は
+      <code>?id=x_dent2_dentsusoke_mypage</code> へ自動遷移するため本画面は描画されない。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS トップ ヒーローエリア）の描画範囲 -->
+    <div class="sks-hero">
+      <h1 class="sks-hero-title">成長加速支援補助金の申請はこちらから</h1>
+      <p class="sks-hero-lead">中小企業・個人事業主の売上拡大と事業継続コストの軽減を支援する補助金です。本ポータルから電子申請を受け付けます。</p>
+
+      <div class="sks-hero-actions">
+        <a class="btn btn-primary btn-lg" href="../SC-01/sc-01-01-login.html">ログイン</a>
+        <a class="btn btn-default btn-lg" href="../SC-02/sc-02-01-form.html">新規登録</a>
+      </div>
+    </div>
+    <!-- ここまでがヒーローウィジェット -->
+
+    <!-- ここから下がウィジェット（SKS トップ 案内カード）の描画範囲 -->
+    <div class="sks-info-cards">
+      <div class="row">
+        <!-- ng-repeat="card in c.data.cards track by card.key"：1枚目 target -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="panel panel-default sks-info-card">
+            <div class="panel-body">
+              <h3 class="sks-info-title">
+                <!-- 実装：<i class="fa fa-building-o" aria-hidden="true"></i> -->
+                <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5c0-3-4-5.5-9-5.5z"/></svg>
+                対象者
+              </h3>
+              <p class="sks-info-body">前年度登録済／未登録いずれの事業者も申請可能</p>
+            </div>
+          </div>
+        </div>
+        <!-- 2枚目 method -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="panel panel-default sks-info-card">
+            <div class="panel-body">
+              <h3 class="sks-info-title">
+                <!-- 実装：<i class="fa fa-pencil-square-o" aria-hidden="true"></i> -->
+                <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                申請方法
+              </h3>
+              <p class="sks-info-body">電子申請（本ポータルより申請）</p>
+            </div>
+          </div>
+        </div>
+        <!-- 3枚目 review -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="panel panel-default sks-info-card">
+            <div class="panel-body">
+              <h3 class="sks-info-title">
+                <!-- 実装：<i class="fa fa-check-square-o" aria-hidden="true"></i> -->
+                <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                審査の流れ
+              </h3>
+              <p class="sks-info-body">事務局1次審査 → 外部審査員による信用調査</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ここまでが案内カードウィジェット -->
+
+  </div>
+</main>
+
+</body>
+</html>

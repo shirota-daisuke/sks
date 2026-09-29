@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-10 問合せ一覧・作成画面 ①初期表示（問合せ履歴 ＋ 新規問合せフォーム）
+  ============================================================================
+  画面設計書  SC-10 ①レイアウト構成（左：問合せ履歴／右：新規問合せ）
+              SC-10 ②画面項目定義 F1 件名・F2 本文
+              SC-10 ⑤表示条件（自身が起票した問合せのみを一覧表示）
+  実装         src/fluent/sp-page/inquiries/inquiries.now.ts
+              src/fluent/sp-widget/inquiry-form/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     c.data.isApplicant === true かつ c.panel === 'new'
+              （ページ表示直後。client_script の初期値が c.panel = 'new'）
+  データ       loadList() の結果 = data.inquiries（sys_updated_on 降順・最大 max_records=30 件）
+  ============================================================================
+  実装との対応（本モックは AngularJS ディレクティブを静的化したもの）
+    ・ng-repeat="inquiry in c.data.inquiries track by inquiry.sys_id" → <tr> を件数分展開
+    ・inquiry.stateClass  → 未回答 label-warning／回答済 label-success（server_script が付与）
+    ・inquiry.updatedOn   → formatDate(sys_updated_on) で yyyy/mm/dd
+    ・送信ボタンは ng-disabled="c.submitting || inquiryForm.$invalid"（件名・本文とも required）
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-10 問合せ一覧・作成 ①初期表示</title>
+<link rel="stylesheet" href="assets/sc-10-mock.css" />
+</head>
+<body>
+
+<!-- ポータル共通ヘッダー（実装：OOTB Stock Header） -->
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<!-- トップタブ（実装：sp-instance-menu/menu.now.ts の Header Menu 5タブ） -->
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="#">マイページ</a></li>
+      <li><a href="#">申請</a></li>
+      <li><a href="#">お知らせ</a></li>
+      <li class="is-active"><a href="#">問合せ</a></li>
+      <li><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①初期表示</b>：<code>c.panel === 'new'</code>（ページ表示直後）。左に自身が起票した問合せ履歴、右に新規問合せフォームを表示する。
+      履歴は <code>sys_updated_on</code> 降順で最大 <code>max_records=30</code> 件。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS 問合せ一覧・作成）の描画範囲 -->
+    <div class="sks-inquiry">
+      <div class="row">
+
+        <!-- 左：問合せ履歴 -->
+        <div class="col-md-7 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">問合せ履歴</h3>
+              <!-- ng-if="c.data.totalCount" -->
+              <span class="sks-count">全 2 件</span>
+            </div>
+
+            <!-- ng-if="c.data.inquiries.length" -->
+            <table class="table table-hover sks-table">
+              <thead>
+                <tr>
+                  <th>件名</th>
+                  <th class="sks-col-state">状態</th>
+                  <th class="sks-col-date">更新日</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- ng-repeat：1件目 -->
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">経費区分の判定について</button>
+                  </td>
+                  <td><span class="label label-warning">未回答</span></td>
+                  <td>2026/08/09</td>
+                </tr>
+                <!-- ng-repeat：2件目 -->
+                <tr>
+                  <td>
+                    <button type="button" class="btn btn-link sks-subject-link">申請書類の記載方法について</button>
+                  </td>
+                  <td><span class="label label-success">回答済</span></td>
+                  <td>2026/07/28</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!--
+              件数上限で切り捨てた場合のみ表示（ng-if="c.data.truncated"）。
+              本モックは全2件＝切り捨てなしのため非表示。実装の markup は以下。
+              <div class="panel-footer sks-truncated">
+                30 件を表示しています（全 42 件）。
+              </div>
+            -->
+          </div>
+        </div>
+
+        <!-- 右：新規問合せ（ng-if="c.panel === 'new'"） -->
+        <div class="col-md-5 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">新規問合せ</h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- サーバー検証エラー（ng-if="c.serverErrors.length"）は ②入力エラー を参照 -->
+
+              <form name="inquiryForm" novalidate>
+                <div class="form-group">
+                  <label for="sks-inquiry-subject">件名 <span class="text-danger">*</span></label>
+                  <input type="text" id="sks-inquiry-subject" name="subject" class="form-control"
+                         placeholder="問合せ件名を入力" maxlength="200" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-inquiry-body">本文 <span class="text-danger">*</span></label>
+                  <textarea id="sks-inquiry-body" name="description" class="form-control" rows="8"
+                            maxlength="2000" required></textarea>
+                  <span class="help-block">2000文字以内で入力してください。</span>
+                </div>
+
+                <!-- 未入力のため ng-disabled="c.submitting || inquiryForm.$invalid" で無効 -->
+                <button type="submit" class="btn btn-primary" disabled>送信する</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+/**
+ * SC-06 自分の情報参照・変更画面
+ * 色は Service Portal テーマの SCSS 変数のみを使用する。
+ */
+.sks-profile {
+    .sks-profile-card {
+        height: 100%;
+    }
+
+    .sks-field-list {
+        margin-bottom: 20px;
+
+        dt {
+            font-size: $font-size-small;
+            font-weight: normal;
+            color: $text-muted;
+            margin-bottom: 2px;
+        }
+
+        dd {
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid $panel-default-border;
+            color: $text-color;
+
+            &:last-child {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: 0;
+            }
+        }
+    }
+
+    .sks-error-list {
+        margin-bottom: 0;
+    }
+
+    .sks-readonly-note {
+        font-size: $font-size-small;
+    }
+
+    .btn + .btn {
+        margin-left: 8px;
+    }
+}

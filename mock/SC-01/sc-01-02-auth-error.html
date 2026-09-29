@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-01 ログイン画面 ②認証エラー
+  ============================================================================
+  画面設計書  SC-01 ③アクション No.1「ログイン」の異常系
+              （誤ったパスワード／存在しないログインID → ログインできない）
+  実装         OOTB ログインウィジェット（widget-login）＝プラットフォーム標準認証
+              → エラーメッセージ・アカウントロック（処理No.13）は
+                 プラットフォームの認証処理が出力する。カスタム実装しない。
+  ============================================================================
+  実装との対応（重要）
+    ・本画面のエラー表示は OOTB の描画結果の再現です。文言はインスタンスの
+      システムメッセージ（sys_ui_message）に依存するため、実機の表示と差異が出ます。
+      画面設計・実装のレビュー対象は「エラーが画面上に表示されること」のみです。
+    ・連続失敗時のアカウントロック（処理No.13）は標準のログイン失敗制御に依存し、
+      独自実装はありません（保留・対象外シート No.10）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-01 ログイン ②認証エラー</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <a class="mock-header-link" href="../SC-00/sc-00-01-top.html">トップ</a>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>②認証エラー</b>：OOTB ログインウィジェットが出力するエラー表示（実装対象外）。
+      文言はインスタンスのシステムメッセージに依存する。
+    </p>
+
+    <!-- ===== OOTB ログインウィジェット（widget-login）の描画結果を再現したモック ===== -->
+    <div class="sp-login-widget">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">ログイン</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="alert alert-danger" role="alert">
+            ユーザー名またはパスワードが正しくありません。
+          </div>
+
+          <form novalidate>
+            <div class="form-group">
+              <label for="user_name">ユーザー名</label>
+              <input type="text" id="user_name" name="user_name" class="form-control" value="sks.demo" autocomplete="username" />
+            </div>
+            <div class="form-group">
+              <label for="user_password">パスワード</label>
+              <input type="password" id="user_password" name="user_password" class="form-control" autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">ログイン</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- ===== ここまで OOTB（実装対象外） ===== -->
+
+    <!-- 補足リンクウィジェットは認証結果によらず常に表示される -->
+    <div class="sks-login-links">
+      <ul class="list-unstyled sks-link-list">
+        <li><a href="../SC-04/sc-04-01-step1.html">パスワードをお忘れですか？</a></li>
+        <li>アカウントをお持ちでない方は <a href="../SC-02/sc-02-01-form.html">新規登録</a></li>
+      </ul>
+      <p class="sks-login-note">※SSOでのログインは前年度登録済み事業者が対象です。多要素認証（MFA）が設定されている場合は追加認証を求めます。</p>
+      <div class="alert alert-info sks-sso-note" role="alert">
+        <svg class="mock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        SSOログイン（Salesforce）は現在未設定です。Multi-Provider SSO に Salesforce を IdP として登録すると、ログインフォームに SSO ログインボタンが表示されます。
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

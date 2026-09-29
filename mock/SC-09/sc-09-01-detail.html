@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-09 お知らせ詳細画面 ①詳細表示（重要度＝高）
+  ============================================================================
+  画面設計書  SC-09 ①レイアウト構成（タイトル／重要度チップ／公開日／本文カード／一覧へ戻る）
+              SC-09 ②表示項目 D1 タイトル・重要度・公開日（処理No.39／処理No.44）
+                              D2 本文（リッチテキスト表示）
+              SC-09 ③アクション No.1「一覧へ戻る」→ SC-08
+              SC-09 ⑥確認事項（既読化のタイミングが未確定 → オプションで切替）
+  実装         src/fluent/sp-page/notice-detail/notice-detail.now.ts（roles: applicant / applicant_admin）
+              src/fluent/sp-widget/notice-detail/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     data.found === true
+              （URLパラメータ sys_id のお知らせが、公開状態・公開期間・公開範囲の条件を満たす）
+  URL          ?id=x_dent2_dentsusoke_notice&sys_id=<お知らせのsys_id>
+  ============================================================================
+  実装との対応
+    ・重要度「高」のみ表記を差し替える（options.high_priority_label 既定「重要」）。
+      中・低は選択リストの表示値（「中」「低」）をそのまま使う。
+      ※ SC-08 一覧は「高」表記のままで、設計書どおりの意図的な差異。
+    ・本文は ng-bind-html（ngSanitize）で描画するため、事務局が登録したHTMLの
+      段落・箇条書き・リンク・表が整形表示される（スクリプト等はサニタイズされる）。
+    ・本文が空の場合は「本文は登録されていません。」を表示する。
+    ・既読化は既定で行わない（mark_read_on_view=false）。一覧クリック時に既読化する現行方針のため。
+      「詳細表示時に既読化する」に決まった場合は同オプションを true にする。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-09 お知らせ詳細 ①詳細表示</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li class="is-active"><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①詳細表示</b>：<code>data.found === true</code>。
+      重要度「高」はチップを「重要」（赤系）に差し替えて表示する（SC-08 一覧は「高」表記）。
+      本文は事務局が登録したリッチテキストを <code>ng-bind-html</code> で描画する。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS お知らせ詳細）の描画範囲 -->
+    <div class="sks-notice-detail">
+
+      <!-- ng-if="c.data.found" -->
+      <div>
+        <!-- D1 タイトル／重要度／公開日 -->
+        <h2 class="sks-notice-title">一次審査の開始について</h2>
+
+        <p class="sks-notice-meta">
+          <!-- 重要度＝高のため options.high_priority_label（既定「重要」） -->
+          <span class="label label-danger">重要</span>
+          <span class="sks-publish-date">公開日：2026/08/10</span>
+          <!-- ng-if="c.data.notice.publishEndDate" -->
+          <span class="sks-publish-end">掲載終了：2026/12/31</span>
+        </p>
+
+        <!-- D2 本文（リッチテキスト） -->
+        <div class="panel panel-default sks-notice-body-panel">
+          <div class="panel-body">
+            <!-- ng-bind-html="c.data.notice.body"（ngSanitize によりサニタイズされる） -->
+            <div class="sks-notice-body">
+              <p>一次審査を開始しました。審査状況はマイページの申請状況からご確認ください。</p>
+              <p>審査にあたり、以下の点にご留意ください。</p>
+              <ul>
+                <li>提出書類に不備がある場合、事務局から不備確認のご連絡をいたします。</li>
+                <li>不備修正のご依頼は、申請状況の詳細画面に表示されます。</li>
+                <li>審査結果はご登録のメールアドレスへご連絡します。</li>
+              </ul>
+              <p>ご不明な点は<a href="../SC-10/sc-10-01-list-new.html">問合せ</a>からご連絡ください。</p>
+            </div>
+            <!-- 本文が空の場合：<p class="text-muted">本文は登録されていません。</p> -->
+          </div>
+        </div>
+
+        <!-- ③アクション No.1 一覧へ戻る -->
+        <a class="btn btn-default" href="../SC-08/sc-08-01-list.html">一覧へ戻る</a>
+      </div>
+
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

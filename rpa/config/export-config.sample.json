@@ -1,0 +1,34 @@
+{
+    "instanceUrl": "https://dentsusokenincdemo2.service-now.com",
+
+    "credentialPath": "C:\\ProgramData\\SKS\\credential\\servicenow.cred.xml",
+
+    "shareRoot": "\\\\fileserver\\sks\\applications",
+    "stagingDir": "C:\\ProgramData\\SKS\\staging",
+    "ledgerPath": "C:\\ProgramData\\SKS\\ledger\\exported.json",
+    "logDir": "C:\\ProgramData\\SKS\\logs",
+
+    "targetTable": "x_dent2_dentsusoke_request",
+    "targetStatus": "review_done",
+    "additionalQuery": "",
+
+    "pageSize": 50,
+    "maxApplications": 500,
+    "maxAttachmentBytes": 52428800,
+    "allowedExtensions": [
+        ".pdf",
+        ".xls",
+        ".xlsx",
+        ".doc",
+        ".docx",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".zip"
+    ],
+
+    "writeBackField": "",
+    "writeBackValue": "exported",
+
+    "logRetentionDays": 400
+}

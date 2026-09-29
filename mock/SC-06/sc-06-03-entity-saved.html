@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-06 自分の情報参照・変更画面 ③事業者情報 更新完了
+  ============================================================================
+  画面設計書  SC-06 ③アクション No.1「保存する」→ 事業者情報変更処理（処理No.14）
+              → 更新完了メッセージを表示し、参照モードに戻して新しい値を表示する
+  実装         src/fluent/sp-widget/profile-form/client_script.js
+                 c.entitySaved = true ／ c.entityMode = 'view'
+              src/fluent/sp-widget/profile-form/server_script.js
+                 saveEntity() → loadEntity() を保存後に再実行して最新値を返す
+  表示条件     c.entitySaved === true かつ c.entityMode === 'view'
+              （次回「編集する」を押すと c.entitySaved は false に戻る）
+  ============================================================================
+  更新されるデータ（x_dent2_dentsusoke_entity・自社レコードのみ）
+    ・u_business_name / u_address / u_industry / u_employee_count
+    ※ 更新対象は PortalContextUtil で解決した自社の事業者に限定している
+      （サーバースクリプトの GlideRecord は ACL を経由しないため、絞り込みを実装側で担保）。
+  ============================================================================
+  本モックの表示：従業員数を 12 → 15 名、所在地を「…丸の内1-2-3 テストビル5F」に更新した直後
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-06 自分の情報 ③更新完了</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li class="is-active"><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>③更新完了</b>：<code>c.entitySaved === true</code>。
+      参照モードに戻り、保存後に再取得した新しい値を表示する。
+    </p>
+
+    <div class="sks-profile">
+      <div class="row">
+
+        <!-- 事業者情報（更新完了） -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default sks-profile-card">
+            <div class="panel-heading">
+              <h3 class="panel-title">事業者情報</h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- ng-if="c.entitySaved" -->
+              <div class="alert alert-success" role="alert">
+                事業者情報を更新しました。
+              </div>
+
+              <!-- ng-if="c.entityMode === 'view'" -->
+              <div>
+                <dl class="sks-field-list">
+                  <dt>事業者名（法人名／屋号）</dt>
+                  <dd>株式会社テスト</dd>
+                  <dt>所在地</dt>
+                  <dd>東京都千代田区丸の内1-2-3 テストビル5F</dd>
+                  <dt>業種</dt>
+                  <dd>サービス業</dd>
+                  <dt>従業員数</dt>
+                  <dd>15 名</dd>
+                  <dt>事業者区分</dt>
+                  <dd>法人</dd>
+                  <dt>法人番号／本人識別情報</dt>
+                  <dd>1234567890123</dd>
+                </dl>
+                <button type="button" class="btn btn-primary">編集する</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- アカウント情報（参照モード） -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default sks-profile-card">
+            <div class="panel-heading">
+              <h3 class="panel-title">アカウント情報</h3>
+            </div>
+            <div class="panel-body">
+              <div>
+                <dl class="sks-field-list">
+                  <dt>メールアドレス</dt>
+                  <dd>sks.demo@example.co.jp</dd>
+                  <dt>ユーザID</dt>
+                  <dd>sks.demo</dd>
+                </dl>
+                <button type="button" class="btn btn-primary">編集する</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

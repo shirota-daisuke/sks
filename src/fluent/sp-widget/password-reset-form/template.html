@@ -1,0 +1,100 @@
+<!-- SC-04 パスワードリセット画面（STEP1／STEP2 を1カード内に区切り線で分けて配置） -->
+<div class="sks-reset">
+  <div class="panel panel-default sks-reset-card">
+    <div class="panel-body">
+
+      <!-- STEP1：再設定メールの送信 -->
+      <div class="sks-step">
+        <h3 class="sks-step-title">STEP1：再設定メールの送信</h3>
+
+        <div class="alert alert-success" ng-if="c.sent" role="alert">
+          再設定用リンクを送信しました。ご登録のメールアドレスをご確認ください。<br />
+          <small>入力されたメールアドレスが登録されている場合のみメールが届きます。</small>
+        </div>
+
+        <div class="alert alert-danger" ng-if="c.sendErrors.length" role="alert">
+          <ul class="list-unstyled sks-error-list">
+            <li ng-repeat="err in c.sendErrors track by $index">{{err}}</li>
+          </ul>
+        </div>
+
+        <form name="sendForm" ng-submit="c.sendLink()" novalidate ng-if="!c.sent">
+          <div class="form-group">
+            <label for="sks-reset-email">登録済みメールアドレス <span class="text-danger">*</span></label>
+            <input type="email" id="sks-reset-email" name="resetEmail" class="form-control"
+                   placeholder="example@company.co.jp"
+                   ng-model="c.step1.email" maxlength="256" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block"
+                  ng-disabled="c.sending || sendForm.$invalid">
+            <span ng-if="c.sending"><i class="fa fa-spinner fa-spin"></i> 送信中…</span>
+            <span ng-if="!c.sending">再設定用リンクを送信</span>
+          </button>
+        </form>
+      </div>
+
+      <hr class="sks-step-divider" />
+
+      <!-- STEP2：新しいパスワードの設定（再設定用リンク経由でのみ表示） -->
+      <div class="sks-step">
+        <h3 class="sks-step-title">STEP2：新しいパスワードの設定</h3>
+
+        <!-- リンク未経由 -->
+        <p class="text-muted" ng-if="c.data.tokenState === 'none'">
+          メール内の再設定用リンクからアクセスすると、この欄で新しいパスワードを設定できます。
+        </p>
+
+        <!-- トークン不正 -->
+        <div class="alert alert-danger" ng-if="c.data.tokenState === 'invalid'" role="alert">
+          再設定用のリンクが無効です。お手数ですが STEP1 から再度お手続きをお願いします。
+        </div>
+
+        <!-- トークン期限切れ -->
+        <div class="alert alert-warning" ng-if="c.data.tokenState === 'expired'" role="alert">
+          再設定用リンクの有効期限が切れています。お手数ですが STEP1 から再度お手続きをお願いします。
+        </div>
+
+        <!-- 更新完了 -->
+        <div class="alert alert-success" ng-if="c.data.tokenState === 'used'" role="alert">
+          パスワードを更新しました。ログイン画面へ移動します…
+        </div>
+
+        <!-- パスワード更新フォーム -->
+        <div ng-if="c.data.tokenState === 'valid'">
+          <p class="text-muted sks-target-account" ng-if="c.data.maskedEmail">
+            対象アカウント：{{c.data.maskedEmail}}
+          </p>
+
+          <div class="alert alert-danger" ng-if="c.updateErrors.length" role="alert">
+            <ul class="list-unstyled sks-error-list">
+              <li ng-repeat="err in c.updateErrors track by $index">{{err}}</li>
+            </ul>
+          </div>
+
+          <form name="updateForm" ng-submit="c.updatePassword()" novalidate>
+            <div class="form-group">
+              <label for="sks-new-password">新しいパスワード <span class="text-danger">*</span></label>
+              <input type="password" id="sks-new-password" name="newPassword" class="form-control"
+                     ng-model="c.step2.password" maxlength="128" required />
+              <span class="help-block">8文字以上128文字以内で入力してください。</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error': c.passwordMismatch()}">
+              <label for="sks-new-password-confirm">新しいパスワード（確認） <span class="text-danger">*</span></label>
+              <input type="password" id="sks-new-password-confirm" name="newPasswordConfirm" class="form-control"
+                     ng-model="c.step2.password_confirm" maxlength="128" required />
+              <span class="help-block" ng-if="c.passwordMismatch()">パスワードが一致していません。</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block"
+                    ng-disabled="c.updating || updateForm.$invalid || c.passwordMismatch()">
+              <span ng-if="c.updating"><i class="fa fa-spinner fa-spin"></i> 更新中…</span>
+              <span ng-if="!c.updating">パスワードを更新</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

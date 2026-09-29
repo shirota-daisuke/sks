@@ -1,0 +1,44 @@
+<!-- SC-05 マイページ「最近のお知らせ」（D4：重要度／タイトル／公開日） -->
+<div class="panel panel-default sks-notices">
+  <div class="panel-heading">
+    <h3 class="panel-title">最近のお知らせ</h3>
+    <a class="sks-more" href="{{c.data.listUrl}}">すべて見る</a>
+  </div>
+
+  <div class="panel-body" ng-if="!c.data.isApplicant">
+    <p class="text-muted">事業者ユーザでログインするとお知らせが表示されます。</p>
+  </div>
+
+  <table class="table table-hover sks-table" ng-if="c.data.isApplicant && c.data.notices.length">
+    <thead>
+      <tr>
+        <th class="sks-col-priority">重要度</th>
+        <th>タイトル</th>
+        <th class="sks-col-date">公開日</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="notice in c.data.notices track by notice.sys_id"
+          ng-class="{'sks-unread': !notice.read}">
+        <td>
+          <span class="label" ng-class="notice.priorityClass" ng-bind="notice.priorityLabel"></span>
+        </td>
+        <td>
+          <button type="button" class="btn btn-link sks-title-link"
+                  ng-disabled="c.navigating"
+                  ng-click="c.openNotice(notice)">
+            {{notice.title}}
+          </button>
+          <span class="sks-badge-unread" ng-if="!notice.read">未読</span>
+        </td>
+        <td>{{notice.publishDate}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="panel-body text-center text-muted"
+       ng-if="c.data.isApplicant && !c.data.notices.length">
+    <i class="fa fa-inbox fa-2x"></i>
+    <p>公開中のお知らせはありません。</p>
+  </div>
+</div>

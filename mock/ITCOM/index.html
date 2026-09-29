@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  ITCOM 担当範囲（申請機能・審査プロセス）画面モック一覧
+  ============================================================================
+  既存の ../index.html（SC-00〜SC-10）は実装済みウィジェットの写しだが、
+  本フォルダの画面は実装が存在しないため【設計提案】である。
+  画面番号は画面設計書に未定義のため ITCOM-nn の仮番号を付けている。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ITCOM 担当範囲 画面モック一覧（設計提案）</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/itcom-mock.css" />
+<style>
+  .idx-wrap { max-width: 1180px; margin: 0 auto; padding: 32px 16px 56px; }
+  .idx-head { margin-bottom: 24px; }
+  .idx-head h1 { margin: 0 0 6px; font-size: 22px; }
+  .idx-head p { margin: 0; color: #777; font-size: 13px; line-height: 1.8; }
+  .idx-table { background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 28px; }
+  .idx-table th, .idx-table td { padding: 9px 12px; border-top: 1px solid #eee; font-size: 13px; vertical-align: top; }
+  .idx-table thead th { background: #f5f5f5; border-top: 0; color: #555; font-weight: bold; white-space: nowrap; }
+  .idx-table td code, .idx-head code, .idx-list code {
+      padding: 1px 4px; background: #f7f7f9; border: 1px solid #e1e1e8; border-radius: 3px;
+      font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #a33;
+  }
+  .idx-sc { width: 92px; white-space: nowrap; font-weight: bold; }
+  .idx-file { white-space: nowrap; }
+  .idx-section { margin: 28px 0 10px; font-size: 16px; font-weight: bold; }
+  .idx-actor { color: #8a6d3b; font-size: 11px; }
+  .idx-list { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px 14px 34px; margin-bottom: 20px; }
+  .idx-list li { margin-bottom: 8px; font-size: 13px; line-height: 1.8; }
+  .idx-list li:last-child { margin-bottom: 0; }
+  .idx-block { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; line-height: 1.9; }
+</style>
+</head>
+<body>
+
+<div class="idx-wrap">
+
+  <div class="idx-head">
+    <h1>ITCOM 担当範囲 画面モック一覧 — 設計提案</h1>
+    <p>
+      成長加速支援補助金 申請ポータル・審査システム／申請機能・審査プロセス（ITCOM 主担当）<br />
+      対象：処理No.16 以降の申請系および審査プロセス
+      ｜ 既存の <a href="../index.html">SC-00〜SC-10 モック一覧</a>（ポータル系・実装済み）とは位置づけが異なります
+    </p>
+  </div>
+
+  <p class="mock-proposal">
+    <b>本フォルダの画面はすべて設計提案です。</b>
+    既存の <code>mock/SC-00</code>〜<code>SC-10</code> は実装済みウィジェットの DOM をそのまま写したものですが、
+    ITCOM 担当範囲は実装が存在しないため、これらは「こう作るのが妥当ではないか」という提案にとどまります。
+    画面番号 <code>ITCOM-01</code>〜<code>ITCOM-09</code> は仮番号で、画面設計書への追番が必要です。
+    各ファイル冒頭の HTML コメントに、参照した既存定義・欠けている前提・未確定事項を記載しています。
+  </p>
+
+  <div class="idx-section">画面一覧</div>
+  <table class="table idx-table">
+    <thead>
+      <tr>
+        <th class="idx-sc">画面</th>
+        <th>内容</th>
+        <th class="idx-file">ファイル</th>
+        <th>対応する処理・ステータス</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="idx-sc">ITCOM-01<br /><span class="idx-actor">事業者</span></td>
+        <td>申請入力：基本情報（STEP1）</td>
+        <td class="idx-file"><a href="itcom-01-apply-basic.html">itcom-01-apply-basic.html</a></td>
+        <td>処理No.16 申請情報入力 ／ <code>input</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-02<br /><span class="idx-actor">事業者</span></td>
+        <td>申請入力：対象経費明細（STEP2）</td>
+        <td class="idx-file"><a href="itcom-02-apply-expenses.html">itcom-02-apply-expenses.html</a></td>
+        <td>処理No.18 対象経費登録／処理No.17 補助金額自動判定</td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-03<br /><span class="idx-actor">事業者</span></td>
+        <td>申請入力：添付書類（STEP3）</td>
+        <td class="idx-file"><a href="itcom-03-apply-attachments.html">itcom-03-apply-attachments.html</a></td>
+        <td>（処理番号未割当）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-04<br /><span class="idx-actor">事業者</span></td>
+        <td>申請入力：内容確認・提出（STEP4）＋★提出完了</td>
+        <td class="idx-file"><a href="itcom-04-apply-confirm.html">itcom-04-apply-confirm.html</a></td>
+        <td><code>input</code> → <code>accepted</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-05<br /><span class="idx-actor">事業者</span></td>
+        <td>申請の不備修正（再入力・再提出）</td>
+        <td class="idx-file"><a href="itcom-05-defect-fix.html">itcom-05-defect-fix.html</a></td>
+        <td><code>defect_request</code> → <code>defect_fixing</code> → <code>defect_answered</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-06<br /><span class="idx-actor">事務局</span></td>
+        <td>一次審査：対象一覧</td>
+        <td class="idx-file"><a href="itcom-06-review-list.html">itcom-06-review-list.html</a></td>
+        <td><code>accepted</code>／<code>first_review</code>／<code>defect_answered</code>／<code>re_review</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-07<br /><span class="idx-actor">事務局</span></td>
+        <td>一次審査：申請詳細・審査＋★不備確認依頼の入力</td>
+        <td class="idx-file"><a href="itcom-07-review-detail.html">itcom-07-review-detail.html</a></td>
+        <td>→ <code>first_review_done</code>／<code>defect_request</code>／<code>rejected</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-08<br /><span class="idx-actor">事務局</span></td>
+        <td>信用調査：要否判定・外部調査・結果取込</td>
+        <td class="idx-file"><a href="itcom-08-credit-check.html">itcom-08-credit-check.html</a></td>
+        <td><code>credit_judging</code>／<code>credit_exempt</code>／<code>ext_preparing</code>／<code>ext_reviewing</code>／<code>result_waiting</code>／<code>result_checking</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc">ITCOM-09<br /><span class="idx-actor">事務局</span></td>
+        <td>採択・不採択の確定＋★不採択の入力</td>
+        <td class="idx-file"><a href="itcom-09-award-decision.html">itcom-09-award-decision.html</a></td>
+        <td>→ <code>review_done</code>／<code>rejected</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="idx-section">T03 申請ステータス16値と本モックの対応</div>
+  <div class="idx-block">
+    遷移させる処理が現状で存在するのは <b>2つだけ</b>です。
+    <table class="table idx-table" style="margin-top:12px; margin-bottom:0;">
+      <thead>
+        <tr><th>ステータス</th><th>遷移させる処理</th><th>本モックでの担当画面</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>input</code> 申請入力中</td><td>実装済（暫定）</td><td>ITCOM-01〜03</td></tr>
+        <tr><td><code>accepted</code> 受付済</td><td>実装済（暫定）</td><td>ITCOM-04</td></tr>
+        <tr><td><code>first_review</code> 一次審査中</td><td><b>なし</b></td><td>ITCOM-06／07</td></tr>
+        <tr><td><code>defect_request</code> 不備確認依頼</td><td><b>なし</b></td><td>ITCOM-07</td></tr>
+        <tr><td><code>defect_fixing</code> 不備修正中</td><td><b>なし</b></td><td>ITCOM-05</td></tr>
+        <tr><td><code>defect_answered</code> 不備修正回答あり</td><td><b>なし</b></td><td>ITCOM-05</td></tr>
+        <tr><td><code>re_review</code> 再審査中</td><td><b>なし</b></td><td>ITCOM-07</td></tr>
+        <tr><td><code>first_review_done</code> 一次審査完了</td><td><b>なし</b></td><td>ITCOM-07</td></tr>
+        <tr><td><code>credit_judging</code> 信用調査要否判定中</td><td><b>なし</b></td><td>ITCOM-08</td></tr>
+        <tr><td><code>credit_exempt</code> 信用調査免除</td><td><b>なし</b></td><td>ITCOM-08</td></tr>
+        <tr><td><code>ext_preparing</code> 外部調査準備中</td><td><b>なし</b></td><td>ITCOM-08</td></tr>
+        <tr><td><code>ext_reviewing</code> 外部信用調査中</td><td><b>なし</b></td><td>ITCOM-08</td></tr>
+        <tr><td><code>result_waiting</code> 調査結果取込待ち</td><td><b>なし</b></td><td>ITCOM-08</td></tr>
+        <tr><td><code>result_checking</code> 信用調査結果確認中</td><td><b>なし</b></td><td>ITCOM-08</td></tr>
+        <tr><td><code>review_done</code> 申請審査完了</td><td><b>なし</b></td><td>ITCOM-09</td></tr>
+        <tr><td><code>rejected</code> 不採択</td><td><b>なし</b></td><td>ITCOM-09</td></tr>
+        <tr><td><code>withdrawn</code> 取下げ</td><td>実装済（A02 未決で既定非表示）</td><td>SC-07</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="idx-section">実装前に決着が必要なデータ構造</div>
+  <ul class="idx-list">
+    <li>
+      <b>経費明細テーブル</b>（ITCOM-02）：T03 には <code>u_total_expense_amount</code>（合計金額）の1列しかなく、
+      明細の登録先が無い。対象経費区分マスタ・専門家経費日額上限マスタは参照元として実装済みだが、突き合わせる相手が存在しない。
+    </li>
+    <li>
+      <b>添付ファイル</b>（ITCOM-03）：<code>sys_attachment</code> を扱うコードが1件も無く、ACL も未定義。
+      書類種別を保持する項目も無いため、どの提出書類かを区別できない。
+    </li>
+    <li>
+      <b>補助金額の保持先</b>（ITCOM-02／04／07）：上限額・補助率・対象経費はあるが、算出した補助金額の列が無い。
+      画面表示のみになり、一覧・帳票・ダッシュボードに出ない。
+    </li>
+    <li>
+      <b>審査結果の記録</b>（ITCOM-07）：判定・理由・審査者・審査日時・審査担当者の列が無い。
+      SC-11 のユーザ登録審査にも「却下理由を記録する項目が無い」という同じ TODO が残っている。
+    </li>
+    <li>
+      <b>信用調査の依頼・結果</b>（ITCOM-08）：保持するテーブルが無い。再調査の履歴を残すため 1対多の子テーブルを推奨。
+    </li>
+    <li>
+      <b>採択番号・交付決定額</b>（ITCOM-09）：いずれも列が無い。
+      <code>u_award_number_for_sync</code> は前年度実績の Salesforce 連携用であり用途が異なる。
+    </li>
+    <li>
+      <b>処理履歴</b>（ITCOM-05／07／08／09）：各画面のタイムラインに相当するテーブルが無い。
+      <code>sys_audit</code> からの再構成か、専用の履歴テーブルが必要。
+    </li>
+    <li>
+      <b>公募回次</b>：T03 に列が無く、複数回次・複数件の申請を表現できない。
+    </li>
+  </ul>
+
+  <div class="idx-section">この遷移が無いことで動かない既存機能</div>
+  <ul class="idx-list">
+    <li><b>SC-17「採択者一覧（申請審査完了）」帳票</b>：<code>review_done</code> が発生しないため常に0件。</li>
+    <li><b>SC-15 ダッシュボードの申請系カード</b>：同様に0件（構成上の誤りではない旨がコードのコメントに明記されている）。</li>
+    <li><b>RPA 連携（添付ファイルの共有フォルダ転送）</b>：<code>review_done</code> を契機にしているため起動しない。添付の実装も無い。</li>
+    <li><b>SC-07「不備を修正する」ボタン</b>：遷移先 URL（<code>application_form_url</code>）が未設定のため表示されない。ITCOM-05 がその遷移先に相当。</li>
+  </ul>
+
+  <div class="idx-section">モックの見方</div>
+  <ul class="idx-list">
+    <li>
+      事業者向け画面（ITCOM-01〜05）はポータルのヘッダー＋トップタブ（<code>.mock-header</code>／<code>.mock-tabs</code>）、
+      事務局向け画面（ITCOM-06〜09）は事務局ワークスペース風のシェル（<code>.mock-ws-*</code>）を被せています。
+      いずれもモック専用の枠で、実装では OOTB のヘッダー／ワークスペースが描画します。
+    </li>
+    <li>
+      スタイルは <code>../assets/sks-mock.css</code>（Bootstrap 3 相当の最小サブセット）を読み込んだうえで、
+      本フォルダに無いコンポーネントのみ <code>assets/itcom-mock.css</code> に追加しています。
+      class 名は本モックの提案であり、実装との一致を保証しません。
+    </li>
+    <li>
+      ★印のファイルは、実装では排他表示となる複数状態をレビュー用に1ファイルへ並べたものです（既存モックと同じ慣習）。
+    </li>
+    <li>
+      表示データは検証環境のデモデータ（株式会社テスト／事業 太郎／APP-2026-00123）を起点に、
+      審査の各段階を示すため架空の申請を追加しています。実インスタンスには未登録です。
+    </li>
+    <li>
+      各ファイル冒頭の HTML コメントに「参照した既存定義」「欠けている前提」「未確定事項」を記載しています。
+      レビュー時はコメントを併せてご確認ください。
+    </li>
+  </ul>
+
+</div>
+
+</body>
+</html>

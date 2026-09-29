@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-02 仮登録画面 ①初期表示
+  ============================================================================
+  画面設計書  SC-02 ①レイアウト構成（中央配置の仮登録カード）
+              SC-02 ②F1 ログインID（半角英数字4〜20桁・暫定）／F2 メールアドレス
+              SC-02 ③アクション No.1「仮登録する」（処理No.1 仮登録受付／処理No.2 案内メール）
+              SC-02 ④画面遷移（画面遷移せず画面内に完了メッセージを表示）
+  実装         src/fluent/sp-page/register/register.now.ts（public: true）
+              src/fluent/sp-widget/register-form/{template.html, client_script.js, server_script.js, styles.scss}
+  表示条件     c.view === 'form'（初期値）
+  ============================================================================
+  実装との対応
+    ・送信ボタンは ng-disabled="c.submitting || registerForm.$invalid"。
+      ログインID（required＋ng-pattern /^[0-9A-Za-z]{4,20}$/）とメール（required＋type=email）が
+      満たされるまで押せない。未入力の初期表示では無効。
+    ・クライアント検証メッセージは $touched 後に help-block で表示する（②入力エラー を参照）。
+    ・注記文は options.notice_message で差し替え可。
+    ・未認証（guest）で書き込みが発生するため、本番相当ではCAPTCHA・レート制限が必要（未実装）。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-02 仮登録 ①初期表示</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <a class="mock-header-link" href="../SC-01/sc-01-01-login.html">ログイン</a>
+  </div>
+</header>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>①初期表示</b>：<code>c.view === 'form'</code>。
+      ログインIDとメールアドレスのみを受け付け、入力が揃うまで「仮登録する」は無効。
+    </p>
+
+    <!-- ここから下がウィジェット（SKS 仮登録フォーム）の描画範囲 -->
+    <div class="sks-register">
+      <div class="panel panel-default sks-register-card">
+        <div class="panel-body">
+
+          <h2 class="sks-register-title">仮登録</h2>
+
+          <!-- ng-if="c.view === 'form'" -->
+          <div>
+            <!-- サーバー検証エラー（ng-if="c.serverErrors.length"）は ②入力エラー を参照 -->
+
+            <form name="registerForm" novalidate>
+              <div class="form-group">
+                <label for="sks-login-id">ログインID <span class="text-danger">*</span></label>
+                <input type="text" id="sks-login-id" name="loginId" class="form-control"
+                       placeholder="半角英数字で入力" maxlength="20" required />
+                <!-- $touched かつ $error.required のとき「ログインIDを入力してください。」 -->
+                <!-- $touched かつ $error.pattern のとき「半角英数字4～20桁で入力してください。」 -->
+              </div>
+
+              <div class="form-group">
+                <label for="sks-email">メールアドレス <span class="text-danger">*</span></label>
+                <input type="email" id="sks-email" name="email" class="form-control"
+                       placeholder="example@company.co.jp" maxlength="256" required />
+                <!-- $touched かつ $error.required／$error.email のとき help-block を表示 -->
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block" disabled>仮登録する</button>
+            </form>
+
+            <p class="sks-register-note">ご入力のメールアドレス宛に、本登録用のご案内をお送りします。</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- ここまでがウィジェットの描画範囲 -->
+
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  SC-06 自分の情報参照・変更画面 ④アカウント情報 編集モード（重複エラー表示）
+  ============================================================================
+  画面設計書  SC-06 ②F5 メールアドレス（編集可・形式チェック）
+                      F6 ユーザID（表示のみ・変更不可／事務局への問い合わせ案内）
+              SC-06 ③アクション No.2「編集する」→ アカウント情報変更処理（処理No.15）
+  実装         src/fluent/sp-widget/profile-form/client_script.js  c.editAccount() / c.saveAccount()
+              src/fluent/sp-widget/profile-form/server_script.js   saveAccount()（処理No.15）
+  表示条件     c.accountMode === 'edit'（事業者情報カードは参照モードのまま）
+              かつ c.accountErrors.length > 0（本モックは重複エラーを表示）
+  ============================================================================
+  実装との対応
+    ・サーバー側検証メッセージ
+        メールアドレスを入力してください。
+        メールアドレスの形式が正しくありません。
+        メールアドレスは256文字以内で入力してください。
+        このメールアドレスは既に使用されています。   … 自分以外の事業者ユーザと重複（Q06 暫定）
+        アカウント情報が見つかりません。／アカウント情報の更新に失敗しました。…
+    ・ユーザID（F6）は readonly の入力欄として表示し、変更できないことを help-block で伝える。
+    ・更新対象は gs.getUserID() のレコードのみ（自分以外は更新しない）。
+
+  ★ 未確定事項（保留・対象外シート No.13）
+    メールアドレス変更時の再認証要否は未確定。現状は再認証なしで変更を受け付ける。
+    再認証が必要と決まった場合、この画面にパスワード再入力欄を追加する。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-06 自分の情報 ④アカウント情報 編集モード</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li class="is-active"><a href="#">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-note">
+      <b>④アカウント情報 編集モード</b>：<code>c.accountMode === 'edit'</code>。
+      メールアドレスのみ編集可。ユーザIDは readonly。本モックはサーバー検証エラー（メール重複）を表示した状態。
+    </p>
+
+    <div class="sks-profile">
+      <div class="row">
+
+        <!-- 事業者情報（参照モードのまま） -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default sks-profile-card">
+            <div class="panel-heading">
+              <h3 class="panel-title">事業者情報</h3>
+            </div>
+            <div class="panel-body">
+              <div>
+                <dl class="sks-field-list">
+                  <dt>事業者名（法人名／屋号）</dt>
+                  <dd>株式会社テスト</dd>
+                  <dt>所在地</dt>
+                  <dd>東京都千代田区丸の内1-2-3</dd>
+                  <dt>業種</dt>
+                  <dd>サービス業</dd>
+                  <dt>従業員数</dt>
+                  <dd>12 名</dd>
+                  <dt>事業者区分</dt>
+                  <dd>法人</dd>
+                  <dt>法人番号／本人識別情報</dt>
+                  <dd>1234567890123</dd>
+                </dl>
+                <button type="button" class="btn btn-primary">編集する</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- アカウント情報（編集モード＋エラー） -->
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default sks-profile-card">
+            <div class="panel-heading">
+              <h3 class="panel-title">アカウント情報</h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- ng-if="c.accountErrors.length" / ng-repeat="err in c.accountErrors track by $index" -->
+              <div class="alert alert-danger" role="alert">
+                <ul class="list-unstyled sks-error-list">
+                  <li>このメールアドレスは既に使用されています。</li>
+                </ul>
+              </div>
+
+              <!-- ng-if="c.accountMode === 'edit'" -->
+              <form name="accountForm" novalidate>
+                <div class="form-group">
+                  <label for="sks-account-email">メールアドレス <span class="text-danger">*</span></label>
+                  <input type="email" id="sks-account-email" name="accountEmail" class="form-control"
+                         maxlength="256" required value="hanako.jigyo@example.co.jp" />
+                </div>
+
+                <div class="form-group">
+                  <label for="sks-account-user-id">ユーザID</label>
+                  <input type="text" id="sks-account-user-id" class="form-control" value="sks.demo" readonly />
+                  <span class="help-block">ユーザIDは変更できません。</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">保存する</button>
+                <button type="button" class="btn btn-default">キャンセル</button>
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

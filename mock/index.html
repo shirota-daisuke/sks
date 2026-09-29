@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  成長加速支援補助金 申請ポータル — 画面モック一覧（実装用HTML）
+  ============================================================================
+  対象：ポータル系（HLC主担当）事業者向け画面 SC-00〜SC-10
+  各画面は1ページ内で表示状態が切り替わる構成のため、表示状態ごとに1ファイルとしている。
+  DOM構造・class名・文言は実装（src/fluent/sp-widget/<widget>/template.html）と同一に保ち、
+  AngularJS ディレクティブを静的化して HTML コメントで併記している。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>申請ポータル 画面モック一覧（SC-00〜SC-10）</title>
+<link rel="stylesheet" href="assets/sks-mock.css" />
+<style>
+  .idx-wrap { max-width: 1180px; margin: 0 auto; padding: 32px 16px 56px; }
+  .idx-head { margin-bottom: 24px; }
+  .idx-head h1 { margin: 0 0 6px; font-size: 22px; }
+  .idx-head p { margin: 0; color: #777; font-size: 13px; line-height: 1.8; }
+  .idx-table { background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 28px; }
+  .idx-table th, .idx-table td { padding: 9px 12px; border-top: 1px solid #eee; font-size: 13px; vertical-align: top; }
+  .idx-table thead th { background: #f5f5f5; border-top: 0; color: #555; font-weight: bold; white-space: nowrap; }
+  .idx-table td code, .idx-head code, .idx-list code {
+      padding: 1px 4px; background: #f7f7f9; border: 1px solid #e1e1e8; border-radius: 3px;
+      font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #a33;
+  }
+  .idx-sc { width: 78px; white-space: nowrap; font-weight: bold; }
+  .idx-file { white-space: nowrap; }
+  .idx-section { margin: 28px 0 10px; font-size: 16px; font-weight: bold; }
+  .idx-guest { color: #8a6d3b; font-size: 11px; }
+  .idx-list { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px 14px 34px; margin-bottom: 20px; }
+  .idx-list li { margin-bottom: 8px; font-size: 13px; line-height: 1.8; }
+  .idx-list li:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div class="idx-wrap">
+
+  <div class="idx-head">
+    <h1>申請ポータル 画面モック一覧（SC-00〜SC-10）— 実装用HTML</h1>
+    <p>
+      成長加速支援補助金 申請ポータル・審査システム／ポータル系（HLC主担当）事業者向け画面<br />
+      スコープ <code>x_dent2_dentsusoke</code>／ポータル <code>/x_dent2_dentsusoke_sks</code>
+      ｜ 実装：<code>src/fluent/sp-page/</code>・<code>src/fluent/sp-widget/</code>
+    </p>
+  </div>
+
+  <div class="idx-section">画面・表示状態の一覧</div>
+  <table class="table idx-table">
+    <thead>
+      <tr>
+        <th class="idx-sc">画面</th>
+        <th>表示状態</th>
+        <th class="idx-file">ファイル</th>
+        <th>表示条件</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="idx-sc">SC-00<br /><span class="idx-guest">未ログイン</span></td>
+        <td>トップ（ヒーロー＋案内カード3枚）</td>
+        <td class="idx-file"><a href="SC-00/sc-00-01-top.html">SC-00/sc-00-01-top.html</a></td>
+        <td><code>data.redirectUrl === ''</code>（ログイン済み事業者はマイページへ自動遷移）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-01<br /><span class="idx-guest">未ログイン</span></td>
+        <td>ログイン 初期表示</td>
+        <td class="idx-file"><a href="SC-01/sc-01-01-login.html">SC-01/sc-01-01-login.html</a></td>
+        <td>OOTB ログインウィジェット＋補足リンク（SSO未設定案内）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>ログイン 認証エラー</td>
+        <td class="idx-file"><a href="SC-01/sc-01-02-auth-error.html">SC-01/sc-01-02-auth-error.html</a></td>
+        <td>プラットフォーム標準認証のエラー表示（実装対象外）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-02<br /><span class="idx-guest">未ログイン</span></td>
+        <td>仮登録 初期表示</td>
+        <td class="idx-file"><a href="SC-02/sc-02-01-form.html">SC-02/sc-02-01-form.html</a></td>
+        <td><code>c.view === 'form'</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>仮登録 入力エラー</td>
+        <td class="idx-file"><a href="SC-02/sc-02-02-error.html">SC-02/sc-02-02-error.html</a></td>
+        <td><code>c.serverErrors.length &gt; 0</code>／各欄 <code>$touched &amp;&amp; $invalid</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>仮登録 完了</td>
+        <td class="idx-file"><a href="SC-02/sc-02-03-done.html">SC-02/sc-02-03-done.html</a></td>
+        <td><code>c.view === 'done'</code>（処理No.1／処理No.2）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-03<br /><span class="idx-guest">トークン</span></td>
+        <td>本登録 フォーム表示</td>
+        <td class="idx-file"><a href="SC-03/sc-03-01-form.html">SC-03/sc-03-01-form.html</a></td>
+        <td><code>data.state === 'form'</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>本登録 入力エラー</td>
+        <td class="idx-file"><a href="SC-03/sc-03-02-error.html">SC-03/sc-03-02-error.html</a></td>
+        <td><code>c.serverErrors</code>／<code>c.passwordMismatch()</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>本登録 完了（登録申請審査中）</td>
+        <td class="idx-file"><a href="SC-03/sc-03-03-done.html">SC-03/sc-03-03-done.html</a></td>
+        <td><code>data.state === 'done'</code>（処理No.3／4／5）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>本登録 リンク無効／期限切れ</td>
+        <td class="idx-file"><a href="SC-03/sc-03-04-invalid-expired.html">SC-03/sc-03-04-invalid-expired.html</a></td>
+        <td><code>data.state === 'invalid' / 'expired'</code>（★排他・確認用に併記）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-04<br /><span class="idx-guest">未ログイン</span></td>
+        <td>パスワードリセット 初期表示（STEP1）</td>
+        <td class="idx-file"><a href="SC-04/sc-04-01-step1.html">SC-04/sc-04-01-step1.html</a></td>
+        <td><code>tokenState === 'none'</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>STEP1 送信完了</td>
+        <td class="idx-file"><a href="SC-04/sc-04-02-sent.html">SC-04/sc-04-02-sent.html</a></td>
+        <td><code>c.sent === true</code>（処理No.11 前半）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>STEP2 入力可</td>
+        <td class="idx-file"><a href="SC-04/sc-04-03-step2.html">SC-04/sc-04-03-step2.html</a></td>
+        <td><code>tokenState === 'valid'</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>STEP2 トークン不正／期限切れ</td>
+        <td class="idx-file"><a href="SC-04/sc-04-04-token-error.html">SC-04/sc-04-04-token-error.html</a></td>
+        <td><code>tokenState === 'invalid' / 'expired'</code>（★排他・確認用に併記）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>パスワード更新完了</td>
+        <td class="idx-file"><a href="SC-04/sc-04-05-updated.html">SC-04/sc-04-05-updated.html</a></td>
+        <td><code>tokenState === 'used'</code>（処理No.11 後半→SC-01へ遷移）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-05</td>
+        <td>マイページ 初期表示</td>
+        <td class="idx-file"><a href="SC-05/sc-05-01-mypage.html">SC-05/sc-05-01-mypage.html</a></td>
+        <td><code>data.isApplicant === true</code>（D1〜D5）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>マイページ データなし</td>
+        <td class="idx-file"><a href="SC-05/sc-05-02-no-data.html">SC-05/sc-05-02-no-data.html</a></td>
+        <td>申請0件・未読0件・問合せ0件・お知らせ0件</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>マイページ 事業者ユーザ以外</td>
+        <td class="idx-file"><a href="SC-05/sc-05-03-not-applicant.html">SC-05/sc-05-03-not-applicant.html</a></td>
+        <td><code>data.isApplicant === false</code></td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-06</td>
+        <td>自分の情報 参照モード</td>
+        <td class="idx-file"><a href="SC-06/sc-06-01-view.html">SC-06/sc-06-01-view.html</a></td>
+        <td><code>entityMode === 'view'</code> かつ <code>accountMode === 'view'</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>事業者情報 編集モード</td>
+        <td class="idx-file"><a href="SC-06/sc-06-02-entity-edit.html">SC-06/sc-06-02-entity-edit.html</a></td>
+        <td><code>entityMode === 'edit'</code>（処理No.14）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>事業者情報 更新完了</td>
+        <td class="idx-file"><a href="SC-06/sc-06-03-entity-saved.html">SC-06/sc-06-03-entity-saved.html</a></td>
+        <td><code>c.entitySaved === true</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>アカウント情報 編集モード（重複エラー）</td>
+        <td class="idx-file"><a href="SC-06/sc-06-04-account-edit.html">SC-06/sc-06-04-account-edit.html</a></td>
+        <td><code>accountMode === 'edit'</code>（処理No.15）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-07</td>
+        <td>申請状況 一覧＋詳細（審査中）</td>
+        <td class="idx-file"><a href="SC-07/sc-07-01-list-detail.html">SC-07/sc-07-01-list-detail.html</a></td>
+        <td><code>data.selected != null</code>（D1〜D3）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>申請状況 不備修正中</td>
+        <td class="idx-file"><a href="SC-07/sc-07-02-defect-fixing.html">SC-07/sc-07-02-defect-fixing.html</a></td>
+        <td><code>status === 'defect_fixing'</code>（連携先URL未設定のため案内表示）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>申請状況 申請0件</td>
+        <td class="idx-file"><a href="SC-07/sc-07-03-empty.html">SC-07/sc-07-03-empty.html</a></td>
+        <td><code>data.applications.length === 0</code></td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-08</td>
+        <td>お知らせ一覧 初期表示（未読／既読）</td>
+        <td class="idx-file"><a href="SC-08/sc-08-01-list.html">SC-08/sc-08-01-list.html</a></td>
+        <td><code>data.notices.length &gt; 0</code>（処理No.40・41・43・44）</td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>お知らせ一覧 0件</td>
+        <td class="idx-file"><a href="SC-08/sc-08-02-empty.html">SC-08/sc-08-02-empty.html</a></td>
+        <td><code>data.notices.length === 0</code></td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-09</td>
+        <td>お知らせ詳細（重要度＝高）</td>
+        <td class="idx-file"><a href="SC-09/sc-09-01-detail.html">SC-09/sc-09-01-detail.html</a></td>
+        <td><code>data.found === true</code></td>
+      </tr>
+      <tr>
+        <td class="idx-sc"></td>
+        <td>お知らせ詳細 対象なし</td>
+        <td class="idx-file"><a href="SC-09/sc-09-02-not-found.html">SC-09/sc-09-02-not-found.html</a></td>
+        <td><code>data.found === false</code>（★2ケースを併記）</td>
+      </tr>
+
+      <tr>
+        <td class="idx-sc">SC-10</td>
+        <td>問合せ一覧・作成（7状態）</td>
+        <td class="idx-file"><a href="SC-10/index.html">SC-10/index.html</a></td>
+        <td>初期表示／入力エラー／送信完了／詳細（未回答・回答済）／0件／権限外</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="idx-section">別冊</div>
+  <ul class="idx-list">
+    <li>
+      <b><a href="APPENDIX/index.html">付録：画面番号未定の実装済み画面</a></b>
+      — 本一覧と同じ「実装の写し」ですが、画面設計書に画面番号が無いため分けています。
+      現在は「申請の入力」（<code>x_dent2_dentsusoke_apply</code>）の3ファイルを収録。
+      <b>画面設計書への追番が必要です。</b>
+    </li>
+    <li>
+      <b><a href="ITCOM/index.html">ITCOM 担当範囲（申請機能・審査プロセス）</a></b>
+      — 処理No.16 以降の申請系・審査プロセスは ITCOM 主担当の範囲で未実装です。
+      その部分の画面イメージをまとめています（ITCOM-01〜09）。
+      <b>実装が存在しないため設計提案です</b>（画面番号も仮番号 <code>ITCOM-nn</code>）。
+    </li>
+  </ul>
+
+  <div class="idx-section">実装との対応</div>
+  <ul class="idx-list">
+    <li>
+      画面の枠（ヘッダー・トップタブ）は <code>.mock-header</code>／<code>.mock-tabs</code> のモック専用要素です。
+      実装では OOTB Stock Header と Header Menu（<code>src/fluent/sp-instance-menu/menu.now.ts</code> の5タブ）が描画します。
+      未ログイン画面（SC-00〜SC-04）はタブを表示しません。
+    </li>
+    <li>
+      <code>&lt;div class="sks-*"&gt;</code> 以下がウィジェットの描画範囲で、<code>template.html</code> と同一の
+      DOM 構造・class 名・文言です。分岐は <code>&lt;!-- ng-if="..." --&gt;</code> の形でコメント併記しています。
+    </li>
+    <li>
+      スタイルは <code>assets/sks-mock.css</code>（SC-00〜SC-09）に集約しています。前半は Bootstrap 3 相当の最小サブセット、
+      後半が各ウィジェットの <code>styles.scss</code> 相当で、SCSS変数はBootstrap 3の既定値で解決しています。
+      実際の色はポータルテーマ（OOTB Coral）により変わります。SC-10 は <code>SC-10/assets/sc-10-mock.css</code> に同等の内容を持っています。
+    </li>
+    <li>
+      アイコンは実装では Font Awesome（<code>&lt;i class="fa fa-*"&gt;</code>）ですが、モックは外部CSSを読み込まないため
+      インラインSVGで代替しています。
+    </li>
+    <li>
+      ★印のファイルは、実装では排他表示となる複数状態をレビュー用に1ファイルへ並べたものです。
+    </li>
+    <li>
+      表示データは検証環境のデモデータに沿えています（事業者：株式会社テスト／ユーザ：事業 太郎（sks.demo）／
+      申請：APP-2026-00123）。SC-06・SC-07 の一部、SC-10 の回答済データは状態を確認するための追加データで、実インスタンスには未登録です。
+      申請 APP-2026-00123 も手置きのデモデータだったため削除しました（申請の入力画面 ITCOM-01〜03 の実装により、
+      事業者が自分で申請を作成できるようになったため）。モックの表示値はそのまま残しています。
+    </li>
+  </ul>
+
+  <div class="idx-section">モック作成時に反映した実装課題（単体テスト結果より）</div>
+  <ul class="idx-list">
+    <li>
+      <b>SC-04 STEP1</b>（No.41・NG軽微）：メール形式不正時にエラーメッセージが表示されない。
+      <a href="SC-04/sc-04-01-step1.html">sc-04-01-step1.html</a> のコメントに修正案（help-block の追加）を記載。
+    </li>
+    <li>
+      <b>SC-06 事業者情報</b>（No.65・NG軽微）：必須未入力時にエラーメッセージが表示されない。
+      <a href="SC-06/sc-06-02-entity-edit.html">sc-06-02-entity-edit.html</a> のコメントに修正案を記載。
+    </li>
+    <li>
+      <b>SC-05 ロール不足時のアクセス</b>（No.59・保留）：admin は 404 にならずページが開く可能性がある。
+      その場合の表示を <a href="SC-05/sc-05-03-not-applicant.html">sc-05-03-not-applicant.html</a> に用意。
+    </li>
+    <li>
+      <b>お知らせ read ACL の不正値</b>（権限No.9・NG重要）：画面表示（ウィジェットの GlideRecord 経由）には
+      影響しないため、モックの内容には反映していません。ACL 側の修正が必要です。
+    </li>
+  </ul>
+
+  <div class="idx-section">未確定事項（モックに反映していないもの）</div>
+  <ul class="idx-list">
+    <li><b>SC-00 ⑥／SC-01 ⑥</b>：サービス説明文言・SSO（IF-01）採用方式。文言はウィジェットオプションで差し替え可。</li>
+    <li><b>SC-02／SC-03</b>：ログインIDの命名規則、パスワードの桁数・複雑性ルール（暫定8文字以上128文字以内）。</li>
+    <li><b>SC-03 ④</b>：仮登録トークンの有効期限（暫定7日）、SC-04 の再設定リンク有効期限（暫定24時間）。</li>
+    <li><b>SC-06 ②F5</b>：メールアドレス変更時の再認証要否（現状は再認証なし）。</li>
+    <li><b>SC-07 ③No.3</b>：申請取下げの採用要否（A02）。実装済みだが <code>show_withdraw=false</code> で非表示。</li>
+    <li><b>SC-07 ⑥／A03</b>：不備修正時の申請入力機能との連携方式（<code>application_form_url</code> 未設定）。</li>
+    <li><b>SC-09 ⑥</b>：既読化のタイミング（現状は一覧クリック時。<code>mark_read_on_view</code> で切替可）。</li>
+  </ul>
+
+</div>
+
+</body>
+</html>

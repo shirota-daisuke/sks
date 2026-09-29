@@ -1,0 +1,290 @@
+<!-- 申請の内容確認・提出（ITCOM-04）：確認画面と提出完了 -->
+<div class="sks-confirm">
+
+  <div class="alert alert-warning" ng-if="!c.data.isApplicant" role="alert">
+    {{c.data.message}}
+  </div>
+
+  <!-- 提出完了 -->
+  <div ng-if="c.data.state === 'done'" class="panel panel-default sks-confirm-card">
+    <div class="panel-body text-center sks-confirm-done">
+      <svg class="mock-icon" viewBox="0 0 16 16" width="48" height="48" style="fill:#5cb85c;">
+        <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.7 5.3l-4.4 5.3a.7.7 0 01-1 .1L3.8 8.4a.7.7 0 01.9-1l1.9 1.6 3.9-4.7a.7.7 0 011.1.9z" />
+      </svg>
+      <h2 class="sks-confirm-title">申請を受け付けました</h2>
+      <p class="sks-done-lead">申請番号：<strong>{{c.data.submitResult.applicationNumber}}</strong></p>
+
+      <dl class="sks-confirm-list sks-done-list">
+        <dt>対象経費合計</dt>
+        <dd>{{c.data.submitResult.totalExpense | number}}円</dd>
+        <dt>補助上限額</dt>
+        <dd>{{c.data.submitResult.capAmount | number}}円</dd>
+        <dt>補助率</dt>
+        <dd>{{c.data.submitResult.rateLabel}}</dd>
+        <dt>補助金額（試算）</dt>
+        <dd><strong>{{c.data.submitResult.subsidyAmount | number}}円</strong></dd>
+      </dl>
+
+      <p class="text-muted sks-done-note">
+        事務局にて審査を行います。審査状況は「申請」画面でご確認いただけます。
+      </p>
+      <p class="text-muted sks-done-warning" ng-repeat="w in c.data.submitResult.warnings track by $index">
+        {{w}}
+      </p>
+
+      <a class="btn btn-primary" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a>
+    </div>
+  </div>
+
+  <!-- 提出できる申請が無い／提出済み -->
+  <div ng-if="c.data.isApplicant && (c.data.state === 'no_draft' || c.data.state === 'locked')"
+       class="panel panel-default sks-confirm-card">
+    <div class="panel-body text-center sks-confirm-message">
+      <svg class="mock-icon" viewBox="0 0 16 16" width="42" height="42"
+           ng-attr-style="{{c.data.state === 'locked' ? 'fill:#5bc0de' : 'fill:#f0ad4e'}}">
+        <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3.2a1 1 0 110 2 1 1 0 010-2zm1.2 9.3H6.8v-1h.8V7.8h-.8v-1h2.4v5.7h.8v1z" />
+      </svg>
+      <h2 class="sks-confirm-title">申請を提出できません</h2>
+      <p class="text-muted">{{c.data.message}}</p>
+      <p>
+        <a class="btn btn-primary" ng-if="c.data.state === 'no_draft'" ng-href="{{c.data.applyUrl}}">申請の入力へ</a>
+        <a class="btn btn-primary" ng-if="c.data.state === 'locked'" ng-href="{{c.data.applicationsUrl}}">申請状況を確認する</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- 内容確認 -->
+  <div ng-if="c.data.isApplicant && c.data.state === 'form'">
+
+    <ul class="sks-confirm-steps">
+      <li class="is-done">
+        <a ng-href="{{c.data.applyUrl}}"><span class="sks-step-no">1</span>基本情報</a>
+      </li>
+      <li class="is-done">
+        <a ng-href="{{c.data.expenseUrl}}"><span class="sks-step-no">2</span>対象経費</a>
+      </li>
+      <li class="is-done">
+        <a ng-href="{{c.data.documentUrl}}"><span class="sks-step-no">3</span>添付書類</a>
+      </li>
+      <li class="is-active"><span class="sks-step-no">4</span>内容確認・提出</li>
+    </ul>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="panel panel-default sks-confirm-card">
+          <div class="panel-body">
+            <h2 class="sks-confirm-title">申請内容の確認</h2>
+
+            <p class="sks-confirm-lead">
+              以下の内容で申請を提出します。<strong>提出後は内容を変更できません。</strong>
+              修正が必要な場合は各項目の「修正」から戻ってください。
+            </p>
+
+            <div class="alert alert-danger" ng-if="c.serverErrors.length" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.serverErrors track by $index">{{err}}</li>
+              </ul>
+            </div>
+
+            <!-- 提出できない理由。押す前に示して該当のステップへ戻せるようにする -->
+            <div class="alert alert-warning sks-blockers" ng-if="c.data.blockers.length" role="alert">
+              <p class="sks-blockers-title">次の項目が未入力・未提出のため、まだ提出できません。</p>
+              <!--
+                この判定は保存済みの申請の内容で行う。
+                入力欄に値が見えていても保存していない場合は未入力として扱われるため、
+                その可能性を案内に含める。
+              -->
+              <p class="sks-blockers-hint">
+                入力済みのはずの項目が並んでいる場合は、その画面で保存されていない可能性があります。
+                該当の画面を開いて保存してからお試しください。
+              </p>
+              <ul class="sks-blockers-list">
+                <li ng-repeat="b in c.data.blockers track by $index">
+                  {{b.message}}
+                  <a ng-href="{{b.url}}">{{b.label}}</a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- 事業者情報 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h3>事業者情報</h3>
+                <a ng-href="{{c.data.profileUrl}}">自分の情報で変更</a>
+              </div>
+              <dl class="sks-confirm-list">
+                <dt>事業者名</dt>
+                <dd>{{c.data.entity.businessName}}</dd>
+                <dt>事業者区分</dt>
+                <dd>{{c.data.entity.entityTypeLabel}}</dd>
+                <dt>法人番号</dt>
+                <dd>{{c.data.entity.corporateNumber || '—'}}</dd>
+                <dt>所在地</dt>
+                <dd>{{c.data.entity.address}}</dd>
+                <dt>業種</dt>
+                <dd>{{c.data.entity.industryLabel}}</dd>
+              </dl>
+            </div>
+
+            <!-- 申請区分・売上増加率 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h3>申請区分・売上増加率</h3>
+                <a ng-href="{{c.data.applyUrl}}">修正</a>
+              </div>
+              <dl class="sks-confirm-list">
+                <dt>組織形態</dt>
+                <dd>{{c.data.request.organizationTypeLabel || '未選択'}}</dd>
+                <dt>従業員数区分</dt>
+                <dd>{{c.data.request.employeeCategoryLabel || '未選択'}}</dd>
+                <dt>売上増加率対象月</dt>
+                <dd>{{c.data.request.salesIncreaseTargetMonthLabel || '未入力'}}</dd>
+                <dt>売上増加率</dt>
+                <dd>{{c.data.request.salesIncreaseRateLabel || '未入力'}}</dd>
+                <dt>特例措置</dt>
+                <dd>{{c.data.request.specialMeasure ? '対象' : '対象外'}}</dd>
+              </dl>
+            </div>
+
+            <!-- 対象経費 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h3>対象経費</h3>
+                <a ng-href="{{c.data.expenseUrl}}">修正</a>
+              </div>
+              <table class="table sks-confirm-table">
+                <thead>
+                  <tr>
+                    <th>経費区分</th>
+                    <th>内容</th>
+                    <th class="sks-col-days">日数</th>
+                    <th class="sks-col-amount">金額（円）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="item in c.data.items track by item.sys_id"
+                      ng-class="{'sks-row-error': item.capError}">
+                    <td>
+                      {{item.categoryName}}
+                      <span class="sks-expert" ng-if="item.expertFeeName">（{{item.expertFeeName}}）</span>
+                    </td>
+                    <td>
+                      {{item.description}}
+                      <p class="sks-cap-error" ng-if="item.capError">{{item.capError}}</p>
+                    </td>
+                    <td class="sks-col-days">{{item.days === '' ? '—' : item.days}}</td>
+                    <td class="sks-col-amount">{{item.amountLabel}}</td>
+                  </tr>
+                  <tr ng-if="!c.data.items.length">
+                    <td colspan="4" class="text-muted sks-empty">対象経費の明細が登録されていません。</td>
+                  </tr>
+                  <tr class="sks-confirm-total" ng-if="c.data.items.length">
+                    <td colspan="3">対象経費合計</td>
+                    <td class="sks-col-amount">{{c.data.totalExpenseLabel}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 添付書類 -->
+            <div class="sks-confirm-block">
+              <div class="sks-confirm-head">
+                <h3>添付書類</h3>
+                <a ng-href="{{c.data.documentUrl}}">修正</a>
+              </div>
+              <dl class="sks-confirm-list sks-confirm-documents">
+                <dt ng-repeat-start="doc in c.data.documents track by doc.sys_id">
+                  {{doc.documentTypeLabel}}
+                  <span class="label label-danger sks-doc-required" ng-if="doc.required">必須</span>
+                </dt>
+                <dd ng-repeat-end ng-class="{'sks-doc-unsubmitted': doc.required && !doc.submitted}">
+                  <span ng-if="doc.submitted">
+                    <a ng-href="{{doc.downloadUrl}}" target="_blank" rel="noopener">{{doc.fileName}}</a>
+                    <span class="sks-doc-size">{{doc.sizeLabel}}</span>
+                  </span>
+                  <span ng-if="!doc.submitted">未提出</span>
+                </dd>
+              </dl>
+            </div>
+
+            <!-- 同意事項。文面は未確定のためウィジェットのオプションで差し替える -->
+            <div class="sks-confirm-block sks-consent">
+              <div class="sks-confirm-head">
+                <h3>申請にあたっての確認</h3>
+              </div>
+              <div class="checkbox" ng-repeat="text in c.data.consentItems track by $index">
+                <label>
+                  <input type="checkbox" ng-model="c.consent[$index]" />
+                  {{text}}
+                </label>
+              </div>
+              <p class="help-block" ng-if="!c.isConsented()">
+                すべての項目に同意すると提出できます。
+              </p>
+            </div>
+
+            <div class="sks-confirm-actions">
+              <a class="btn btn-default" ng-href="{{c.data.documentUrl}}">戻る（添付書類）</a>
+              <button type="button" class="btn btn-primary btn-lg" ng-click="c.submit()"
+                      ng-disabled="!c.canSubmit()">
+                <span ng-if="c.submitting"><i class="fa fa-spinner fa-spin"></i> 送信中…</span>
+                <span ng-if="!c.submitting">申請を提出する</span>
+              </button>
+            </div>
+
+            <p class="sks-confirm-note">{{c.data.note}}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 補助金額の試算（処理No.17） -->
+      <div class="col-md-4">
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">補助金額（試算）</div>
+          <div class="panel-body">
+            <div ng-if="c.data.estimate.ok">
+              <dl class="sks-estimate-list">
+                <dt>対象経費合計</dt>
+                <dd>{{c.data.estimate.totalExpense}}</dd>
+                <dt>補助率</dt>
+                <dd>{{c.data.estimate.rateLabel}}</dd>
+                <dt>補助率適用後</dt>
+                <dd>{{c.data.estimate.byRate}}</dd>
+                <dt>補助上限額</dt>
+                <dd>{{c.data.estimate.capAmount}}</dd>
+                <dt class="sks-estimate-total">補助金額</dt>
+                <dd class="sks-estimate-total">{{c.data.estimate.subsidyAmount}}</dd>
+              </dl>
+              <p class="text-muted sks-estimate-capped" ng-if="c.data.estimate.cappedByLimit">
+                対象経費に補助率を適用した額が補助上限額を超えるため、上限額が適用されています。
+              </p>
+              <p class="text-muted sks-estimate-disclaimer">
+                試算値です。確定額は事務局の審査により決定します。
+              </p>
+            </div>
+
+            <div class="alert alert-warning" ng-if="!c.data.estimate.ok" role="alert">
+              <ul class="list-unstyled sks-error-list">
+                <li ng-repeat="err in c.data.estimate.errors track by $index">{{err}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default sks-estimate-card">
+          <div class="panel-heading">提出後の流れ</div>
+          <div class="panel-body">
+            <ol class="sks-flow-list">
+              <li>事務局が受付内容を確認します（受付済）。</li>
+              <li>一次審査を行います。不備がある場合は不備確認の依頼が届きます。</li>
+              <li>採択・不採択が確定すると申請状況に反映されます。</li>
+            </ol>
+            <p class="text-muted sks-flow-note">
+              提出後の内容変更はできません。不備確認の依頼を受けた場合のみ修正できます。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

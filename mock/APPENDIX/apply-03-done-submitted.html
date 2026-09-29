@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  申請入力・提出画面 ③提出完了／④提出済み（下書きなし）／⑤権限外
+  ============================================================================
+  位置づけ   実装済み画面の写し。画面設計書に画面番号が無い（付録扱い）。
+  実装       src/fluent/sp-widget/application-form/
+
+  ★ 実装では排他表示となる3つの状態をレビュー用に1ファイルへ並べている。
+       ③ data.state === 'done'       提出直後
+       ④ data.state === 'submitted'  下書きが無く提出済みの申請がある
+       ⑤ data.isApplicant === false  事業者に紐づかないアカウント
+  ============================================================================
+  実装との対応
+    ③提出完了
+      ・submit() の成功時に return しており、以降の下書き読み込みを行わない
+        （server_script.js：data.state = 'done' の直後に return）。
+      ・申請番号は提出時に採番する（APP-<西暦>-<5桁連番>）。
+        下書きの時点では u_application_number に '(下書き)' を入れている
+        （T03 で mandatory のため値が必要）。
+      ・金額は Angular の number フィルタでカンマ区切りにしている
+        （{{... | number}}円）。他の画面はサーバー側で整形しているが、
+        submit() の戻り値は整数のままのためクライアント側で整形している。
+      ・warnings は ng-repeat で列挙する。現状は申請受付メールの未送信を伝える1件のみ。
+
+    ④提出済み（下書きなし）
+      ・1事業者1申請の想定。下書きが無く提出済みの申請がある場合は
+        入力フォームを出さず、この案内のみを表示する。
+      ・ステータスは ApplicationStatusUtil で事業者用表記へ変換
+        （DB値 accepted → 「受付済」）。色は getLabelClass() による。
+      ・「内容の変更が必要な場合は事務局へお問い合わせください」としているのは、
+        提出後は ACL（acl_request_write_applicant：自社かつ input のみ）で
+        事業者側から更新できないため。
+
+    ⑤権限外
+      ・ページ側で roles: applicant / applicant_admin を要求しているため、
+        通常はこの状態に到達しない（Service Portal が 404 ページへ遷移する）。
+        ただし admin は全ロールを満たすため到達しうる。
+      ・PortalContextUtil.getMyEntityId() が空の場合に表示する。
+  ============================================================================
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>申請入力・提出 ③提出完了／④提出済み／⑤権限外</title>
+<link rel="stylesheet" href="../assets/sks-mock.css" />
+<link rel="stylesheet" href="assets/appendix-mock.css" />
+</head>
+<body>
+
+<header class="mock-header">
+  <div class="container mock-header-inner">
+    <span class="mock-portal-title">成長加速支援補助金 申請ポータル</span>
+    <span class="mock-user">事業 太郎 様（株式会社テスト）</span>
+  </div>
+</header>
+
+<nav class="mock-tabs">
+  <div class="container">
+    <ul>
+      <li><a href="../SC-05/sc-05-01-mypage.html">マイページ</a></li>
+      <li><a href="../SC-07/sc-07-01-list-detail.html">申請</a></li>
+      <li class="is-active"><a href="#">申請の入力</a></li>
+      <li><a href="../SC-08/sc-08-01-list.html">お知らせ</a></li>
+      <li><a href="../SC-10/sc-10-01-list-new.html">問合せ</a></li>
+      <li><a href="../SC-06/sc-06-01-view.html">自分の情報</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="mock-main">
+  <div class="container">
+
+    <p class="mock-appendix">
+      <b>実装済みの画面です（実装の写し）。</b>
+      ★ 実装では排他表示となる3つの状態を、レビュー用に1ファイルへ並べています。
+    </p>
+
+    <!-- ================================================================== -->
+    <p class="mock-note">
+      <b>③提出完了</b>（<code>data.state === 'done'</code>）：
+      「申請を提出」の確認ダイアログで OK した後。申請番号が採番され、
+      ステータスが 申請入力中 → 受付済 へ遷移している。
+    </p>
+
+    <div class="sks-apply">
+      <!-- ng-if="c.data.state === 'done'" -->
+      <div class="panel panel-default sks-apply-card">
+        <div class="panel-body text-center sks-apply-message">
+          <!-- 実装では <i class="fa fa-check-circle fa-3x text-success">。モックはインラインSVGで代替 -->
+          <svg class="mock-icon mock-icon-3x" viewBox="0 0 16 16" style="fill:#5cb85c;">
+            <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.7 5.3l-4.4 5.3a.7.7 0 01-1 .1L3.8 8.4a.7.7 0 01.9-1l1.9 1.6 3.9-4.7a.7.7 0 011.1.9z" />
+          </svg>
+          <h2 class="sks-apply-title">申請を受け付けました</h2>
+          <p class="sks-done-lead">申請番号：<strong>APP-2026-00001</strong></p>
+
+          <dl class="dl-horizontal sks-apply-result">
+            <dt>補助上限額</dt>
+            <dd>20,000,000円</dd>
+            <dt>補助率</dt>
+            <dd>1/2</dd>
+            <dt>補助金額（試算）</dt>
+            <dd><strong>4,100,000円</strong></dd>
+          </dl>
+
+          <!-- ng-repeat="w in c.data.submitResult.warnings" -->
+          <p class="text-muted">受付内容のメール通知は要否が未確定のため送信していません。申請状況は「申請」画面でご確認いただけます。</p>
+
+          <a class="btn btn-primary" href="../SC-07/sc-07-01-list-detail.html">申請状況を確認する</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <p class="mock-state-divider">★ ④提出済み（下書きなし）</p>
+    <p class="mock-note">
+      <code>data.state === 'submitted'</code>：提出後に再度「申請の入力」を開いた場合。
+      1事業者1申請の想定のため、入力フォームは表示しない。
+      提出後は ACL により事業者側から更新できないため、変更は事務局への問い合わせへ誘導している。
+    </p>
+
+    <div class="sks-apply">
+      <!-- ng-if="c.data.state === 'submitted'" -->
+      <div class="panel panel-default sks-apply-card">
+        <div class="panel-body text-center sks-apply-message">
+          <!-- 実装では <i class="fa fa-info-circle fa-3x text-info"> -->
+          <svg class="mock-icon mock-icon-3x" viewBox="0 0 16 16" style="fill:#5bc0de;">
+            <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 3.2a1 1 0 110 2 1 1 0 010-2zm1.2 9.3H6.8v-1h.8V7.8h-.8v-1h2.4v5.7h.8v1z" />
+          </svg>
+          <h2 class="sks-apply-title">申請は提出済みです</h2>
+          <p class="text-muted">
+            申請番号 <strong>APP-2026-00001</strong>
+            （<span class="label label-warning">受付済</span>）<br />
+            <!-- ng-if="c.data.latestSubmitted.submittedOn" -->
+            <span>提出日時：2026/09/24 15:08</span>
+          </p>
+          <p class="text-muted">
+            内容の変更が必要な場合は、お手数ですが事務局へお問い合わせください。
+          </p>
+          <a class="btn btn-primary" href="../SC-07/sc-07-01-list-detail.html">申請状況を確認する</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <p class="mock-state-divider">★ ⑤権限外（事業者に紐づかないアカウント）</p>
+    <p class="mock-note">
+      <code>data.isApplicant === false</code>：ページ側で applicant ロールを要求しているため
+      通常は到達しないが、admin は全ロールを満たすため到達しうる
+      （SC-05 の「事業者ユーザ以外」と同じ扱い）。
+    </p>
+
+    <div class="sks-apply">
+      <!-- ng-if="!c.data.isApplicant" -->
+      <div class="alert alert-warning" role="alert">
+        このページは事業者ユーザ向けです。事業者情報が紐づいたアカウントでログインしてください。
+      </div>
+    </div>
+
+    <p class="mock-note" style="margin-top:28px;">
+      <b>実装上の制約</b>：完了画面の「補助金額（試算）」は<b>画面表示のみ</b>です。
+      T03 申請には補助金額を保持する列が無く（上限額・補助率・対象経費のみ）、
+      事務局の一覧・帳票・ダッシュボードには出ません。列の追加が必要です。
+    </p>
+
+  </div>
+</main>
+
+</body>
+</html>
